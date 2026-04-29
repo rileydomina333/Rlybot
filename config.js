@@ -28,8 +28,8 @@ global.owner = [
 ];
 
 
-global.mods = ['xxxxxxxxxx'];
-global.prems = ['xxxxxxxxxx', 'xxxxxxxxxx'];
+global.mods = ['584167240185'];
+global.prems = ['584167240185', 'xxxxxxxxxx'];
 
 global.multiplier = 69;
 global.maxwarn = '4';
