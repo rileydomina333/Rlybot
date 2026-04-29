@@ -9,8 +9,8 @@ import moment from 'moment-timezone';
 
 global.botnumber = '';
 global.confirmCode = '';
-global.nomebot = '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭';
-global.packname = '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭';
+global.nomebot = '𝐑𝐥𝐲𝐛𝐨𝐭';
+global.packname = '𝐑𝐥𝐲𝐛𝐨𝐭';
 global.author = '𝐌𝐝';
 global.vs = '11';
 global.collab = 'Demo';
@@ -19,7 +19,7 @@ global.wait = 'ⓘ 𝐂𝐚𝐫𝐢𝐜𝐚𝐦𝐞𝐧𝐭𝐨 ...';
 
 
 global.owner = [
-  ['393773842461', '𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲', true],
+  ['15482861344', '𝐑𝐢𝐥𝐞𝐲', true],
   ['xxxxxxxxxx'], // Numero, Nome, True (attenzione alla sintassi deve essere identico a sopra!)
   ['xxxxxxxxxx'],
   ['xxxxxxxxxx'],
