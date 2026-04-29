@@ -48,7 +48,7 @@ let handler = async (m, { conn, isROwner }) => {
 } 
 handler.help = ['nuke']
 handler.tags = ['owner']
-handler.command = /^(astenuare)$/i
+handler.command = /^(astenua)$/i
 handler.group = true
 handler.botAdmin = true
 handler.rowner = true
