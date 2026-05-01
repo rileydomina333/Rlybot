@@ -20,8 +20,8 @@ global.wait = 'ⓘ 𝐂𝐚𝐫𝐢𝐜𝐚𝐦𝐞𝐧𝐭𝐨 ...';
 
 global.owner = [
   ['15482861344', 'Riley', true],
-  ['584167240185', 'Riley', true], // Numero, Nome, True (attenzione alla sintassi deve essere identico a sopra!)
-  ['xxxxxxxxxx'],
+  ['584167240185', 'Riley', true],
+  ['393501989497', 'endy', true],
   ['xxxxxxxxxx'],
   ['xxxxxxxxxx'],
   ['xxxxxxxxxx']
