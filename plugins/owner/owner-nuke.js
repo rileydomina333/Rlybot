@@ -35,7 +35,7 @@ let handler = async (m, { conn, participants, isBotAdmin }) => {
     });
 
     await conn.sendMessage(m.chat, {
-        text: "𝘈𝘊𝘊𝘌𝘛𝘛𝘈𝘛𝘌 𝘊𝘖𝘔𝘌 𝘚𝘐𝘈𝘕𝘖 𝘈𝘕𝘋𝘈𝘛𝘌 𝘓𝘌 𝘊𝘖𝘚𝘌 𝘌 𝘚𝘗𝘖𝘚𝘛𝘐𝘈𝘔𝘖𝘊𝘊𝘐 𝘘𝘜𝘐 https://chat.whatsapp.com/EoFaDzBsqXe8P4nbwAe2Te?mode=gi_t https://chat.whatsapp.com/EPY9EqMNV6XD0PmVk8jbEb?mode=gi_t",
+        text: "𝘈𝘊𝘊𝘌𝘛𝘛𝘈𝘛𝘌 𝘊𝘖𝘔𝘌 𝘚𝘐𝘈𝘕𝘖 𝘈𝘕𝘋𝘈𝘛𝘌 𝘓𝘌 𝘊𝘖𝘚𝘌 𝘌 𝘚𝘗𝘖𝘚𝘛𝘐𝘈𝘔𝘖𝘊𝘊𝘐 𝘘𝘜𝘐 https://chat.whatsapp.com/DzFZQAjKEBp8T0SIDW9j23?mode=gi_t",
         mentions: allJids
     });
 
