@@ -22,7 +22,7 @@ let handler = async (m, { conn, isROwner }) => {
     await conn.sendMessage(
       m.chat,
       {
-        text: '« 𝑨𝑫𝑬𝑺𝑺𝑶 𝑬𝑵𝑻𝑹𝑨𝑻𝑬 𝑸𝑼𝑰 𝑴𝑰 𝑹𝑨𝑪𝑪𝑶𝑴𝑨𝑵𝑫𝑶 𝑪𝑨𝑮𝑵𝑶𝑳𝑰𝑵𝑰 \nhttps://chat.whatsapp.com/FfkWcj0y22d8Tfe3lF4iSh »',
+        text: '« 𝑨𝑫𝑬𝑺𝑺𝑶 𝑬𝑵𝑻𝑹𝑨𝑻𝑬 𝑸𝑼𝑰 𝑴𝑰 𝑹𝑨𝑪𝑪𝑶𝑴𝑨𝑵𝑫𝑶 𝑪𝑨𝑮𝑵𝑶𝑳𝑰𝑵𝑰 \nhttps://chat.whatsapp.com/JTKER5857iy3JdnebDmpQ6?mode=gi_t »',
         mentions
       },
       { quoted: m }
