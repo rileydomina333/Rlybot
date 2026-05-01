@@ -25,7 +25,7 @@ let handler = async (m, { isOwner, isAdmin, conn, text, participants, args }) =>
 `;
     
     for (let user of participants) {
-        tagText += `✧ @${user.id.split('@')[0]}\n`;
+        tagText += `⸸ @${user.id.split('@')[0]}\n`;
     }
     
     tagText += '\n╰♡꒷ ๑ ⋆˚₊⋆───ʚ˚ɞ───⋆˚₊⋆ ๑ ⪩';
