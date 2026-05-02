@@ -26,7 +26,7 @@ let handler = async (m, { conn, text, participants, command, usedPrefix }) => {
     // Messaggio del bacio
     let messaggio = `🫂 *${await conn.getName(m.sender)} ha abbracciato forte forte ${await conn.getName(utenteBaciato)}!* 🫂`;
 
-    await conn.sendMessage(m.chat, { text: messaggio, mentions: [utenteAbbracciato] }, { quoted: m });
+    await conn.sendMessage(m.chat, { text: messaggio, mentions: [utenteBaciato] }, { quoted: m });
 };
 
 handler.command = ["abbraccia"];
