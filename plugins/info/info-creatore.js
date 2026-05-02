@@ -2,7 +2,7 @@ import pkg from '@chatunity/baileys'
 const { generateWAMessageFromContent } = pkg
 
 let handler = async (m, { conn }) => {
-  const ownerNumber = '+15482861344'
+  const ownerNumber = '+584167240185'
   const ownerName = 'Riley'
   const nomebot = conn.user?.name || global.db?.data?.nomedelbot || global.nomebot || 'ChatUnity'
 
