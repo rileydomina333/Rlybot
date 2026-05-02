@@ -8,7 +8,7 @@ let handler = async (m, { conn }) => {
         forwardedNewsletterMessageInfo: {
             newsletterJid: '120363259442839354@newsletter',
             serverMessageId: 100,
-            newsletterName: `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭 ✦ Staff Ufficiale`
+            newsletterName: `𝐑𝐋𝐘𝐁𝐎𝐓-𝐌𝐃 ✦ Staff Ufficiale`
         }
     };
 
@@ -22,22 +22,22 @@ let handler = async (m, { conn }) => {
 
     // Testo elegante con i numeri in chiaro
     let testo = `
-୧・︶ ✦ 𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭 ✦ ︶・୨
+୧・︶ ✦ 𝐑𝐋𝐘𝐁𝐎𝐓-𝐌𝐃 ✦ ︶・୨
 ꒷꒦ ‧₊ 🛡️ 𝐒 𝐓 𝐀 𝐅 𝐅 🛡️ ₊‧ ꒷꒦
 ୧・︶ : ︶ : ︶ : ︶ : ︶ : ︶・୨
 
-✦ 👑 +39 377 384 2461 ~ Vale |CEO|
-✦ 👨‍💻 +39 352 058 3119 ~ Diego
-✦ 👨‍💻 +66 62 140 9462 ~ Matte
-✦ 👨‍💻 +39 329 194 4932 ~ Giuse
+✦ 👑 +1 5482861344 ~ Riley |OWN|
+✦ 👨‍💻 +39 350 198 9497 ~ endy
+✦ 👨‍💻 +81 70-9491-4530 ~ lexa
+✦ 🦾 +7 7011947373 ~ numero bot
 
-👑 _Il team dietro 𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲._
+👑 _Il team dietro 𝐑𝐋𝐘𝐁𝐎𝐓-𝐌𝐃._
 ୧・︶ : ︶ ꒷꒦ ‧₊ ୧`.trim();
 
     // 1. Invia le schede contatto (rubrica)
     await conn.sendMessage(m.chat, {
         contacts: {
-            displayName: 'Staff 𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲',
+            displayName: 'Staff 𝐑𝐋𝐘𝐁𝐎𝐓-𝐌𝐃',
             contacts: vcards
         },
         contextInfo: cuContext
