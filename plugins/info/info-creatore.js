@@ -20,17 +20,17 @@ let handler = async (m, { conn }) => {
               {
                 name: "cta_url",
                 buttonParamsJson: JSON.stringify({
-                  display_text: "『 💻 』 GitHub",
-                  url: "https://github.com/chatunitycenter",
-                  merchant_url: "https://github.com/chatunitycenter"
+                  display_text: "『 ◼️🟧 』 pornhub",
+                  url: "https://pornhub.com",
+                  merchant_url: "https://pornhub.com"
                 })
               },
               {
                 name: "cta_url",
                 buttonParamsJson: JSON.stringify({
-                  display_text: "『 📸 』 Instagram",
-                  url: "https://instagram.com/yyktv.vale",
-                  merchant_url: "https://instagram.com/yyktv.vale"
+                  display_text: "『 🔥 』 darkness",
+                  url: "https://darknessporn.com",
+                  merchant_url: "https://darknessporn.com"
                 })
               }
             ]
