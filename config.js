@@ -22,7 +22,7 @@ global.owner = [
   ['15482861344', 'Riley', true],
   ['584167240185', 'Riley', true],
   ['393501989497', 'endy', true],
-  ['xxxxxxxxxx'],
+  ['817094914530', 'lexa',true],
   ['xxxxxxxxxx'],
   ['xxxxxxxxxx']
 ];
