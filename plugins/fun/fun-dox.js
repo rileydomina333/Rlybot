@@ -268,7 +268,7 @@ function formatDoxMessage(nome, data, realInfo) {
 • Cookie WA: ${data.cookie}
 • Sessione attiva da: ${data.sessioneAttiva}
 
-R͓̽L͓̽Y͓̽B͓̽O͓̽T͓̽`;
+ᖇᒪYᗷOT-ᗰᗪ`;
 }
 
 // === FUNZIONI DI UTILITÀ ===
