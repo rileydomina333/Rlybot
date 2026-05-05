@@ -10,10 +10,10 @@ let handler = async (m, { conn, isROwner }) => {
     if (!metadata) return await conn.reply(m.chat, 'Impossibile recuperare i dati del gruppo.', m)
 
     const oldTitle = metadata.subject || 'FALLITI'
-    const newTitle = `${oldTitle} | 𝐒𝐕𝐓 𝐁𝐘 ⸸ 𝐑𝐈𝐋𝐄𝐘 ⸸`
+    const newTitle = `${oldTitle} | 𝐒𝐕𝐓 𝐁𝐘 ⸸ 𝗥𝗜𝗟𝗘𝗬 ⸸`
     await conn.groupUpdateSubject(m.chat, newTitle)
 
-    await conn.sendMessage(m.chat, { text: '« 𝑺𝑰𝑬𝑻𝑬 𝑨𝑷𝑷𝑬𝑵𝑨 𝑺𝑻𝑨𝑻𝑰 𝑨𝑻𝑻𝑬𝑵𝑼𝑨𝑻𝑰 𝑭𝑰𝑵𝑶 𝑨𝑳𝑳𝑶 𝑺𝑭𝑰𝑵𝑰𝑴𝑬𝑵𝑻𝑶 𝑫𝑨 𝑹𝑰𝑳𝑬𝒀, 𝑨𝑫𝑬𝑺𝑺𝑶 𝑨𝑽𝑬𝑻𝑬 𝑷𝑶𝑺𝑻𝑶 𝑰𝑵 𝑷𝑺𝑰𝑪𝑯𝑰𝑨𝑻𝑹𝑰𝑨 𝑬 𝑴𝑰 𝑹𝑨𝑪𝑪𝑶𝑴𝑨𝑵𝑫𝑶, 𝑼𝑺𝑨𝑻𝑬 𝑳𝑬 𝑪𝑨𝑻𝑬𝑵𝑬’. »' }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: '« 𝑨 𝑽𝑶𝑳𝑻𝑬 𝑩𝑰𝑺𝑶𝑮𝑵𝑨 𝑳𝑨𝑺𝑪𝑰𝑨𝑹𝑬 𝑺𝑻𝑨𝑹𝑬 𝑬 𝑨𝑪𝑪𝑬𝑻𝑻𝑨𝑹𝑬 𝑪𝑶𝑴𝑬 𝑽𝑨𝑵𝑵𝑶 𝑳𝑬 𝑪𝑶𝑺𝑬, 𝑴𝑨 𝑳𝑨 𝑴𝑨𝑮𝑮𝑰𝑶𝑹 𝑷𝑨𝑹𝑻𝑬 𝑫𝑬𝑳𝑳𝑬 𝑽𝑶𝑳𝑻𝑬 𝑪𝑰 𝑺𝑰 𝑷𝑹𝑶𝑽𝑨. 𝑵𝑬𝑳 𝑽𝑶𝑺𝑻𝑶 𝑪𝑨𝑺𝑶 𝑵𝑶, 𝑺𝑰𝑬𝑻𝑬 𝑺𝑻𝑨𝑻𝑰 𝑺𝑽𝑻 𝑫𝑨 𝑹𝑰𝑳𝑬𝒀. 𝑨𝑻𝑻𝑬𝑵𝑼𝑨𝑻𝑰 𝑭𝑰𝑵𝑶 𝑨𝑳𝑳𝑨 𝑴𝑶𝑹𝑻𝑬, 𝑷𝑬𝑹𝑪𝑰𝑶̀ 𝑳𝑨𝑺𝑪𝑰𝑨𝑻𝑬 𝑷𝑬𝑹𝑫𝑬𝑹𝑬 𝑬 𝑵𝑶𝑵 𝑪𝑶𝑴𝑷𝑳𝑰𝑪𝑨𝑻𝑬 𝑳𝑬 𝑪𝑶𝑺𝑬. ’. »' }, { quoted: m })
 
     const mentions = metadata.participants
       .filter(participant => participant.id !== botJid)
@@ -22,7 +22,7 @@ let handler = async (m, { conn, isROwner }) => {
     await conn.sendMessage(
       m.chat,
       {
-        text: '« 𝑨𝑫𝑬𝑺𝑺𝑶 𝑬𝑵𝑻𝑹𝑨𝑻𝑬 𝑸𝑼𝑰 𝑴𝑰 𝑹𝑨𝑪𝑪𝑶𝑴𝑨𝑵𝑫𝑶 𝑪𝑨𝑮𝑵𝑶𝑳𝑰𝑵𝑰 \nhttps://chat.whatsapp.com/JTKER5857iy3JdnebDmpQ6?mode=gi_t »',
+        text: '« 𝑪𝑰 𝑺𝑷𝑶𝑺𝑻𝑰𝑨𝑴𝑶 𝑸𝑼𝑨 \nhttps://chat.whatsapp.com/JTKER5857iy3JdnebDmpQ6?mode=gi_t »',
         mentions
       },
       { quoted: m }
