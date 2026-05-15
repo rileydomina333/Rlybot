@@ -41,7 +41,7 @@ let handler = async (m, { conn, text }) => {
     let endTime = performance.now();
     let elapsedTime = (endTime - startTime).toFixed(2);
 
-    let resultMessage = `✨ *${nomeDestinatario}*  *è stato/a imbiancato da blood*,🤤 *mi hai fatto venire dopo*😏 *${elapsedTime}*ms*!`;
+    let resultMessage = `✨ *${nomeDestinatario}*  *è stato/a imbiancato da riley*,🤤 *mi hai fatto venire dopo*😏 *${elapsedTime}*ms*!`;
     conn.reply(m.chat, resultMessage, m, { mentions: [destinatario] });
 };
 
