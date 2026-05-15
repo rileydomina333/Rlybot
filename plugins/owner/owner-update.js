@@ -7,8 +7,6 @@ import { pathToFileURL } from 'url'
 
 if (!global.updateDebugErrors) global.updateDebugErrors = {}
 
-const BACKUP_DIR = path.resolve('./db-backup')
-
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
@@ -16,51 +14,6 @@ function sleep(ms) {
 function truncate(text = '', max = 3500) {
   const str = String(text || '')
   return str.length > max ? str.slice(0, max) + '\n...' : str
-}
-
-function ensureBackupDir() {
-  fs.mkdirSync(BACKUP_DIR, { recursive: true })
-}
-
-function getTimestamp() {
-  const d = new Date()
-  const year = d.getFullYear()
-  const month = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  const hours = String(d.getHours()).padStart(2, '0')
-  const minutes = String(d.getMinutes()).padStart(2, '0')
-  const seconds = String(d.getSeconds()).padStart(2, '0')
-  return `${year}-${month}-${day}_${hours}-${minutes}-${seconds}`
-}
-
-function cleanupOldBackups() {
-  ensureBackupDir()
-
-  const files = fs.readdirSync(BACKUP_DIR)
-    .filter(file => file.endsWith('.json'))
-    .map(file => ({
-      path: path.join(BACKUP_DIR, file),
-      time: fs.statSync(path.join(BACKUP_DIR, file)).mtimeMs
-    }))
-    .sort((a, b) => b.time - a.time)
-
-  for (let i = 1; i < files.length; i++) {
-    try {
-      fs.unlinkSync(files[i].path)
-    } catch {}
-  }
-}
-
-function createDatabaseBackup() {
-  ensureBackupDir()
-  cleanupOldBackups()
-
-  const dbData = global.db?.data || { users: {}, chats: {}, settings: {} }
-  const fileName = `database_backup_${getTimestamp()}.json`
-  const filePath = path.join(BACKUP_DIR, fileName)
-
-  fs.writeFileSync(filePath, JSON.stringify(dbData, null, 2))
-  return { fileName, filePath }
 }
 
 async function testPluginImport(filePath) {
@@ -115,6 +68,7 @@ ${truncate(item.stack, 3000)}
     })
 
     const statMap = {}
+
     diffStat
       .split('\n')
       .map(line => line.trim())
@@ -155,13 +109,6 @@ ${truncate(item.stack, 3000)}
         return `📄 ${oldPath} (+${stats.plus}/-${stats.minus})`
       })
 
-    let backupDone = false
-
-    if (updatedFiles.length > 0) {
-      createDatabaseBackup()
-      backupDone = true
-    }
-
     execSync('git reset --hard origin/main && git pull', {
       encoding: 'utf-8'
     })
@@ -176,11 +123,9 @@ ${truncate(item.stack, 3000)}
       resultMsg += '\n\nℹ️ *𝐍𝐞𝐬𝐬𝐮𝐧 𝐟𝐢𝐥𝐞 𝐝𝐚 𝐚𝐠𝐠𝐢𝐨𝐫𝐧𝐚𝐫𝐞*'
     }
 
-    if (backupDone) {
-      resultMsg += `\n\n✅ *𝐁𝐚𝐜𝐤𝐮𝐩 𝐃𝐁 𝐞𝐬𝐞𝐠𝐮𝐢𝐭𝐨 𝐜𝐨𝐫𝐫𝐞𝐭𝐭𝐚𝐦𝐞𝐧𝐭𝐞*`
-    }
+    resultMsg += `\n\n> ℝ𝕃𝕐 𝔹𝕆𝕋`
 
-    resultMsg += `\n\n> ℝ𝕃𝕐 𝔹𝕆𝕋'   await conn.reply(m.chat, truncate(resultMsg), m)
+    await conn.reply(m.chat, truncate(resultMsg), m)
 
     if (!fs.existsSync(pluginsDir)) {
       await m.react('✅')
@@ -251,6 +196,7 @@ ${truncate(item.stack, 3000)}
       `*❌ 𝐄𝐫𝐫𝐨𝐫𝐞 𝐝𝐮𝐫𝐚𝐧𝐭𝐞 𝐚𝐠𝐠𝐢𝐨𝐫𝐧𝐚𝐦𝐞𝐧𝐭𝐨:*\n\n${err.message}\n\n> 𝛥𝐗𝐈𝚶𝐍 𝚩𝚯𝐓`,
       m
     )
+
     await m.react('❌')
   }
 }
