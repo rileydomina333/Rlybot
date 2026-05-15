@@ -93,7 +93,7 @@ let handler = async (m, { conn, command, usedPrefix }) => {
 ${truncate(item.stack, 3000)}
 \`\`\`
 
-> 𝐑𝐋𝐘 𝐁𝐎𝐓`
+> 𝑹𝑳𝒀 𝑩𝑶𝑻`
 
     return conn.reply(m.chat, fullMsg, m)
   }
@@ -180,7 +180,7 @@ ${truncate(item.stack, 3000)}
       resultMsg += `\n\n✅ *𝐁𝐚𝐜𝐤𝐮𝐩 𝐃𝐁 𝐞𝐬𝐞𝐠𝐮𝐢𝐭𝐨 𝐜𝐨𝐫𝐫𝐞𝐭𝐭𝐚𝐦𝐞𝐧𝐭𝐞*`
     }
 
-    resultMsg += `\n\n> 𝐑𝐋𝐘 𝐁𝐎𝐓`
+    resultMsg += `\n\n> 𝑹𝑳𝒀 𝑩𝑶𝑻`
 
     await conn.reply(m.chat, truncate(resultMsg), m)
 
@@ -221,11 +221,11 @@ ${truncate(item.stack, 3000)}
 📄 *𝐅𝐢𝐥𝐞:* ${item.file}
 💥 *𝐌𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨:* ${item.message}
 
-> 𝐑𝐋𝐘 𝐁𝐎𝐓`
+> 𝑹𝑳𝒀 𝑩𝑶𝑻`
 
         await conn.sendMessage(m.chat, {
           text: shortMsg,
-          footer: 'Rly bot',
+          footer: ',
           buttons: [
             {
               buttonId: `${usedPrefix}debugplugin ${debugId}`,
