@@ -24,7 +24,7 @@ global.owner = [
   ['393501989497', 'endy', true],
   ['817094914530', 'lexa',true],
   ['905348622918', 'immortal',true],
-  ['393780306700', 'deadly', true]
+  ['212784392820', 'deadly', true]
 ];
 
 
