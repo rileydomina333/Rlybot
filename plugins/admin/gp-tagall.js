@@ -1,191 +1,155 @@
-import fetch from 'node-fetch';
-import PhoneNumber from 'awesome-phonenumber';
+// ✦ Plugin fatto da Deadly 
 
-const handler = async (m, { conn, participants, args }) => {
-  const messaggio = args.join` `;
-  const info = messaggio ? `»『 📢 』 \`MESSAGGIO:\` *${messaggio}*` : '';
-  let messaggi = `*─ׄ─ׅ─ׄ『 .𖥔 ݁ ˖🌍── .✦ 』─ׄ─ׅ─ׄ*\n\n${info ? info + '\n' : ''}\n╭  ┄ 𝅄  ۪꒰ \`RlyBot\` ꒱  ۟   𝅄 ┄\n`;
-  
-  if (!global.emojiCache) global.emojiCache = new Map();
-  if (!global.cacheStats) global.cacheStats = { hits: 0, misses: 0, errors: 0 };
-  if (!global.cacheTimestamps) global.cacheTimestamps = new Map();
-  
-  const CACHE_TTL = 5 * 60 * 1000;
-  const now = Date.now();
-  for (const [key, timestamp] of global.cacheTimestamps.entries()) {
-    if (now - timestamp > CACHE_TTL) {
-      global.emojiCache.delete(key);
-      global.cacheTimestamps.delete(key);
-    }
-  }
-  
-  const countryEmojiFallback = {
-    '1': '🇺🇸', '39': '🇮🇹', '33': '🇫🇷', '49': '🇩🇪', '44': '🇬🇧', '34': '🇪🇸', '55': '🇧🇷',
-    '52': '🇲🇽', '54': '🇦🇷', '91': '🇮🇳', '86': '🇨🇳', '81': '🇯🇵', '82': '🇰🇷', '7': '🇷🇺',
-    '90': '🇹🇷', '20': '🇪🇬', '27': '🇿🇦', '61': '🇦🇺', '62': '🇮🇩', '60': '🇲🇾', '65': '🇸🇬',
-    '66': '🇹🇭', '84': '🇻🇳', '63': '🇵🇭', '92': '🇵🇰', '93': '🇦🇫', '98': '🇮🇷', '964': '🇮🇶',
-    '966': '🇸🇦', '971': '🇦🇪', '972': '🇮🇱', '30': '🇬🇷', '31': '🇳🇱', '32': '🇧🇪', '41': '🇨🇭',
-    '43': '🇦🇹', '45': '🇩🇰', '46': '🇸🇪', '47': '🇳🇴', '48': '🇵🇱', '351': '🇵🇹', '358': '🇫🇮',
-    '380': '🇺🇦', '420': '🇨🇿', '421': '🇸🇰', '385': '🇭🇷', '386': '🇸🇮', '387': '🇧🇦',
-    '381': '🇷🇸', '382': '🇲🇪', '383': '🇽🇰', '389': '🇲🇰', '355': '🇦🇱', '359': '🇧🇬',
-    '40': '🇷🇴', '36': '🇭🇺', '216': '🇹🇳'
-  };
+let handler = async (m, { isOwner, isAdmin, conn, participants, args }) => {
+    if (!(isAdmin || isOwner)) return
 
-  const getEmojiForNumber = async (phoneNumber, id) => {
-    if (global.emojiCache.has(id) && global.cacheTimestamps.has(id)) {
-      const cacheTime = global.cacheTimestamps.get(id);
-      if (now - cacheTime < CACHE_TTL) {
-        global.cacheStats.hits++;
-        return global.emojiCache.get(id);
-      } else {
-        global.emojiCache.delete(id);
-        global.cacheTimestamps.delete(id);
-      }
-    }
+    let nomebot = conn.user.name || '𝐁𝐎𝐓'
+    let message = args.join(' ') || '𝑁𝑒𝑠𝑠𝑢𝑛 𝑚𝑒𝑠𝑠𝑎𝑔𝑔𝑖𝑜'
 
-    if (phoneNumber.length < 6 || phoneNumber.length > 15 || isNaN(phoneNumber)) {
-      global.emojiCache.set(id, '🏳️');
-      global.cacheTimestamps.set(id, now);
-      console.warn(`Numero non valido saltato per ${id}: ${phoneNumber}`);
-      return '🏳️';
-    }
+    const getFlag = (num) => {
 
-    try {
-      const pn = PhoneNumber('+' + phoneNumber);
-      if (!pn.isValid()) {
-        global.emojiCache.set(id, '🏳️');
-        global.cacheTimestamps.set(id, now);
-        console.warn(`Numero non valido per ${id}: ${phoneNumber}`);
-        return '🏳️';
-      }
-      
-      const numero = pn.getNumber('international');
-      const countryCode = pn.getCountryCode();
-      if (countryEmojiFallback[countryCode]) {
-        const emoji = countryEmojiFallback[countryCode];
-        global.emojiCache.set(id, emoji);
-        global.cacheTimestamps.set(id, now);
-        global.cacheStats.hits++;
-        return emoji;
-      }
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
-      const response = await fetch(
-        `https://delirius-apiofc.vercel.app/tools/country?text=${numero}`,
-        { 
-          signal: controller.signal,
-          headers: { 
-            'User-Agent': 'VareBot/2.5',
-            'Accept': 'application/json',
-            'Cache-Control': 'no-cache'
-          }
+        const flags = {
+
+            // 🇪🇺 Europa
+            '39': '🇮🇹',
+            '44': '🇬🇧',
+            '33': '🇫🇷',
+            '34': '🇪🇸',
+            '49': '🇩🇪',
+            '41': '🇨🇭',
+            '43': '🇦🇹',
+            '31': '🇳🇱',
+            '32': '🇧🇪',
+            '351': '🇵🇹',
+            '30': '🇬🇷',
+            '48': '🇵🇱',
+            '40': '🇷🇴',
+            '46': '🇸🇪',
+            '47': '🇳🇴',
+            '45': '🇩🇰',
+            '358': '🇫🇮',
+            '36': '🇭🇺',
+            '420': '🇨🇿',
+            '421': '🇸🇰',
+            '385': '🇭🇷',
+            '386': '🇸🇮',
+            '355': '🇦🇱',
+            '380': '🇺🇦',
+            '7': '🇷🇺',
+
+            // 🌎 America
+            '1': '🇺🇸',
+            '52': '🇲🇽',
+            '55': '🇧🇷',
+            '54': '🇦🇷',
+            '56': '🇨🇱',
+            '57': '🇨🇴',
+            '58': '🇻🇪',
+            '51': '🇵🇪',
+            '53': '🇨🇺',
+
+            // 🌏 Asia
+            '81': '🇯🇵',
+            '82': '🇰🇷',
+            '86': '🇨🇳',
+            '91': '🇮🇳',
+            '92': '🇵🇰',
+            '90': '🇹🇷',
+            '62': '🇮🇩',
+            '63': '🇵🇭',
+            '66': '🇹🇭',
+            '84': '🇻🇳',
+            '60': '🇲🇾',
+            '65': '🇸🇬',
+            '971': '🇦🇪',
+            '966': '🇸🇦',
+            '972': '🇮🇱',
+
+            // 🌍 Africa
+            '20': '🇪🇬',
+            '212': '🇲🇦',
+            '213': '🇩🇿',
+            '216': '🇹🇳',
+            '27': '🇿🇦',
+            '234': '🇳🇬',
+            '251': '🇪🇹',
+            '254': '🇰🇪',
+
+            // 🏝️ Oceania
+            '61': '🇦🇺',
+            '64': '🇳🇿',
         }
-      );
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      
-      const json = await response.json();
-      const emoji = json.result?.emoji || '🏳️';
-      global.emojiCache.set(id, emoji);
-      global.cacheTimestamps.set(id, now);
-      global.cacheStats.misses++;
-      
-      return emoji;
-    } catch (error) {
-      console.warn(`Errore API per ${id}:`, error.message);
-      global.cacheStats.errors++;
-      global.emojiCache.set(id, '🏳️');
-      global.cacheTimestamps.set(id, now);
-      return '🏳️';
+
+        let prefixes = Object.keys(flags).sort((a, b) => b.length - a.length)
+
+        for (let prefix of prefixes) {
+            if (num.startsWith(prefix)) {
+                return flags[prefix]
+            }
+        }
+
+        return '🌍'
     }
-  };
 
-  const BATCH_SIZE = 10;
-  const risultati = [];
-  
-  for (let i = 0; i < participants.length; i += BATCH_SIZE) {
-    const batch = participants.slice(i, i + BATCH_SIZE);
-    
-    const batchPromises = batch.map(async (mem) => {
-      const decodedJid = conn.decodeJid(mem.id);
-      const [user, server] = decodedJid.split('@');
-      let id = user.split(':')[0];
-      const phoneNumber = user.split(':')[0];
-      let emoji;
-      const isLID = server === 'lid';
-      if (isLID) {
-        emoji = '🏳️';
-      } else {
-        emoji = await getEmojiForNumber(phoneNumber, id);
-      }
-      return `${emoji} @${id}`;
-    });
+    let text = `
+╔══════════════════╗
+        🔔 𝐓𝐀𝐆 𝐀𝐋𝐋 🔔
+╚══════════════════╝
 
-    const batchResults = await Promise.all(batchPromises);
-    risultati.push(...batchResults);
-    if (i + BATCH_SIZE < participants.length) {
-      await new Promise(resolve => setTimeout(resolve, 50));
+🤖 𝐁𝐨𝐭: ${nomebot}
+
+🗣️ 𝐌𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨:
+➤ ${message}
+
+━━━━━━━━━━━━━━━━━━━
+👥 𝐌𝐄𝐌𝐁𝐑𝐈 𝐃𝐄𝐋 𝐆𝐑𝐔𝐏𝐏𝐎
+━━━━━━━━━━━━━━━━━━━
+`
+
+    for (let user of participants) {
+
+        let number = user.id.split('@')[0]
+        let flag = getFlag(number)
+
+        text += `✦ ${flag} @${number}\n`
     }
-  }
 
-  const getGroupData = async () => {
+    text += `
+━━━━━━━━━━━━━━━━━━━
+✨ Powered By Deadly
+`
+
+    let pp
+
     try {
-      const [groupImg, groupMetadata] = await Promise.all([
-        conn.profilePictureUrl(m.chat, 'image').catch(() => 'https://i.ibb.co/hJW7WwxV/varebot.jpg'),
-        conn.groupMetadata(m.chat)
-      ]);
-      return { 
-        img: groupImg,
-        name: groupMetadata.subject || '',
-        memberCount: participants.length
-      };
+        pp = await conn.profilePictureUrl(m.sender, 'image')
     } catch {
-      return { 
-        img: 'https://i.ibb.co/hJW7WwxV/varebot.jpg',
-        name: '',
-        memberCount: participants.length
-      };
+        pp = 'https://i.ibb.co/rF7S0Yk/avatar-contact.png'
     }
-  };
 
-  const groupData = await getGroupData();
+    await conn.sendMessage(
+        m.chat,
+        {
+            text,
+            mentions: participants.map(p => p.id),
 
-  messaggi += risultati.join('\n');
-  messaggi += `\n╰⸼ ┄ ┄꒰  ׅ୭ *tagall* ୧ ׅ ꒱─ ┄ ⸼`;
-  console.log(`Tagall Cache Stats - Hits: ${global.cacheStats.hits}, Misses: ${global.cacheStats.misses}, Errori: ${global.cacheStats.errors}, Spazio: ${global.emojiCache.size}`);
-  
-  await conn.sendMessage(m.chat, { 
-    text: messaggi,
-    mentions: participants.map(a => conn.decodeJid(a.id)),
-    contextInfo: {
-      externalAdReply: {
-        title: groupData.name,
-        body: `⛧°⋆༺ ${groupData.memberCount} membri ༻⋆°⛧`,
-        thumbnailUrl: groupData.img,
-        sourceUrl: '',
-        mediaType: 1,
-        renderLargerThumbnail: true
-      }
-    }
-  });
-  if (global.emojiCache.size > 500) {
-    const entries = Array.from(global.cacheTimestamps.entries())
-      .sort(([,a], [,b]) => a - b)
-      .slice(0, 100);
-      
-    entries.forEach(([key]) => {
-      global.emojiCache.delete(key);
-      global.cacheTimestamps.delete(key);
-    });
-  }
-};
+            contextInfo: {
+                externalAdReply: {
+                    title: '🔔 TAG ALL PREMIUM',
+                    body: 'Invocazione membri del gruppo',
+                    thumbnailUrl: pp,
+                    mediaType: 1,
+                    renderLargerThumbnail: false,
+                    showAdAttribution: false
+                }
+            }
+        },
+        { quoted: m }
+    )
+}
 
-handler.help = ['tagall'];
-handler.tags = ['gruppo'];
-handler.command = /^(tagall|invoca|menzionatutti|tag)$/i;
-handler.admin = true;
-handler.group = true;
+handler.command = /^(tagall|invocar|marcar|todos)$/i
+handler.group = true
+handler.admin = true
 
-export default handler;
+export default handler
