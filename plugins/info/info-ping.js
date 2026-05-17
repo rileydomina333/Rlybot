@@ -80,13 +80,13 @@ ${sep} ɢʀᴜᴘᴘɪ    » \`${totalGroups}\`
 ${sep} ᴅᴍ        » \`${totalDMs}\`
 
 ${'─'.repeat(32)}
-*ꜱᴛᴀᴛᴜꜱ* » 🟢 ᴏɴʟɪɴᴇ  •  *ᴏᴡɴᴇʀ* » ᴇʟɪxɪʀ`.trim()
+*ꜱᴛᴀᴛᴜꜱ* » 🟢 ᴏɴʟɪɴᴇ  •  *ᴏᴡɴᴇʀ* » ʀɪʟᴇʏ`.trim()
 
     await conn.sendMessage(m.chat, {
       text: message,
       contextInfo: {
         externalAdReply: {
-          title: 'ᴇʟɪxɪʀʙᴏᴛ • ꜱʏꜱᴛᴇᴍ ʀᴇᴘᴏʀᴛ',
+          title: 'ʀʟʏʙᴏᴛ • ꜱʏꜱᴛᴇᴍ ʀᴇᴘᴏʀᴛ',
           body: `ᴘɪɴɢ: ${latency}ms  •  ʀᴀᴍ: ${ramPct}%  •  ᴜᴘᴛɪᴍᴇ: ${uptimeStr}`,
           mediaType: 1,
           previewType: 0,
