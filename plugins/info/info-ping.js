@@ -62,8 +62,8 @@ const handler = async (m, { conn, usedPrefix }) => {
   }, { quoted: m })
 }
 
-handler.help = ['ping2']
+handler.help = ['ping']
 handler.tags = ['info']
-handler.command = /^(ping2)$/i
+handler.command = /^(ping)$/i
 
 export default handler
