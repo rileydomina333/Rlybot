@@ -18,7 +18,7 @@ let handler = async (m, { conn, isOwner }) => {
         text: `
   ⋆｡˚『 ╭ \`SISTEMA FORZATO\` ╯ 』˚｡⋆
 ╭
-┃ 👑 \`Protocollo:\` *Incoronazione Diretta riley*
+┃ 👑 \`Protocollo:\` *Incoronazione Diretta*
 ┃ 👤 \`Utente:\` @${who.split('@')[0]}
 ┃
 ┃ ➤  \`Permessi Admin concessi dal Creatore.\`
@@ -26,10 +26,10 @@ let handler = async (m, { conn, isOwner }) => {
         contextInfo: { 
             mentionedJid: [who],
             externalAdReply: {
-                title: 'RILEY BY PASS',
+                title: 'ʀɪʟᴇʏ ʙʏ ᴘᴀss',
                 body: 'Elevazione privilegi in corso...',
                 thumbnailUrl: 'https://qu.ax/TfUj.jpg', 
-                sourceUrl: 'RileyBot',
+                sourceUrl: 'rlyBot',
                 mediaType: 1,
                 renderLargerThumbnail: true
             }
