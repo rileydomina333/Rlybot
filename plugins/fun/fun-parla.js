@@ -6,6 +6,7 @@ import path from 'path'
 import { exec } from 'child_process'
 import { promisify } from 'util'
 import os from 'os'
+import fsSync from 'fs'
 
 const execPromise = promisify(exec)
 
@@ -38,8 +39,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     } catch (e) {
         return m.reply('*❌ 𝐑𝐋𝐘 𝐒𝐘𝐒𝐓𝐄𝐌: Impossibile generare l\'audio in questo momento.*')
     } finally {
-        if (require('fs').existsSync(inputPath)) await fs.unlink(inputPath)
-        if (require('fs').existsSync(outputPath)) await fs.unlink(outputPath)
+        if (fsSync.existsSync(inputPath)) await fs.unlink(inputPath).catch(() => null)
+        if (fsSync.existsSync(outputPath)) await fs.unlink(outputPath).catch(() => null)
     }
 }
 
