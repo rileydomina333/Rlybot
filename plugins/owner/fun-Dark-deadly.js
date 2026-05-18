@@ -11,8 +11,8 @@ let handler = async (m, { conn }) => {
   );
 };
 
-handler.help = ['dark'|'deadly'];
+handler.help = ['dark'];
 handler.tags = ['giochi'];
-handler.command = ['dark'|'deadly'];
+handler.command = ['dark'];
 
 export default handler;
