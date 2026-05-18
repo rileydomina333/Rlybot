@@ -1,46 +1,46 @@
 // by deadly
 
 import fetch from 'node-fetch'
-import { promises as fs } from 'fs'
+import fs from 'fs'
 import path from 'path'
 import { exec } from 'child_process'
-import { promisify } from 'util'
 import os from 'os'
-import fsSync from 'fs'
-
-const execPromise = promisify(exec)
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
     if (!text) return m.reply(`*⚠️ 𝐑𝐋𝐘 𝐒𝐘𝐒𝐓𝐄𝐌: Inserisci il testo che devo pronunciare.*\n\n*Esempio:* _${usedPrefix}${command} Ciao a tutti_`)
 
     const tmpDir = os.tmpdir()
-    const filename = `tts_${Date.now()}`
-    const inputPath = path.join(tmpDir, `${filename}.mp3`)
-    const outputPath = path.join(tmpDir, `${filename}.ogg`)
+    const fileName = `tts_${Date.now()}`
+    const inputPath = path.join(tmpDir, fileName)
+    const outputPath = path.join(tmpDir, `${fileName}.mp3`)
 
     try {
         let ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=it&client=tw-ob`
-        let res = await fetch(ttsUrl)
-        if (!res.ok) throw new Error()
+        const response = await fetch(ttsUrl)
+        if (!response.ok) throw new Error()
         
-        let buffer = await res.buffer()
-        await fs.writeFile(inputPath, buffer)
+        const arrayBuffer = await response.arrayBuffer()
+        fs.writeFileSync(inputPath, Buffer.from(arrayBuffer))
 
-        await execPromise(`ffmpeg -hide_banner -loglevel error -y -i "${inputPath}" -map_metadata -1 -vn -ar 48000 -ac 1 -c:a libopus -b:a 64k -application voip -f ogg "${outputPath}"`)
-
-        let convertedBuffer = await fs.readFile(outputPath)
+        await new Promise((resolve, reject) => {
+            exec(`ffmpeg -i ${inputPath} -vn -ar 44100 -ac 2 -b:a 128k ${outputPath}`, (err) => {
+                if (err) reject(err)
+                else resolve()
+            })
+        })
 
         await conn.sendMessage(m.chat, {
-            audio: convertedBuffer,
-            mimetype: 'audio/ogg; codecs=opus',
-            ptt: true
+            audio: fs.readFileSync(outputPath),
+            mimetype: 'audio/mpeg',
+            fileName: 'parla.mp3',
+            ptt: false
         }, { quoted: m })
 
     } catch (e) {
         return m.reply('*❌ 𝐑𝐋𝐘 𝐒𝐘𝐒𝐓𝐄𝐌: Impossibile generare l\'audio in questo momento.*')
     } finally {
-        if (fsSync.existsSync(inputPath)) await fs.unlink(inputPath).catch(() => null)
-        if (fsSync.existsSync(outputPath)) await fs.unlink(outputPath).catch(() => null)
+        if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath)
+        if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath)
     }
 }
 
