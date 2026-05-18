@@ -102,9 +102,9 @@ ${'─'.repeat(32)}
   }
 }
 
-handler.help    = ['ping']
+handler.help    = ['ping3']
 handler.tags    = ['info']
-handler.command = /^(ping)$/i
+handler.command = /^(ping3)$/i
 export default handler
 
 function clockString(ms) {
