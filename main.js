@@ -318,7 +318,7 @@ async function requestPairingCodeFlow() {
 let linguaOption;
 if (!hasExistingSession) {
   const menuLingua = `
-┏━━〔 ✨ *ℝ𝕃𝕐 𝔹𝕆𝕋* ✨ 〕━━┓
+┏━━〔 ✨ *ℝ𝕃𝕐 ℝ𝕀𝕃𝔼𝕐 𝔹𝕆𝕋* ✨ 〕━━┓
 ┃
 ┃  🌐 *𝕊𝔼𝕃𝔼ℂ𝕋 𝕃𝔸ℕ𝔾𝕌𝔸𝔾𝔼*
 ┃
@@ -336,7 +336,7 @@ if (!hasExistingSession) {
 ┃  🇹🇷  12: Türkçe
 ┃
 ┗━━━━━━━━━━━━━━━━━━┛
-        𝕊𝕪𝕤𝕥𝕖𝕞 𝕓𝕪 ℝ𝕃𝕐 𝔹𝕆𝕋
+        𝕊𝕪𝕤𝕥𝕖𝕞 𝕓𝕪 ℝ𝕃𝕐 ℝ𝕀𝕃𝔼𝕐 𝔹𝕆𝕋
 `.trim();
 
   linguaOption = await askValidatedChoice(
@@ -354,15 +354,15 @@ if (!hasExistingSession) {
 let opzione;
 if (!pairingMode && !hasExistingSession) {
   const menu = `
-┏━━〔 ✨ *ℝ𝕃𝕐 𝔹𝕆𝕋* ✨ 〕━━┓
+┏━━〔 ✨ *ℝ𝕃𝕐 ℝ𝕀𝕃𝔼𝕐 𝔹𝕆𝕋* ✨ 〕━━┓
 ┃
-┃  🧬 *ℙ𝔸𝕀ℝ𝕀ℕ𝔾 𝕄𝔼𝕋ℍ𝕆𝔻𝕊*
+┃  🧬 *ℙ𝔸𝕀ℝ𝕀ℕ𝔾 ℂ𝕆𝔻𝔼 𝕄𝔼𝕋ℍ𝕆𝔻𝕊*
 ┃
 ┃  👾  Option 1: QR Code
 ┃  ☁️  Option 2: 8-Digit Code
 ┃
 ┗━━━━━━━━━━━━━━━━━━┛
-        𝕊𝕪𝕤𝕥𝕖𝕞 𝕓𝕪 ℝ𝕃𝕐 𝔹𝕆𝕋
+        𝕊𝕪𝕤𝕥𝕖𝕞 𝕓𝕪 ℝ𝕃𝕐 ℝ𝕀𝕃𝔼𝕐 𝔹𝕆𝕋
 `.trim();
 
   opzione = await askValidatedChoice(
