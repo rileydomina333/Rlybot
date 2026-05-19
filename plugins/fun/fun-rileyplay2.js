@@ -18,8 +18,8 @@ const handler = async (m, { conn }) => {
     }, { quoted: m })
 }
 
-handler.help = ['rileyplay']
+handler.help = ['rileyplay2']
 handler.tags = ['fun']
-handler.command = /^rileyplay$/i
+handler.command = /^rileyplay2$/i
 
 export default handler
