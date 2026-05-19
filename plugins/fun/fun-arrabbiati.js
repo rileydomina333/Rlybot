@@ -3,7 +3,7 @@ import path from 'path'
 
 const handler = async (m, { conn }) => {
     // Percorso del file audio
-    const audioPath = './media/1_4927257795608184826.7z'
+    const audioPath = './media/1_4927257795608184826.ogg'
 
     // Controlla se il file esiste per evitare errori nel bot
     if (!fs.existsSync(audioPath)) {
