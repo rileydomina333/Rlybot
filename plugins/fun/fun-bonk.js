@@ -2,7 +2,7 @@
 
 import fs from 'fs'
 
-const TEMPLATE_PATH = './media/bonk.png'
+const TEMPLATE_PATH = './media/768258f4-1c64-4d75-969b-9475cce2ef4c.png'
 
 async function getJimp() {
   const mod = await import('jimp')
