@@ -1,18 +1,25 @@
-let handler = async (m, { conn }) => {
+import fs from 'fs'
+import path from 'path'
 
-  const testo = `*Venom, è il padre demone fondatore di riley,lo ha creato aprendo una ferita al petto con una lama bollente,iniettando il suo sangue a riley,ricucendo la ferita con miscele dolorose,creando riley,lo stesso riley che adesso lui teme possa superarlo 💙👑*`;
+const handler = async (m, { conn }) => {
+    // Percorso del file audio
+    const audioPath = './media/PTT-20260520-WA0355.opus'
 
-  await conn.sendMessage(
-    m.chat,
-    {
-      text: testo
-    },
-    { quoted: m }
-  );
-};
+    // Controlla se il file esiste per evitare errori nel bot
+    if (!fs.existsSync(audioPath)) {
+        return m.reply(`❌ Errore: Il file audio non è stato trovato in ${audioPath}`)
+    }
 
-handler.help = ['venom'];
-handler.tags = ['giochi'];
-handler.command = ['venom'];
+    // Invia l'audio
+    await conn.sendMessage(m.chat, {
+        audio: { url: audioPath },
+        mimetype: 'audio/mpeg',
+        ptt: true // Imposta a false se vuoi che appaia come un file audio e non come nota vocale
+    }, { quoted: m })
+}
 
-export default handler;
+handler.help = ['venom']
+handler.tags = ['fun']
+handler.command = /^venom$/i
+
+export default handler
