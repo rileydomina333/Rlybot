@@ -257,7 +257,7 @@ handler.before = async (m, { conn, usedPrefix, command }) => {
         
         await conn.sendMessage(chat, {
             text: failText,
-            footer: 'ChatUnity Bot',
+            footer: 'Rly Riley Bot',
             interactiveButtons: playAgainButtons(userId, groupId)
         }, { quoted: m });
         delete global.bandieraGame[chat];
