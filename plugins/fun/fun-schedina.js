@@ -7,7 +7,7 @@ import Jimp from 'jimp'
 const PERCORSO_SQUADRE = './media/database/squadre.json'
 const CARTELLA_CACHE = './media/seriea_cache'
 const SFONDO_PATH = path.join(CARTELLA_CACHE, 'sfondo_serie_a.png')
-const SNAI_PATH = './media/snai.png'
+const SNAI_PATH = './media/65e02b72-9501-4d72-888b-31f3c50953e7.png'
 
 // Cambia questo se vuoi un altro sfondo
 const SFONDO_URL = 'https://i.imgur.com/3GbgP6K.png'
