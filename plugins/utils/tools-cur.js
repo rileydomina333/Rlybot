@@ -135,11 +135,11 @@ const handler = async (m, { conn, args, usedPrefix, text, command }) => {
       caption,
       mentions: conn.parseMention(caption),
       buttons: [
-        { buttonId: `.playaudio ${artist} - ${title}`, buttonText: { displayText: '🎧 Scarica canzone' }, type: 1 },
-        { buttonId: `.playvideo ${artist} - ${title}`, buttonText: { displayText: '🎥 Scarica video' }, type: 1 },
+        { buttonId: `.play ${title}`, buttonText: { displayText: '🎧 Scarica canzone' }, type: 1 },
+        { buttonId: `.play ${title}`, buttonText: { displayText: '🎥 Scarica video' }, type: 1 },
       ],
       headerType: 4,
-      footer: `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲-𝐁𝐨𝐭`
+      footer: `Rly-Bot`
     }
 
     await conn.sendMessage(m.chat, msg, { quoted: m })
