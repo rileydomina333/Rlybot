@@ -66,7 +66,7 @@ let handler = async (m, { conn, args, usedPrefix, command, DevMode }) => {
                     bot: Aku,
                     user: Kamu,
                     amount: formatNumber(count),
-                    botName: 'ChatUnity-Bot',
+                    botName: 'Rly Riley Bot',
                     userName: username
                 }),
                 m
