@@ -1,80 +1,118 @@
- 
-function pickRandom(list) {
-  return list[Math.floor(Math.random() * list.length)];
+//plugin insulta by Bonzino
+
+const tag = jid => '@' + String(jid || '').split('@')[0].split(':')[0]
+
+function buildContextMsg(title) {
+  return {
+    key: {
+      participants: '0@s.whatsapp.net',
+      fromMe: false,
+      id: 'CTX'
+    },
+    message: {
+      locationMessage: {
+        name: title
+      }
+    },
+    participant: '0@s.whatsapp.net'
+  }
 }
 
-let handler = async (m, { conn }) => {
-  const userId = m.sender;
-  const groupId = m.chat;
+function resolveTarget(m, text = '', botJid = '') {
+  const ctx = m.message?.extendedTextMessage?.contextInfo || {}
 
-  if (!m.isGroup) throw global.t('insultNoGroup', userId, groupId);
+  const numero = String(text || '').replace(/[^\d]/g, '')
+  if (numero.length >= 5) return `${numero}@s.whatsapp.net`
 
-  const gruppi = global.db?.data?.chats?.[groupId] || {};
-  if (gruppi.spacobot === false) throw global.t('insultDisabled', userId, groupId);
-
-  let menzione = m.mentionedJid?.[0] || (m.quoted ? m.quoted.sender : null) || null;
-  if (!menzione) throw global.t('insultNoTarget', userId, groupId);
-
-  const targetId = menzione.split('@')[0];
-
-  if (menzione === conn.user.jid) {
-    const botLines = global.t('insultBotLines', userId, groupId);
-    const line = pickRandom(botLines);
-    return conn.reply(groupId, line, m);
+  if (String(text || '').endsWith('@s.whatsapp.net') || String(text || '').endsWith('@c.us')) {
+    return String(text).trim()
   }
 
-  const insultList = [
-    'tua mamma fa talmente schifo che deve dare il viagra al suo vibratore',
-    'sei talmente negro che Carlo Conti al confronto è Biancaneve',
-    'sei così brutto che tua madre da piccolo non sapeva se prendere una culla o una gabbia',
-    'sei simpatico come un grappolo di emorroidi',
-    'ti puzza talmente l’alito che la gente scoreggia per cambiare aria',
-    'tua madre prende più schizzi di uno scoglio',
-    'meglio un figlio in guerra che un coglione con i risvoltini come te',
-    'tua madre è come Super Mario, salta per prendere i soldi',
-    'hai meno neuroni di un panino al latte, e sono pure senza glutine',
-    'sei così brutto che quando preghi Gesù si mette su invisibile',
-    'sei così poco fotogenico che i filtri di Instagram ti bloccano per proteggere gli utenti',
-    'le tue scorregge fanno talmente schifo che il Big Bang a confronto sembra una loffa',
-    'il buco del culo di tua madre ha visto più palle dei draghetti di Bubble Game',
-    'se ti vede la morte dice che è arrivato il cambio',
-    'hai il buco del culo con lo stesso diametro del traforo del Monte Bianco',
-    'tua madre è come il sole, batte sempre sulle strade',
-    'dall’alito sembra che ti si sia arenato il cadavere di un’orca in gola',
-    'sei così cornuto che se ti vede un cervo va in depressione',
-    'non ti picchio solo perché la merda schizza',
-    'sei così brutto che quando accendi il computer si avvia subito l’antivirus',
-    'la tua famiglia è così povera che i topi lasciano elemosina sotto il frigorifero',
-    'sei utile come una stufa in estate',
-    'sei utile come un culo senza il buco',
-    'sei utile come un paio di mutande in un porno',
-    'sei fastidioso come un chiodo nel culo',
-    'a te la testa serve solo per tenere distanti le orecchie',
-    'sei così brutto che quando lanci un boomerang non torna',
-    'sei talmente sfigato che se ti cade l’uccello rimbalza e ti picchia nel culo',
-    'sei la prova che Dio a volte sbaglia… e poi si diverte'
-  ];
+  if (Array.isArray(m.mentionedJid) && m.mentionedJid.length) return m.mentionedJid[0]
+  if (Array.isArray(ctx.mentionedJid) && ctx.mentionedJid.length) return ctx.mentionedJid[0]
 
-  const line = pickRandom(insultList);
+  const quotedSender = m.quoted?.sender || m.quoted?.participant || ctx.participant
+  if (quotedSender && quotedSender !== botJid) return quotedSender
 
-  const text = global.t('insultUserText', userId, groupId, {
-    target: targetId,
-    line
-  });
+  return null
+}
 
-  await conn.reply(
-    groupId,
-    text,
-    m,
-    {
-      mentions: [menzione]
+function onlyDigits(value = '') {
+  return String(value || '').replace(/\D/g, '')
+}
+
+function getOwnerNumbers() {
+  const list = [
+    ...(global.owner || []),
+    ...(global.owners || [])
+  ]
+
+  return new Set(
+    list
+      .flat()
+      .map(v => Array.isArray(v) ? v[0] : v)
+      .map(v => onlyDigits(v))
+      .filter(Boolean)
+  )
+}
+
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+  const chat = m.chat || m.key?.remoteJid
+  if (!chat) return
+
+  const sender = String(
+    m.sender ||
+    m.key?.participant ||
+    m.participant ||
+    (m.key?.fromMe ? conn?.user?.id : '')
+  )
+
+  const botJid = conn.user?.jid || conn.user?.id || ''
+  const target = resolveTarget(m, text, botJid)
+  const q = buildContextMsg('*🤬 𝐈𝐍𝐒𝐔𝐋𝐓𝐎*')
+
+  if (!target) {
+    return conn.sendMessage(chat, {
+      text: `╭━━━━━━━🤬━━━━━━━╮
+*✦ 𝐈𝐍𝐒𝐔𝐋𝐓𝐀 ✦*
+╰━━━━━━━🤬━━━━━━━╯
+
+*⚠️ 𝐃𝐞𝐯𝐢 𝐦𝐞𝐧𝐳𝐢𝐨𝐧𝐚𝐫𝐞 𝐪𝐮𝐚𝐥𝐜𝐮𝐧𝐨 𝐨 𝐫𝐢𝐬𝐩𝐨𝐧𝐝𝐞𝐫𝐞 𝐚 𝐮𝐧 𝐦𝐞𝐬𝐬𝐚𝐠𝐠𝐢𝐨.*
+
+*𝐄𝐬𝐞𝐦𝐩𝐢𝐨:*
+*${usedPrefix}${command} @utente*`,
+      contextInfo: global.rcanal?.contextInfo || {}
+    }, { quoted: q })
+  }
+
+  const ownerNumbers = getOwnerNumbers()
+  const targetNumber = onlyDigits(target.split('@')[0])
+  const botNumber = onlyDigits(String(botJid).split('@')[0].split(':')[0])
+
+  if (ownerNumbers.has(targetNumber) || targetNumber === botNumber) {
+    return conn.sendMessage(chat, {
+      text: '*⛔ 𝐍𝐨𝐧 𝐩𝐮𝐨𝐢 𝐮𝐬𝐚𝐫𝐞 𝐪𝐮𝐞𝐬𝐭𝐨 𝐜𝐨𝐦𝐚𝐧𝐝𝐨 𝐬𝐮 𝐮𝐧 𝐨𝐰𝐧𝐞𝐫.*',
+      contextInfo: global.rcanal?.contextInfo || {}
+    }, { quoted: q })
+  }
+
+  const frasi = ['𝙩𝙪𝙖 𝙢𝙖𝙢𝙢𝙖 𝙛𝙖 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙨𝙘𝙝𝙞𝙛𝙤 𝙘𝙝𝙚 𝙙𝙚𝙫𝙚 𝙙𝙖𝙧𝙚 𝙞𝙡 𝙫𝙞𝙖𝙜𝙧𝙖 𝙖𝙡 𝙨𝙪𝙤 𝙫𝙞𝙗𝙧𝙖𝙩𝙤𝙧𝙚','𝙨𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙣𝙚𝙜𝙧𝙤 𝙘𝙝𝙚 𝘾𝙖𝙧𝙡𝙤 𝘾𝙤𝙣𝙩𝙞 𝙖𝙡 𝙘𝙤𝙣𝙛𝙧𝙤𝙣𝙩𝙤 𝙚̀ 𝙗𝙞𝙖𝙣𝙘𝙖𝙣𝙚𝙫𝙚','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙙𝙖 𝙥𝙞𝙘𝙘𝙤𝙡𝙤 𝙣𝙤𝙣 𝙨𝙖𝙥𝙚𝙫𝙖 𝙨𝙚 𝙥𝙧𝙚𝙣𝙙𝙚𝙧𝙚 𝙪𝙣𝙖 𝙘𝙪𝙡𝙡𝙖 𝙤 𝙪𝙣𝙖 𝙜𝙖𝙗𝙗𝙞𝙖','𝙨𝙚𝙞 𝙨𝙞𝙢𝙥𝙖𝙩𝙞𝙘𝙤 𝙘𝙤𝙢𝙚 𝙪𝙣 𝙜𝙧𝙖𝙥𝙥𝙤𝙡𝙤 𝙙𝙞 𝙚𝙢𝙤𝙧𝙧𝙤𝙞𝙙𝙞','𝙩𝙞 𝙥𝙪𝙯𝙯𝙖 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙡`𝙖𝙡𝙞𝙩𝙤 𝙘𝙝𝙚 𝙡𝙖 𝙜𝙚𝙣𝙩𝙚 𝙨𝙘𝙤𝙧𝙚𝙜𝙜𝙞𝙖 𝙥𝙚𝙧 𝙘𝙖𝙢𝙗𝙞𝙖𝙧𝙚 𝙖𝙧𝙞𝙖','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙥𝙧𝙚𝙣𝙙𝙚 𝙥𝙞𝙪̀ 𝙨𝙘𝙝𝙞𝙯𝙯𝙞 𝙙𝙞 𝙪𝙣𝙤 𝙨𝙘𝙤𝙜𝙡𝙞𝙤','𝙩𝙪𝙖 𝙢𝙖𝙢𝙢𝙖 𝙛𝙖 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙨𝙘𝙝𝙞𝙛𝙤 𝙘𝙝𝙚 𝙙𝙚𝙫𝙚 𝙙𝙖𝙧𝙚 𝙞𝙡 𝙫𝙞𝙖𝙜𝙧𝙖 𝙖𝙡 𝙨𝙪𝙤 𝙫𝙞𝙗𝙧𝙖𝙩𝙤𝙧𝙚','𝙢𝙚𝙜𝙡𝙞𝙤 𝙪𝙣 𝙛𝙞𝙜𝙡𝙞𝙤 𝙞𝙣 𝙜𝙪𝙚𝙧𝙧𝙖 𝙘𝙝𝙚 𝙪𝙣 𝙘𝙤𝙜𝙡𝙞𝙤𝙣𝙚 𝙘𝙤𝙣 𝙞 𝙧𝙞𝙨𝙫𝙤𝙡𝙩𝙞𝙣𝙞 𝙘𝙤𝙢𝙚 𝙩𝙚','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙢𝙚 𝙎𝙪𝙥𝙚𝙧 𝙈𝙖𝙧𝙞𝙤, 𝙨𝙖𝙡𝙩𝙖 𝙥𝙚𝙧 𝙥𝙧𝙚𝙣𝙙𝙚𝙧𝙚 𝙞 𝙨𝙤𝙡𝙙𝙞','𝙃𝙖𝙞 𝙢𝙚𝙣𝙤 𝙣𝙚𝙪𝙧𝙤𝙣𝙞 𝙙𝙞 𝙪𝙣 𝙥𝙖𝙣𝙞𝙣𝙤 𝙖𝙡 𝙡𝙖𝙩𝙩𝙚, 𝙚 𝙨𝙤𝙣𝙤 𝙥𝙪𝙧𝙚 𝙨𝙚𝙣𝙯𝙖 𝙜𝙡𝙪𝙩𝙞𝙣𝙚.',' 𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙥𝙧𝙚𝙜𝙝𝙞 𝙂𝙚𝙨𝙪̀ 𝙨𝙞 𝙢𝙚𝙩𝙩𝙚 𝙨𝙪 𝙞𝙣𝙫𝙞𝙨𝙞𝙗𝙞𝙡𝙚','𝙎𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙥𝙤𝙘𝙤 𝙛𝙤𝙩𝙤𝙜𝙚𝙣𝙞𝙘𝙤 𝙘𝙝𝙚 𝙞 𝙛𝙞𝙡𝙩𝙧𝙞 𝙙𝙞 𝙄𝙣𝙨𝙩𝙖𝙜𝙧𝙖𝙢 𝙩𝙞 𝙗𝙡𝙤𝙘𝙘𝙖𝙣𝙤 𝙥𝙚𝙧 𝙥𝙧𝙤𝙩𝙚𝙜𝙜𝙚𝙧𝙚 𝙜𝙡𝙞 𝙪𝙩𝙚𝙣𝙩𝙞.','𝙨𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙣𝙚𝙜𝙧𝙤 𝙘𝙝𝙚 𝘾𝙖𝙧𝙡𝙤 𝘾𝙤𝙣𝙩𝙞 𝙖𝙡 𝙘𝙤𝙣𝙛𝙧𝙤𝙣𝙩𝙤 𝙚̀ 𝙗𝙞𝙖𝙣𝙘𝙖𝙣𝙚𝙫𝙚','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙙𝙖 𝙥𝙞𝙘𝙘𝙤𝙡𝙤 𝙣𝙤𝙣 𝙨𝙖𝙥𝙚𝙫𝙖 𝙨𝙚 𝙥𝙧𝙚𝙣𝙙𝙚𝙧𝙚 𝙪𝙣𝙖 𝙘𝙪𝙡𝙡𝙖 𝙤 𝙪𝙣𝙖 𝙜𝙖𝙗𝙗𝙞𝙖','𝙡𝙚 𝙩𝙪𝙚 𝙨𝙘𝙤𝙧𝙧𝙚𝙜𝙜𝙚 𝙛𝙖𝙣𝙣𝙤 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙨𝙘𝙝𝙞𝙛𝙤 𝙘𝙝𝙚 𝙞𝙡 𝙗𝙞𝙜 𝙗𝙖𝙣𝙜 𝙖 𝙘𝙤𝙣𝙛𝙧𝙤𝙣𝙩𝙤 𝙨𝙚𝙢𝙗𝙧𝙖 𝙪𝙣𝙖 𝙡𝙤𝙛𝙛𝙖','𝙩𝙞 𝙥𝙪𝙯𝙯𝙖 𝙡𝙖 𝙢𝙞𝙣𝙘𝙝𝙞𝙖','𝙞𝙡 𝙗𝙪𝙘𝙤 𝙙𝙚𝙡 𝙘𝙪𝙡𝙤 𝙙𝙞 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙝𝙖 𝙫𝙞𝙨𝙩𝙤 𝙥𝙞𝙪̀ 𝙥𝙖𝙡𝙡𝙚 𝙙𝙚𝙞 𝙙𝙧𝙖𝙜𝙝𝙚𝙩𝙩𝙞 𝙙𝙞 𝙗𝙪𝙗𝙗𝙡𝙚 𝙜𝙖𝙢𝙚','𝙞𝙡 𝙗𝙪𝙘𝙤 𝙙𝙚𝙡 𝙘𝙪𝙡𝙤 𝙙𝙞 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙝𝙖 𝙫𝙞𝙨𝙩𝙤 𝙥𝙞𝙪̀ 𝙥𝙖𝙡𝙡𝙚 𝙙𝙚𝙞 𝙙𝙧𝙖𝙜𝙝𝙚𝙩𝙩𝙞 𝙙𝙞 𝙗𝙪𝙗𝙗𝙡𝙚 𝙜𝙖𝙢𝙚','𝙙𝙞 𝙖 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙙𝙞 𝙨𝙢𝙚𝙩𝙩𝙚𝙧𝙚 𝙙𝙞 𝙘𝙖𝙢𝙗𝙞𝙖𝙧𝙚 𝙧𝙤𝙨𝙨𝙚𝙩𝙩𝙤! 𝙃𝙤 𝙞𝙡 𝙥𝙞𝙨𝙚𝙡𝙡𝙤 𝙘𝙝𝙚 𝙨𝙚𝙢𝙗𝙧𝙖 𝙪𝙣 𝙖𝙧𝙘𝙤𝙗𝙖𝙡𝙚𝙣𝙤!','𝙨𝙚 𝙩𝙞 𝙫𝙚𝙙𝙚 𝙡𝙖 𝙢𝙤𝙧𝙩𝙚 𝙙𝙞𝙘𝙚 𝙘𝙝𝙚 𝙚̀ 𝙖𝙧𝙧𝙞𝙫𝙖𝙩𝙤 𝙞𝙡 𝙘𝙖𝙢𝙗𝙞𝙤','𝙝𝙖𝙞 𝙞𝙡 𝙗𝙪𝙘𝙤 𝙙𝙚𝙡 𝙘𝙪𝙡𝙤 𝙘𝙤𝙣 𝙡𝙤 𝙨𝙩𝙚𝙨𝙨𝙤 𝙙𝙞𝙖𝙢𝙚𝙩𝙧𝙤 𝙙𝙚𝙡 𝙩𝙧𝙖𝙛𝙤𝙧𝙤 𝙙𝙚𝙡𝙡𝙖 𝙢𝙖𝙣𝙞𝙘𝙖','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙢𝙚 𝙞𝙡 𝙨𝙤𝙡𝙚, 𝙗𝙖𝙩𝙩𝙚 𝙨𝙚𝙢𝙥𝙧𝙚 𝙨𝙪𝙡𝙡𝙚 𝙨𝙩𝙧𝙖𝙙𝙚','𝙙𝙖𝙡𝙡`𝙖𝙡𝙞𝙩𝙤 𝙨𝙚𝙢𝙗𝙧𝙖 𝙘𝙝𝙚 𝙩𝙞 𝙨𝙞 𝙨𝙞𝙖 𝙖𝙧𝙚𝙣𝙖𝙩𝙤 𝙞𝙡 𝙘𝙖𝙙𝙖𝙫𝙚𝙧𝙚 𝙙𝙞 𝙪𝙣`𝙤𝙧𝙘𝙖 𝙞𝙣 𝙜𝙤𝙡𝙖','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙘𝙖𝙫𝙖𝙡𝙘𝙖 𝙥𝙞𝙪̀ 𝙙𝙞 𝙪𝙣 𝙛𝙖𝙣𝙩𝙞𝙣𝙤','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙘𝙤𝙧𝙣𝙪𝙩𝙤 𝙘𝙝𝙚 𝙨𝙚 𝙩𝙞 𝙫𝙚𝙙𝙚 𝙪𝙣 𝙘𝙚𝙧𝙫𝙤 𝙫𝙖 𝙞𝙣 𝙙𝙚𝙥𝙧𝙚𝙨𝙨𝙞𝙤𝙣𝙚','𝙣𝙤𝙣 𝙩𝙞 𝙥𝙞𝙘𝙘𝙝𝙞𝙤 𝙨𝙤𝙡𝙤 𝙥𝙚𝙧𝙘𝙝𝙚̀ 𝙡𝙖 𝙢𝙚𝙧𝙙𝙖 𝙨𝙘𝙝𝙞𝙯𝙯𝙖!','𝙩𝙪𝙖 𝙢𝙖𝙢𝙢𝙖 𝙚̀ 𝙘𝙤𝙢𝙚 𝙜𝙡𝙞 𝙤𝙧𝙨𝙞: 𝙨𝙚𝙢𝙥𝙧𝙚 𝙞𝙣 𝙘𝙚𝙧𝙘𝙖 𝙙𝙞 𝙥𝙚𝙨𝙘𝙚','𝙎𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙨𝙛𝙞𝙜𝙖𝙩𝙤 𝙘𝙝𝙚 𝙨𝙚 𝙘𝙤𝙢𝙥𝙧𝙞 𝙪𝙣 𝙗𝙞𝙜𝙡𝙞𝙚𝙩𝙩𝙤 𝙙𝙚𝙡𝙡𝙖 𝙡𝙤𝙩𝙩𝙚𝙧𝙞𝙖, 𝙫𝙞𝙣𝙘𝙞 𝙪𝙣 𝙙𝙚𝙗𝙞𝙩𝙤.','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞́ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙞 𝙩𝙪𝙤𝙞 𝙩𝙞 𝙙𝙖𝙣𝙣𝙤 𝙙𝙖 𝙢𝙖𝙣𝙜𝙞𝙖𝙧𝙚 𝙘𝙤𝙣 𝙡𝙖 𝙛𝙞𝙤𝙣𝙙𝙖','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞́ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙞 𝙩𝙪𝙤𝙞 𝙩𝙞 𝙙𝙖𝙣𝙣𝙤 𝙙𝙖 𝙢𝙖𝙣𝙜𝙞𝙖𝙧𝙚 𝙘𝙤𝙣 𝙡𝙖 𝙛𝙞𝙤𝙣𝙙𝙖','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙖𝙘𝙘𝙚𝙣𝙙𝙞 𝙞𝙡 𝙘𝙤𝙢𝙥𝙪𝙩𝙚𝙧 𝙨𝙞 𝙖𝙩𝙩𝙞𝙫𝙖 𝙨𝙪𝙗𝙞𝙩𝙤 𝙡`𝙖𝙣𝙩𝙞𝙫𝙞𝙧𝙪𝙨',' 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙨𝙞̀ 𝙜𝙧𝙖𝙨𝙨𝙖 𝙘𝙝𝙚 𝙚̀ 𝙨𝙩𝙖𝙩𝙖 𝙪𝙨𝙖𝙩𝙖 𝙘𝙤𝙢𝙚 𝙘𝙤𝙣𝙩𝙧𝙤𝙛𝙞𝙜𝙪𝙧𝙖 𝙙𝙚𝙡𝙡`𝙞𝙘𝙚𝙗𝙚𝙧𝙜 𝙞𝙣 𝙏𝙞𝙩𝙖𝙣𝙞𝙘','𝙇𝙖 𝙩𝙪𝙖 𝙛𝙖𝙢𝙞𝙜𝙡𝙞𝙖 𝙚̀ 𝙘𝙤𝙨𝙞̀ 𝙥𝙤𝙫𝙚𝙧𝙖 𝙘𝙝𝙚 𝙞 𝙩𝙤𝙥𝙞 𝙡𝙖𝙨𝙘𝙞𝙖𝙣𝙤 𝙚𝙡𝙚𝙢𝙤𝙨𝙞𝙣𝙖 𝙨𝙤𝙩𝙩𝙤 𝙞𝙡 𝙛𝙧𝙞𝙜𝙤𝙧𝙞𝙛𝙚𝙧𝙤.','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙩𝙧𝙤𝙞𝙖 𝙘𝙝𝙚 𝙨𝙚 𝙛𝙤𝙨𝙨𝙞 𝙪𝙣𝙖 𝙨𝙞𝙧𝙚𝙣𝙖 𝙧𝙞𝙪𝙨𝙘𝙞𝙧𝙚𝙨𝙩𝙞 𝙡𝙤 𝙨𝙩𝙚𝙨𝙨𝙤 𝙖𝙙 𝙖𝙥𝙧𝙞𝙧𝙚 𝙡𝙚 𝙜𝙖𝙢𝙗𝙚','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙨𝙞̀ 𝙫𝙖𝙘𝙘𝙖 𝙘𝙝𝙚 𝙞𝙣 𝙄𝙣𝙙𝙞𝙖 𝙡𝙖 𝙛𝙖𝙣𝙣𝙤 𝙨𝙖𝙘𝙧𝙖','𝙨𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙧𝙤𝙢𝙥𝙞𝙥𝙖𝙡𝙡𝙚 𝙘𝙝𝙚 𝙡`𝙪𝙣𝙞𝙘𝙤 𝙘𝙤𝙣𝙘𝙤𝙧𝙨𝙤 𝙘𝙝𝙚 𝙫𝙞𝙣𝙘𝙚𝙧𝙚𝙨𝙩𝙞 𝙚̀ 𝙢𝙞𝙨𝙨 𝙨𝙩𝙖𝙞 𝙧𝙤𝙥𝙚𝙣𝙙𝙤 𝙡𝙚 𝙥𝙖𝙡𝙡𝙚','𝙩𝙪𝙖 𝙢𝙖𝙢𝙢𝙖 𝙚̀ 𝙘𝙤𝙢𝙚 𝙞𝙡 𝙈𝙖𝙧𝙨, 𝙢𝙤𝙢𝙚𝙣𝙩𝙤 𝙙𝙞 𝙫𝙚𝙧𝙤 𝙜𝙤𝙙𝙞𝙢𝙚𝙣𝙩𝙤','𝙨𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙯𝙤𝙘𝙘𝙤𝙡𝙖 𝙘𝙝𝙚 𝙨𝙚 𝙩𝙞 𝙙𝙞𝙘𝙤𝙣𝙤 𝙗𝙖𝙩𝙩𝙞 𝙞𝙡 𝟱 𝙘𝙤𝙣𝙩𝙧𝙤𝙡𝙡𝙞 𝙨𝙪𝙗𝙞𝙩𝙤 𝙡`𝙖𝙜𝙚𝙣𝙙𝙖','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙨𝙚 𝙩𝙞 𝙫𝙚𝙙𝙚 𝙡𝙖 𝙢𝙤𝙧𝙩𝙚 𝙨𝙞 𝙜𝙧𝙖𝙩𝙩𝙖 𝙡𝙚 𝙥𝙖𝙡𝙡𝙚','𝙇𝙖 𝙩𝙪𝙖 𝙛𝙖𝙢𝙞𝙜𝙡𝙞𝙖 𝙚̀ 𝙘𝙤𝙨𝙞̀ 𝙥𝙤𝙫𝙚𝙧𝙖 𝙘𝙝𝙚 𝙞 𝙩𝙤𝙥𝙞 𝙡𝙖𝙨𝙘𝙞𝙖𝙣𝙤 𝙚𝙡𝙚𝙢𝙤𝙨𝙞𝙣𝙖 𝙨𝙤𝙩𝙩𝙤 𝙞𝙡 𝙛𝙧𝙞𝙜𝙤𝙧𝙞𝙛𝙚𝙧𝙤.','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙢𝙚 𝙡𝙖 𝙂𝙧𝙚𝙘𝙞𝙖, 𝙝𝙖 𝙪𝙣 𝙗𝙪𝙘𝙤 𝙜𝙞𝙜𝙖𝙣𝙩𝙚 𝙘𝙝𝙚 𝙣𝙤𝙣 𝙫𝙪𝙤𝙡𝙚 𝙨𝙢𝙚𝙩𝙩𝙚𝙧𝙚 𝙙𝙞 𝙖𝙡𝙡𝙖𝙧𝙜𝙖𝙧𝙨𝙞','𝙝𝙖𝙞 𝙥𝙞𝙪̀ 𝙘𝙤𝙧𝙣𝙖 𝙩𝙪, 𝙘𝙝𝙚 𝙪𝙣 𝙨𝙚𝙘𝙘𝙝𝙞𝙤 𝙙𝙞 𝙡𝙪𝙢𝙖𝙘𝙝𝙚','𝙨𝙚𝙞 𝙨𝙞𝙢𝙥𝙖𝙩𝙞𝙘𝙤 𝙘𝙤𝙢𝙚 𝙪𝙣 𝙙𝙞𝙩𝙤 𝙞𝙣 𝙘𝙪𝙡𝙤 𝙚 𝙥𝙪𝙯𝙯𝙞 𝙥𝙪𝙧𝙚 𝙥𝙚𝙜𝙜𝙞𝙤','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙡𝙖𝙣𝙘𝙞 𝙪𝙣 𝙗𝙤𝙤𝙢𝙚𝙧𝙖𝙣𝙜 𝙣𝙤𝙣 𝙩𝙤𝙧𝙣𝙖','𝙨𝙚𝙞 𝙪𝙩𝙞𝙡𝙚 𝙘𝙤𝙢𝙚 𝙪𝙣𝙖 𝙨𝙩𝙪𝙛𝙖 𝙞𝙣 𝙚𝙨𝙩𝙖𝙩𝙚','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙤𝙙𝙞𝙤𝙨𝙤 𝙘𝙝𝙚 𝙨𝙚 𝙜𝙞𝙖𝙣𝙣𝙞 𝙈𝙤𝙧𝙖𝙣𝙙𝙞 𝙩𝙞 𝙙𝙤𝙫𝙚𝙨𝙨𝙚 𝙖𝙗𝙗𝙧𝙖𝙘𝙘𝙞𝙖𝙧𝙚 𝙡𝙤 𝙛𝙖𝙧𝙚𝙗𝙗𝙚 𝙨𝙤𝙡𝙤 𝙥𝙚𝙧 𝙨𝙤𝙛𝙛𝙤𝙘𝙖𝙧𝙩𝙞','𝙨𝙚𝙞 𝙪𝙩𝙞𝙡𝙚 𝙘𝙤𝙢𝙚 𝙪𝙣 𝙘𝙪𝙡𝙤 𝙨𝙚𝙣𝙯𝙖 𝙞𝙡 𝙗𝙪𝙘𝙤','𝙨𝙚𝙞 𝙪𝙩𝙞𝙡𝙚 𝙘𝙤𝙢𝙚 𝙪𝙣𝙖 𝙨𝙩𝙪𝙛𝙖 𝙞𝙣 𝙚𝙨𝙩𝙖𝙩𝙚','𝙨𝙚𝙞 𝙪𝙩𝙞𝙡𝙚 𝙘𝙤𝙢𝙚 𝙪𝙣 𝙥𝙖𝙞𝙤 𝙙𝙞 𝙢𝙪𝙩𝙖𝙣𝙙𝙚 𝙞𝙣 𝙪𝙣 𝙥𝙤𝙧𝙣𝙤','𝙨𝙚𝙞 𝙛𝙖𝙨𝙩𝙞𝙙𝙞𝙤𝙨𝙤 𝙘𝙤𝙢𝙚 𝙪𝙣 𝙘𝙝𝙞𝙤𝙙𝙤 𝙣𝙚𝙡 𝙘𝙪𝙡𝙤','𝙨𝙚𝙞 𝙪𝙩𝙞𝙡𝙚 𝙦𝙪𝙖𝙣𝙩𝙤 𝙪𝙣𝙖 𝙡𝙖𝙪𝙧𝙚𝙖 𝙞𝙣 𝙇𝙚𝙩𝙩𝙚𝙧𝙚 & 𝙁𝙞𝙡𝙤𝙨𝙤𝙛𝙞𝙖','𝙖 𝙩𝙚 𝙡𝙖 𝙩𝙚𝙨𝙩𝙖 𝙨𝙚𝙧𝙫𝙚 𝙨𝙤𝙡𝙤 𝙥𝙚𝙧 𝙩𝙚𝙣𝙚𝙧 𝙙𝙞𝙨𝙩𝙖𝙘𝙘𝙖𝙩𝙚 𝙡𝙚 𝙤𝙧𝙚𝙘𝙘𝙝𝙞𝙚','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙨𝙞̀ 𝙨𝙪𝙤𝙧𝙖 𝙘𝙝𝙚 𝙨𝙞 𝙞𝙣𝙘𝙝𝙞𝙣𝙖 𝙖𝙙 𝙤𝙜𝙣𝙞 𝙘𝙖𝙥𝙥𝙚𝙡𝙡𝙖','𝙝𝙖𝙞 𝙫𝙞𝙨𝙩𝙤 𝙥𝙞𝙪̀ 𝙥𝙞𝙨𝙚𝙡𝙡𝙞 𝙩𝙚 𝙙𝙚 𝙣𝙖 𝙯𝙪𝙥𝙥𝙖 𝙙𝙚𝙧 𝙘𝙖𝙨𝙖𝙡𝙚','𝙨𝙚𝙞 𝙘𝙤𝙨𝙞 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙨𝙚 𝙩𝙞 𝙫𝙚𝙙𝙚 𝙞𝙡 𝙜𝙖𝙩𝙩𝙤 𝙣𝙚𝙧𝙤 𝙨𝙞 𝙜𝙧𝙖𝙩𝙩𝙖 𝙡𝙚 𝙥𝙖𝙡𝙡𝙚 𝙚 𝙜𝙞𝙧𝙖 𝙡𝙖𝙣𝙜𝙤𝙡𝙤','𝙨𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙨𝙛𝙞𝙜𝙖𝙩𝙤 𝙘𝙝𝙚 𝙨𝙚 𝙩𝙞 𝙘𝙖𝙙𝙚 𝙡`𝙪𝙘𝙘𝙚𝙡𝙡𝙤 𝙧𝙞𝙢𝙗𝙖𝙡𝙯𝙖 𝙚 𝙩𝙞 𝙥𝙞𝙘𝙘𝙝𝙞𝙖 𝙣𝙚𝙡 𝙘𝙪𝙡𝙤','𝙏𝙪𝙖 𝙨𝙤𝙧𝙚𝙡𝙡𝙖 𝙚̀ 𝙘𝙤𝙨𝙞̀ 𝙩𝙧𝙤𝙞𝙖 𝙘𝙝𝙚 𝙊𝙣𝙡𝙮𝙁𝙖𝙣𝙨 𝙡𝙚 𝙝𝙖 𝙘𝙝𝙞𝙚𝙨𝙩𝙤 𝙙𝙞 𝙫𝙚𝙨𝙩𝙞𝙧𝙨𝙞 𝙙𝙞 𝙥𝙞𝙪̀.','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙢𝙚 𝙡𝙖 𝙨𝙖𝙡𝙨𝙞𝙘𝙘𝙞𝙖 𝙗𝙪𝙙𝙚𝙡𝙡𝙖 𝙛𝙪𝙤𝙧𝙞 𝙢𝙖𝙞𝙖𝙡𝙖 𝙙𝙚𝙣𝙩𝙧𝙤','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙢𝙚 𝙪𝙣 𝙘𝙪𝙤𝙧𝙚, 𝙨𝙚 𝙣𝙤𝙣 𝙗𝙖𝙩𝙩𝙚 𝙢𝙪𝙤𝙧𝙚','𝙩𝙪𝙖 𝙢𝙖𝙢𝙢𝙖 𝙚̀ 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙗𝙖𝙜𝙖𝙨𝙨𝙖 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙩𝙞 𝙝𝙖 𝙥𝙖𝙧𝙩𝙤𝙧𝙞𝙩𝙤 𝙨𝙞 𝙚̀ 𝙘𝙝𝙞𝙚𝙨𝙩𝙖 𝙨𝙚 𝙖𝙨𝙨𝙤𝙢𝙞𝙜𝙡𝙞𝙖𝙨𝙨𝙞 𝙥𝙞𝙪̀ 𝙖𝙡𝙡`𝙞𝙙𝙧𝙖𝙪𝙡𝙞𝙘𝙤 𝙤 𝙖𝙡 𝙥𝙤𝙨𝙩𝙞𝙣𝙤','𝙎𝙚𝙞 𝙡𝙖 𝙥𝙧𝙤𝙫𝙖 𝙘𝙝𝙚 𝘿𝙞𝙤 𝙖 𝙫𝙤𝙡𝙩𝙚 𝙨𝙗𝙖𝙜𝙡𝙞𝙖... 𝙚 𝙥𝙤𝙞 𝙨𝙞 𝙙𝙞𝙫𝙚𝙧𝙩𝙚.','𝙩𝙪 𝙣𝙤𝙣 𝙨𝙚𝙞 𝙪𝙣 𝙪𝙤𝙢𝙤. 𝙎𝙚𝙞 𝙪𝙣𝙖 𝙛𝙞𝙜𝙪𝙧𝙖 𝙢𝙞𝙩𝙤𝙡𝙤𝙜𝙞𝙘𝙖 𝙘𝙤𝙣 𝙞𝙡 𝙘𝙤𝙧𝙥𝙤 𝙙𝙞 𝙪𝙤𝙢𝙤 𝙚 𝙡𝙖 𝙩𝙚𝙨𝙩𝙖 𝙙𝙞 𝙘𝙖𝙯𝙯𝙤','𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙢𝙚 𝙪𝙣𝙖 𝙡𝙖𝙫𝙖𝙩𝙧𝙞𝙘𝙚: 𝙨𝙞 𝙛𝙖 𝙗𝙞𝙖𝙣𝙘𝙝𝙞, 𝙣𝙚𝙧𝙞 𝙚 𝙘𝙤𝙡𝙤𝙧𝙖𝙩𝙞 𝙩𝙪𝙩𝙩𝙞 𝙖 𝟵𝟬 𝙜𝙧𝙖𝙙𝙞!','𝙎𝙚𝙞 𝙞𝙡 𝙢𝙤𝙩𝙞𝙫𝙤 𝙥𝙚𝙧 𝙘𝙪𝙞 𝙖𝙡𝙘𝙪𝙣𝙞 𝙖𝙣𝙞𝙢𝙖𝙡𝙞 𝙖𝙗𝙗𝙖𝙣𝙙𝙤𝙣𝙖𝙣𝙤 𝙞 𝙘𝙪𝙘𝙘𝙞𝙤𝙡𝙞. 𝙋𝙚𝙧𝙨𝙞𝙣𝙤 𝙒𝙞𝙠𝙞𝙥𝙚𝙙𝙞𝙖 𝙩𝙞 𝙘𝙤𝙧𝙧𝙚𝙜𝙜𝙚𝙧𝙚𝙗𝙗𝙚, 𝙢𝙖 𝙢𝙖𝙣𝙘𝙤 𝙡𝙤𝙧𝙤 𝙝𝙖𝙣𝙣𝙤 𝙩𝙚𝙢𝙥𝙤 𝙥𝙚𝙧 𝙡𝙚 𝙩𝙪𝙚 𝙘𝙖𝙯𝙯𝙖𝙩𝙚','𝙎𝙚 𝙡𝙖 𝙨𝙩𝙪𝙥𝙞𝙙𝙞𝙩𝙖̀ 𝙛𝙤𝙨𝙨𝙚 𝙪𝙣’𝙤𝙡𝙞𝙢𝙥𝙞𝙖𝙙𝙚, 𝙨𝙖𝙧𝙚𝙨𝙩𝙞 𝙘𝙖𝙢𝙥𝙞𝙤𝙣𝙚 𝙙𝙚𝙡 𝙢𝙤𝙣𝙙𝙤, 𝙘𝙤𝙣 𝙧𝙚𝙘𝙤𝙧𝙙 𝙢𝙤𝙣𝙙𝙞𝙖𝙡𝙚 𝙞𝙣 𝙘𝙖𝙜𝙖𝙧𝙚 𝙞𝙡 𝙘𝙖𝙯𝙯𝙤 𝙚 𝙣𝙤𝙣 𝙘𝙤𝙣𝙘𝙡𝙪𝙙𝙚𝙧𝙚 𝙪𝙣 𝙘𝙖𝙯𝙯𝙤.','𝙃𝙖𝙞 𝙪𝙣 𝙫𝙞𝙨𝙤 𝙘𝙝𝙚 𝙥𝙤𝙩𝙧𝙚𝙗𝙗𝙚 𝙛𝙚𝙧𝙢𝙖𝙧𝙚 𝙪𝙣 𝙤𝙧𝙤𝙡𝙤𝙜𝙞𝙤... 𝙚 𝙛𝙖𝙧𝙡𝙤 𝙫𝙤𝙢𝙞𝙩𝙖𝙧𝙚.','𝙎𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙨𝙚𝙞 𝙣𝙖𝙩𝙤, 𝙞𝙡 𝙙𝙤𝙩𝙩𝙤𝙧𝙚 𝙝𝙖 𝙥𝙧𝙚𝙨𝙤 𝙖 𝙘𝙖𝙡𝙘𝙞 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙥𝙚𝙧 𝙧𝙞𝙥𝙞𝙘𝙘𝙖','𝙎𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙗𝙧𝙪𝙩𝙩𝙤 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙨𝙚𝙞 𝙣𝙖𝙩𝙤, 𝙡 𝙤𝙨𝙩𝙚𝙩𝙧𝙞𝙘𝙖 𝙝𝙖 𝙘𝙝𝙞𝙚𝙨𝙩𝙤 𝙪𝙣 𝙖𝙪𝙢𝙚𝙣𝙩𝙤 𝙙𝙞 𝙨𝙩𝙞𝙥𝙚𝙣𝙙𝙞𝙤 𝙥𝙚𝙧 𝙩𝙧𝙖𝙪𝙢𝙖 𝙥𝙨𝙞𝙘𝙤𝙡𝙤𝙜𝙞𝙘𝙤','𝙎𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙧𝙞𝙥𝙪𝙜𝙣𝙖𝙣𝙩𝙚 𝙘𝙝𝙚 𝙞𝙡 𝙩𝙪𝙤 𝙧𝙞𝙛𝙡𝙚𝙨𝙨𝙤 𝙣𝙚𝙜𝙡𝙞 𝙨𝙥𝙚𝙘𝙘𝙝𝙞 𝙨𝙞 𝙨𝙪𝙞𝙘𝙞𝙙𝙖.','𝙎𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙙𝙚𝙛𝙤𝙧𝙢𝙚 𝙘𝙝𝙚 𝙞 𝙘𝙖𝙣𝙞 𝙧𝙖𝙣𝙙𝙖𝙜𝙞 𝙩𝙞 𝙥𝙞𝙨𝙘𝙞𝙖𝙣𝙤 𝙖𝙙𝙙𝙤𝙨𝙨𝙤 𝙥𝙚𝙧 𝙥𝙞𝙚𝙩𝙖̀.','𝙎𝙚𝙞 𝙡𝙖 𝙥𝙧𝙤𝙫𝙖 𝙘𝙝𝙚 𝙡 𝙖𝙗𝙤𝙧𝙩𝙤 𝙙𝙤𝙫𝙧𝙚𝙗𝙗𝙚 𝙚𝙨𝙨𝙚𝙧𝙚 𝙡𝙚𝙜𝙖𝙡𝙚 𝙛𝙞𝙣𝙤 𝙖𝙞 𝟰𝟬 𝙖𝙣𝙣𝙞.','𝙎𝙚𝙞 𝙘𝙤𝙢𝙚 𝙪𝙣 𝙥𝙧𝙚𝙨𝙚𝙧𝙫𝙖𝙩𝙞𝙫𝙤 𝙗𝙪𝙘𝙖𝙩𝙤: 𝙝𝙖𝙞 𝙪𝙣 𝙨𝙤𝙡𝙤 𝙘𝙤𝙢𝙥𝙞𝙩𝙤 𝙚 𝙡𝙤 𝙨𝙗𝙖𝙜𝙡𝙞.','𝙏𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙨𝙞̀ 𝙩𝙧𝙤𝙞𝙖 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙖𝙥𝙧𝙚 𝙡𝙚 𝙜𝙖𝙢𝙗𝙚, 𝙡 𝙊𝙉𝙐 𝙢𝙖𝙣𝙙𝙖 𝙖𝙞𝙪𝙩𝙞 𝙪𝙢𝙖𝙣𝙞𝙩𝙖𝙧𝙞.','𝙎𝙚𝙞 𝙘𝙤𝙨𝙞̀ 𝙧𝙞𝙩𝙖𝙧𝙙𝙖𝙩𝙤 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙜𝙞𝙤𝙘𝙝𝙞 𝙖 𝙣𝙖𝙨𝙘𝙤𝙣𝙙𝙞𝙣𝙤, 𝙩𝙞 𝙥𝙚𝙧𝙙𝙞 𝙥𝙪𝙧𝙚 𝙩𝙚 𝙨𝙩𝙚𝙨𝙨𝙤.','𝙎𝙚𝙞 𝙡𝙖 𝙥𝙧𝙤𝙫𝙖 𝙫𝙞𝙫𝙚𝙣𝙩𝙚 𝙘𝙝𝙚 𝙡’𝙖𝙗𝙤𝙧𝙩𝙤 𝙥𝙤𝙨𝙩-𝙣𝙖𝙩𝙖𝙡𝙚 𝙙𝙤𝙫𝙧𝙚𝙗𝙗𝙚 𝙚𝙨𝙨𝙚𝙧𝙚 𝙡𝙚𝙜𝙖𝙡𝙚.','𝙏𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙚̀ 𝙘𝙤𝙨𝙞̀ 𝙩𝙧𝙤𝙞𝙖 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙖𝙥𝙧𝙚 𝙡𝙚 𝙜𝙖𝙢𝙗𝙚, 𝙊𝙣𝙡𝙮𝙁𝙖𝙣𝙨 𝙘𝙧𝙖𝙨𝙝𝙖 𝙥𝙚𝙧 𝙞𝙡 𝙩𝙧𝙖𝙛𝙛𝙞𝙘𝙤., 𝙎𝙚𝙞 𝙘𝙤𝙨𝙞 𝙗𝙧𝙪𝙩𝙩𝙖 𝙘𝙝𝙚 𝙦𝙪𝙖𝙣𝙙𝙤 𝙨𝙚𝙞 𝙣𝙖𝙩𝙖 𝙞𝙡 𝙙𝙤𝙩𝙩𝙤𝙧𝙚 𝙖 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙖𝙡 𝙥𝙤𝙨𝙩𝙤 𝙙𝙚𝙡𝙡𝙚 𝙘𝙤𝙣𝙜𝙧𝙖𝙩𝙪𝙡𝙖𝙯𝙞𝙤𝙣𝙞 𝙡𝙚 𝙝𝙖 𝙛𝙖𝙩𝙩𝙤 𝙡𝙚 𝙘𝙤𝙣𝙙𝙤𝙜𝙡𝙞𝙖𝙣𝙯𝙚.,𝙎𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙪𝙩𝙞𝙡𝙚 𝙘𝙝𝙚 𝙨𝙚 𝙩𝙞 𝙩𝙧𝙤𝙫𝙖𝙨𝙨𝙚 𝙖𝙛𝙛𝙤𝙜𝙖𝙣𝙙𝙤 𝙞𝙡 𝙢𝙖𝙧𝙚 𝙨𝙞 𝙘𝙤𝙥𝙧𝙞𝙧𝙚𝙗𝙗𝙚 𝙙𝙖 𝙨𝙤𝙡𝙤, 𝙨𝙚𝙞 𝙘𝙤𝙨𝙞 𝙞𝙧𝙧𝙞𝙩𝙖𝙣𝙩𝙚 𝙘𝙝𝙚 𝙜𝙡𝙞 𝙖𝙣𝙩𝙞𝙩𝙖𝙘𝙘𝙝𝙞 𝙙𝙚𝙞 𝙘𝙤𝙢𝙥𝙪𝙩𝙚𝙧 𝙨𝙞 𝙖𝙧𝙧𝙚𝙨𝙖𝙣𝙤 𝙙𝙞 𝙛𝙧𝙤𝙣𝙩𝙚 𝙖 𝙩𝙚, 𝙝𝙖𝙞 𝙡𝙖 𝙘𝙝𝙖𝙧𝙞𝙨𝙢𝙖 𝙙𝙞 𝙪𝙣 𝙖𝙨𝙘𝙞𝙪𝙜𝙖𝙢𝙖𝙣𝙤 𝙪𝙨𝙖𝙩𝙤, 𝙨𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙫𝙪𝙤𝙩𝙤 𝙘𝙝𝙚 𝙪𝙣 𝙚𝙘𝙝𝙤 𝙣𝙚𝙡𝙡𝙖 𝙩𝙚𝙨𝙩𝙖 𝙛𝙖 𝙧𝙞𝙢𝙗𝙖𝙡𝙯𝙤, 𝙩𝙧𝙤𝙫𝙖𝙧𝙚 𝙙𝙚𝙡 𝙨𝙚𝙣𝙨𝙤 𝙞𝙣 𝙩𝙚 𝙚̀ 𝙘𝙤𝙢𝙚 𝙘𝙚𝙧𝙘𝙖𝙧𝙚 𝙬𝙞𝙛𝙞 𝙣𝙚𝙡 𝙙𝙚𝙨𝙚𝙧𝙩𝙤, 𝙡𝙖 𝙩𝙪𝙖 𝙞𝙣𝙩𝙚𝙡𝙡𝙞𝙜𝙚𝙣𝙯𝙖 𝙚̀ 𝙘𝙤𝙢𝙚 𝙪𝙣 𝙖𝙘𝙘𝙚𝙣𝙙𝙞𝙣𝙤 𝙨𝙘𝙖𝙧𝙞𝙘𝙤: 𝙣𝙤𝙣 𝙛𝙖 𝙪𝙣𝙖 𝙨𝙘𝙞𝙣𝙡𝙡𝙖, 𝙨𝙚𝙞 𝙘𝙤𝙨𝙞 𝙞𝙣𝙪𝙩𝙞𝙡𝙚 𝙘𝙝𝙚 𝙪𝙣 𝙞𝙣𝙩𝙚𝙧𝙧𝙪𝙩𝙩𝙤𝙧𝙚 𝙨𝙥𝙚𝙣𝙩𝙤 𝙝𝙖 𝙥𝙞𝙪̀ 𝙛𝙪𝙣𝙯𝙞𝙤𝙣𝙞 𝙙𝙞 𝙩𝙚, 𝙡𝙖 𝙩𝙪𝙖 𝙥𝙧𝙚𝙨𝙚𝙣𝙯𝙖 𝙚̀ 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙖𝙣𝙣𝙤𝙮𝙞𝙣𝙜 𝙘𝙝𝙚 𝙪𝙣 𝙯𝙖𝙣𝙯𝙖𝙧𝙖 𝙡𝙖 𝙣𝙤𝙩𝙩𝙚 𝙚̀ 𝙥𝙞𝙪̀ 𝙨𝙤𝙥𝙥𝙤𝙧𝙩𝙖𝙗𝙞𝙡𝙚, 𝙨𝙚𝙞 𝙡𝙖 𝙥𝙧𝙤𝙫𝙖 𝙫𝙞𝙫𝙚𝙣𝙩𝙚 𝙘𝙝𝙚 𝙡’𝙚𝙫𝙤𝙡𝙪𝙯𝙞𝙤𝙣𝙚 𝙘𝙖𝙢𝙢𝙞𝙣𝙖 𝙖𝙡 𝙘𝙤𝙣𝙩𝙧𝙖𝙧𝙞𝙤, 𝙨𝙚𝙞 𝙘𝙤𝙨𝙞 𝙧𝙞𝙙𝙞𝙘𝙤𝙡𝙤 𝙘𝙝𝙚 𝙛𝙞𝙣𝙤 𝙖 𝙡𝙚 𝙘𝙤𝙢𝙞𝙘𝙝𝙚 𝙨𝙘𝙚𝙣𝙙𝙤𝙣𝙤 𝙙𝙖𝙡 𝙥𝙖𝙡𝙘𝙤, 𝙨𝙚𝙞 𝙡’𝙚𝙦𝙪𝙞𝙫𝙖𝙡𝙚𝙣𝙩𝙚 𝙪𝙢𝙖𝙣𝙤 𝙙𝙞 𝙪𝙣𝙖 𝙨𝙘𝙝𝙚𝙧𝙢𝙖𝙩𝙖 𝙗𝙞𝙖𝙣𝙘𝙖, 𝙡𝙖 𝙩𝙪𝙖 𝙛𝙖𝙘𝙘𝙞𝙖 𝙚̀ 𝙡’𝙖𝙣𝙩𝙞-𝙞𝙘𝙤𝙣𝙖 𝙙𝙚𝙡𝙡𝙚 𝙛𝙤𝙩𝙤 𝙥𝙧𝙤𝙛𝙞𝙡𝙤, 𝙨𝙚𝙞 𝙘𝙤𝙨𝙞 𝙣𝙤𝙞𝙤𝙨𝙤 𝙘𝙝𝙚 𝙪𝙣 𝙡𝙞𝙗𝙧𝙤 𝙙𝙞 𝙞𝙨𝙩𝙧𝙪𝙯𝙞𝙤𝙣𝙞 𝙥𝙚𝙧 𝙡’𝙖𝙨𝙥𝙞𝙧𝙖𝙥𝙤𝙡𝙫𝙚𝙧𝙚 𝙨𝙚𝙢𝙗𝙧𝙖 𝙪𝙣 𝙧𝙤𝙢𝙖𝙣𝙯𝙤, 𝙩𝙪 𝙨𝙚𝙞 𝙡’𝙖𝙥𝙥𝙞𝙘𝙖𝙯𝙞𝙤𝙣𝙚 𝙘𝙝𝙚 𝙩𝙪𝙩𝙩𝙞 𝙙𝙞𝙨𝙞𝙣𝙨𝙩𝙖𝙡𝙡𝙖𝙣𝙤 𝙙𝙤𝙥𝙤 𝙪𝙣’𝙤𝙧𝙖. 𝙎𝙚𝙞 𝙘𝙤𝙨𝙞 𝙪𝙜𝙡𝙮 𝙘𝙝𝙚 𝙞 𝙘𝙡𝙤𝙬𝙣 𝙩𝙞 𝙪𝙨𝙖𝙣𝙤 𝙘𝙤𝙢𝙚 𝙢𝙖𝙨𝙘𝙤𝙩, 𝙡𝙖 𝙩𝙪𝙖 𝙞𝙣𝙩𝙚𝙡𝙡𝙞𝙜𝙚𝙣𝙯𝙖 𝙝𝙖 𝙡𝙖 𝙙𝙚𝙣𝙨𝙞𝙩𝙖̀ 𝙙𝙞 𝙪𝙣𝙖 𝙣𝙪𝙫𝙤𝙡𝙖, 𝙨𝙚𝙞 𝙘𝙤𝙨𝙞 𝙞𝙣𝙪𝙩𝙞𝙡𝙚 𝙘𝙝𝙚 𝙣𝙚𝙢𝙢𝙚𝙣𝙤 𝙘𝙤𝙢𝙚 𝙘𝙖𝙧𝙞𝙘𝙤 𝙙𝙞 𝙥𝙚𝙨𝙞 𝙨𝙚𝙧𝙫𝙞𝙧𝙚𝙨𝙩𝙞, 𝙡𝙖 𝙩𝙪𝙖 𝙛𝙖𝙘𝙘𝙞𝙖 𝙚̀ 𝙡’𝙪𝙣𝙞𝙘𝙖 𝙘𝙤𝙨𝙖 𝙘𝙝𝙚 𝙥𝙚𝙧𝙨𝙞𝙣𝙤 𝙡𝙚 𝙨𝙥𝙚𝙘𝙘𝙝𝙞𝙚𝙧𝙚 𝙧𝙞𝙛𝙞𝙪𝙩𝙖𝙣𝙤, 𝙨𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙨𝙘𝙤𝙣𝙘𝙡𝙪𝙨𝙤 𝙘𝙝𝙚 𝙞 𝙨𝙞𝙩𝙞 𝙙𝙞 𝙩𝙧𝙖𝙨𝙡𝙤𝙘𝙝𝙞 𝙩𝙞 𝙪𝙨𝙖𝙣𝙤 𝙘𝙤𝙢𝙚 𝙚𝙨𝙚𝙢𝙥𝙞𝙤, 𝙡𝙖 𝙩𝙪𝙖 𝙫𝙤𝙘𝙚 𝙚̀ 𝙘𝙤𝙨𝙞 𝙨𝙩𝙧𝙞𝙙𝙚𝙣𝙩𝙚 𝙘𝙝𝙚 𝙞 𝙘𝙝𝙞𝙧𝙪𝙧𝙜𝙞 𝙡𝙖 𝙪𝙨𝙖𝙣𝙤 𝙖𝙡 𝙥𝙤𝙨𝙩𝙤 𝙙𝙚𝙡 𝙡𝙖𝙨𝙚𝙧, 𝙨𝙚𝙞 𝙡𝙖 𝙥𝙧𝙤𝙫𝙖 𝙘𝙝𝙚 𝙡’𝙚𝙧𝙧𝙤𝙧𝙚 𝙙𝙞 𝙨𝙮𝙨𝙩𝙚𝙢𝙖 𝙚𝙨𝙞𝙨𝙩𝙚 𝙖𝙣𝙘𝙝𝙚 𝙣𝙚𝙡𝙡’𝙚𝙫𝙤𝙡𝙪𝙯𝙞𝙤𝙣𝙚, 𝙨𝙚𝙞 𝙩𝙖𝙡𝙢𝙚𝙣𝙩𝙚 𝙣𝙤𝙞𝙤𝙨𝙤 𝙘𝙝𝙚 𝙞 𝙢𝙤𝙣𝙤𝙡𝙤𝙜𝙝𝙞 𝙙𝙞 𝙢𝙖𝙩𝙚𝙢𝙖𝙩𝙞𝙘𝙖 𝙨𝙪𝙤𝙣𝙖𝙣𝙤 𝙘𝙤𝙢𝙚 𝙨𝙝𝙤𝙬 𝙘𝙤𝙢𝙞𝙘𝙞, 𝙡𝙖 𝙩𝙪𝙖 𝙥𝙚𝙧𝙨𝙤𝙣𝙖𝙡𝙞𝙩𝙖̀ 𝙚̀ 𝙡’𝙚𝙦𝙪𝙞𝙫𝙖𝙡𝙚𝙣𝙩𝙚 𝙙𝙞 𝙪𝙣 𝙨𝙞𝙡𝙚𝙣𝙯𝙞𝙤 𝙞𝙢𝙗𝙖𝙧𝙖𝙯𝙯𝙖𝙣𝙩𝙚, 𝙨𝙚𝙞 𝙘𝙤𝙨𝙞 𝙨𝙘𝙖𝙧𝙨𝙤 𝙘𝙝𝙚 𝙥𝙚𝙧𝙙𝙚𝙧𝙚 𝙘𝙤𝙣 𝙩𝙚 𝙨𝙖 𝙙𝙞 𝙫𝙞𝙩𝙩𝙤𝙧𝙞𝙖.  5 𝙢𝙞𝙣𝙪𝙩𝙞 𝙩𝙪𝙤 𝙥𝙖𝙙𝙧𝙚, 9 𝙢𝙚𝙨𝙞 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙥𝙚𝙧 𝙛𝙖𝙧𝙚 𝙪𝙣𝙤 𝙨𝙘𝙝𝙚𝙧𝙯𝙤 𝙙𝙚𝙡𝙡𝙖 𝙣𝙖𝙩𝙪𝙧𝙖 𝙘𝙤𝙢𝙚 𝙩𝙚, 𝙈𝙖 𝙡𝙖 𝙘𝙤𝙡𝙥𝙖 𝙢𝙞𝙘𝙖 è 𝙩𝙪𝙖, 𝙘𝙚 𝙡 𝙝𝙖 𝙩𝙪𝙖 𝙢𝙖𝙙𝙧𝙚 𝙘𝙝𝙚 𝙖𝙡 𝙥𝙤𝙨𝙩𝙤 𝙙𝙞 𝙙𝙤𝙣𝙖𝙧𝙩𝙞 𝙖𝙙 𝙪𝙣𝙤 𝙯𝙤𝙤 𝙩𝙞 𝙝𝙖 𝙥𝙤𝙧𝙩𝙖𝙩𝙤 𝙖 𝙘𝙖𝙨𝙖.']
+
+  const insulto = frasi[Math.floor(Math.random() * frasi.length)]
+
+  return conn.sendMessage(chat, {
+    text: `*🤬 ${tag(target)}, ${insulto}*`,
+    mentions: [target],
+    contextInfo: {
+      ...(global.rcanal?.contextInfo || {}),
+      mentionedJid: [target]
     }
-  );
-};
+  }, { quoted: q })
+}
 
-handler.command = /^(insulta|insulto|insult|insulta_es|insultar|insulte|beleidige|insultar_pt|insultar_br|سب|اه insultar_ar|अपमान|insulte_fr|hina|insultar_id|hakaret)$/i;
-handler.tags = ['fun'];
-handler.help = ['insulta @user', 'insulto @user', 'insult @user', 'insultar @user', 'insulte @user', 'beleidige @user', 'insultar_pt @user', 'سب @user', 'अपमान @user', 'insulte_fr @user', 'hina @user', 'insultar_id @user', 'hakaret @user'];
+handler.help = ['insulta @utente']
+handler.tags = ['fun']
+handler.command = ['insulta']
+handler.group = true
 
-
-export default handler;
+export default handler
