@@ -1,4 +1,3 @@
-
 import yts from 'yt-search';
 import fg from 'api-dylux';
 import fetch from 'node-fetch';
@@ -8,7 +7,7 @@ import path from 'path';
 import os from 'os';
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-  if (!text) return m.reply(`⚡ *RLY-BOT*\n\n💡 _Scrivi:_ ${usedPrefix + command} nome canzone`);
+  if (!text) return m.reply(`⚡ *𝗥𝗟𝗬-𝗕𝗢𝗧*\n\n💡 _Scrivi:_ ${usedPrefix + command} nome canzone`);
 
   try {
     const search = await yts(text);
@@ -19,7 +18,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     if (command === 'play') {
         let infoMsg = `┏━━━━━━━━━━━━━━━━━━━┓\n` +
-                      `   🎧  *𝙋𝙡𝙖𝙮 RLY-BOT* 🎧\n` +
+                      `   🎧  *𝙋𝙡𝙖𝙮 𝗥𝗟𝗬-𝗕𝗢𝗧* 🎧\n` +
                       `┗━━━━━━━━━━━━━━━━━━━┛\n\n` +
                       `◈ 📌 *𝗧𝗶𝘁𝗼𝗹𝗼:* ${vid.title}\n` +
                       `◈ ⏱️ *𝗗𝘂𝗿𝗮𝘁𝗮:* ${vid.timestamp}\n\n` +
@@ -28,7 +27,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         return await conn.sendMessage(m.chat, {
             image: { url: vid.thumbnail },
             caption: infoMsg,
-            footer: 'RLY-BOT',
+            footer: '\n𝛥𝐗𝐈𝚶𝐍 𝚩𝚯𝐓',
             buttons: [
                 { buttonId: `${usedPrefix}playaud ${url}`, buttonText: { displayText: '🎵 𝗔𝗨𝗗𝗜𝗢 (𝗠𝗣𝟯)' }, type: 1 },
                 { buttonId: `${usedPrefix}playvid ${url}`, buttonText: { displayText: '🎬 𝗩𝗜𝗗𝗘𝗢 (𝗠𝗣𝟰)' }, type: 1 }
@@ -37,7 +36,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
         }, { quoted: m });
     }
 
-    await conn.sendMessage(m.chat, { react: { text: "⚡", key: m.key } });
+    await conn.sendMessage(m.chat, { react: { text: "🎵", key: m.key } });
 
     let downloadUrl = null;
     const isAudio = command === 'playaud';
@@ -61,7 +60,7 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 
     const tmpDir = os.tmpdir();
     const fileName = `file_${Date.now()}`;
-    const inputPath = path.join(tmpDir, fileName);
+    const inputPath = path.join( tmpDir, `${fileName}.${isAudio ? 'mp3' : 'mp4'}`);
     const outputPath = path.join(tmpDir, `${fileName}.${isAudio ? 'mp3' : 'mp4'}`);
 
     const response = await fetch(downloadUrl);
@@ -69,27 +68,34 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     const arrayBuffer = await response.arrayBuffer();
     fs.writeFileSync(inputPath, Buffer.from(arrayBuffer));
 
-    if (isAudio) {
-        await new Promise((resolve, reject) => {
-            exec(`ffmpeg -i ${inputPath} -vn -ar 44100 -ac 2 -b:a 128k ${outputPath}`, (err) => {
-                if (err) reject(err);
-                else resolve();
-            });
-        });
+if (isAudio) {
+    const voicePath = path.join(tmpDir, `${fileName}.ogg`)
 
-        await conn.sendMessage(m.chat, {
-            audio: fs.readFileSync(outputPath),
-            mimetype: 'audio/mpeg',
-            fileName: `${vid.title}.mp3`,
-            ptt: false
-        }, { quoted: m });
-    } else {
-        await conn.sendMessage(m.chat, {
-            video: fs.readFileSync(inputPath),
-            mimetype: 'video/mp4',
-            caption: `✅ *𝐒𝐜𝐚𝐫𝐢𝐜𝐚𝐭𝐨 𝐝𝐚 RLY-BOT*`,
-        }, { quoted: m });
-    }
+    await new Promise((resolve, reject) => {
+        exec(
+            `ffmpeg -hide_banner -loglevel error -y -i "${inputPath}" -map_metadata -1 -vn -ar 48000 -ac 1 -c:a libopus -b:a 64k -application voip -f ogg "${voicePath}"`,
+            (err) => {
+                if (err) reject(err)
+                else resolve()
+            }
+        )
+    })
+
+    await conn.sendMessage(m.chat, {
+        audio: fs.readFileSync(voicePath),
+        mimetype: 'audio/ogg; codecs=opus',
+        ptt: true
+    }, { quoted: m })
+
+    if (fs.existsSync(voicePath)) fs.unlinkSync(voicePath)
+
+} else {
+    await conn.sendMessage(m.chat, {
+        video: fs.readFileSync(inputPath),
+        mimetype: 'video/mp4',
+        caption: `✅ *𝐒𝐜𝐚𝐫𝐢𝐜𝐚𝐭𝐨 𝐝𝐚 𝗥𝗟𝗬-𝗕𝗢𝗧*`
+    }, { quoted: m })
+}
 
     if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
     if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
