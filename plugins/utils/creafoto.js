@@ -10,37 +10,40 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     return
   }
 
-  try {
-    await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
-    
-    const prompt = encodeURIComponent(text)
-    const imageUrl = `https://image.pollinations.ai/p/${prompt}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000)}&nologo=true`
-    
-    const response = await fetch(imageUrl)
-    if (!response.ok) throw new Error('Errore nel recupero dell\'immagine')
-    const buffer = await response.buffer()
+  const prompt = encodeURIComponent(text)
+  const providers = [
+    `https://image.pollinations.ai/p/${prompt}?width=1024&height=1024&seed=${Math.floor(Math.random() * 1000)}&nologo=true`,
+    `https://api.scrapi.download/ai/text2img?prompt=${prompt}`,
+    `https://api.xyroinee.xyz/api/ai/text2img?q=${prompt}`
+  ]
 
-    await conn.sendMessage(m.chat, { react: { text: '🎨', key: m.key } })
+  await conn.sendMessage(m.chat, { react: { text: '⏳', key: m.key } })
 
-    await conn.sendMessage(
-      m.chat,
-      {
-        image: buffer,
-        caption: `✨ *Ecco la tua foto:* _"${text}"_\n\n*Generata da:* @${m.sender.split('@')[0]}`,
-        mentions: [m.sender]
-      },
-      { quoted: m }
-    )
+  for (let url of providers) {
+    try {
+      const response = await fetch(url)
+      if (!response.ok) continue
+      
+      const buffer = await response.buffer()
+      if (buffer.length < 1000) continue 
 
-  } catch (e) {
-    console.error('Errore creafoto:', e)
-    await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
-    await conn.sendMessage(
-      m.chat,
-      { text: '❌ *Si è verificato un errore durante la generazione dell\'immagine. Riprova più tardi.*' },
-      { quoted: m }
-    )
+      await conn.sendMessage(m.chat, { react: { text: '🎨', key: m.key } })
+      await conn.sendMessage(
+        m.chat,
+        {
+          image: buffer,
+          caption: `✨ *Ecco la tua foto:* _"${text}"_\n\n*Generata da:* @${m.sender.split('@')[0]}`,
+          mentions: [m.sender]
+        },
+        { quoted: m }
+      )
+      return 
+    } catch {
+      continue
+    }
   }
+
+  await conn.sendMessage(m.chat, { react: { text: '❌', key: m.key } })
 }
 
 handler.help = ['creafoto <descrizione>']
