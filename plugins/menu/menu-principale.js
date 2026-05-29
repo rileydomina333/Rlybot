@@ -16,7 +16,7 @@ const handler = async (message, { conn, usedPrefix, command }) => {
 
     const menuText = generateMenuText(usedPrefix, botName, userCount, userId, groupId);
 
-    const photopath = path.join(__dirname, '../../media/IMG-20260509-WA0130.jpg'); 
+    const photopath = path.join(__dirname, '../../media/WA_1780014746420.jpeg'); 
 
     const footerText = `Powered by ℝ𝕃𝕐 𝔹𝕆𝕋 ✨`;
 
