@@ -52,22 +52,22 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
     return `
 ┏━━〔 ✨ *${botName}* ✨ 〕━━┓
 ┃
-┃  👤 *Utente:* @${userId.split('@')[0]}
-┃  📊 *Database:* ${userCount}
-┃  ⚙️ *Versione:* ${vs}
+┃  💠 *Utente:* @${userId.split('@')[0]}
+┃  💠 *Database:* ${userCount}
+┃  💠 *Versione:* ${vs}
 ┃
 ┣━━〔 💠 *SISTEMA* 〕━━┓
-┃ 📑 \`${prefix}installa\`
-┃ 🛠️ \`${prefix}sistema\`
-┃ ⚡ \`${prefix}ping\`
+┃ 💠 \`${prefix}installa\`
+┃ 💠 \`${prefix}sistema\`
+┃ 💠 \`${prefix}ping\`
 ┃
-┣━━〔 🧠 *INTELLIGENZA* 〕━━┓
-┃ 🤖 \`${prefix}rlybot\`
-┃ 🌍 \`${prefix}lingua\`
+┣━━〔 💠 *INTELLIGENZA* 〕━━┓
+┃ 💠 \`${prefix}rlybot\`
+┃ 💠 \`${prefix}lingua\`
 ┃
-┣━━〔 🛠️ *ASSISTENZA* 〕━━┓
-┃ 📩 \`${prefix}report\`
-┃ 💡 \`${prefix}suggerisci\`
+┣━━〔 💠 *ASSISTENZA* 〕━━┓
+┃ 💠 \`${prefix}report\`
+┃ 💠 \`${prefix}suggerisci\`
 ┃
 ┗━━━━━━━━━━━━━━━━━━┛`.trim();
 }
