@@ -44,7 +44,7 @@ function generateMenuText(prefix, userId, groupId) {
    ୧ 💠 ୭ *Menu Moderatore*
 ╰┈ ─ ─ ✦ ─ ─ ┈╯
 
-╭💠 Gestione Utenti 💠★╮
+╭★ Gestione Utenti ★╮
 │ 💠 *${prefix}kick* @user — Rimuovi utente
 │ 💠 *${prefix}muta* @user — Silenzia utente
 │ 💠 *${prefix}smuta* @user — Ripristina utente
@@ -53,7 +53,7 @@ function generateMenuText(prefix, userId, groupId) {
 │ 💠 *${prefix}listawarn* — Lista avvertimenti
 ╰★───────────★╯
 
-╭💠 Gestione Gruppo 💠╮
+╭★ Gestione Gruppo ★╮
 │ 💠 *${prefix}del* — Elimina un messaggio
 │ 💠 *${prefix}hidetag* testo — Menziona tutti
 │ 💠 *${prefix}tagall* — Tagga tutti
@@ -61,11 +61,11 @@ function generateMenuText(prefix, userId, groupId) {
 │ 💠 *${prefix}inattivi* — Gestisci inattivi
 ╰★───────────★╯
 
-╭💠 Info 💠╮
+╭★ Info ★╮
 │ 💠 *${prefix}listmod* — Lista moderatori
 ╰★───────────★╯
 
-╭★ 💠 Non disponibili per mod 💠╮
+╭★ Non disponibili per mod ★╮
 │ 💠 *promuovi* — Solo admin
 │ 💠 *retrocedi* — Solo admin
 ╰★───────────★╯
