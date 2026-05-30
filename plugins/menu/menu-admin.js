@@ -65,33 +65,33 @@ function generateMenuText(prefix, userId, groupId) {
     const menuTitle = global.t('adminMenuTitle', userId, groupId);
 
     const commandList = `
-• 👑 *${global.t('promoteCommand', userId, groupId)}*
-• 👑 *${global.t('demoteCommand', userId, groupId)}*
-• 👑 *${global.t('warnCommands', userId, groupId)}*
-• 👑 *${global.t('muteCommands', userId, groupId)}*
-• 👑 *${global.t('setNameCommand', userId, groupId)}*
-• 👑 *${global.t('hidetagCommand', userId, groupId)}*
-• 👑 *${global.t('tagallCommand', userId, groupId)}*
-• 👑 *${global.t('kickCommand', userId, groupId)}*
-• 👑 *${global.t('adminsCommand', userId, groupId)}*
-• 👑 *${global.t('openCloseCommand', userId, groupId)}*
-• 👑 *${global.t('setWelcomeCommand', userId, groupId)}*
-• 👑 *${global.t('setByeCommand', userId, groupId)}*
-• 👑 *${global.t('inactiveCommand', userId, groupId)}*
-• 👑 *${global.t('listNumCommand', userId, groupId)}*
-• 👑 *${global.t('cleanupCommand', userId, groupId)}*
-• 👑 *${global.t('rulesCommand', userId, groupId)}*
-• 👑 *${global.t('listWarnCommand', userId, groupId)}*
-• 👑 *${global.t('linkCommand', userId, groupId)}*
-• 👑 *${global.t('linkQrCommand', userId, groupId)}*
-• 👑 *${global.t('requestsCommand', userId, groupId)}*
+• 💠 *${global.t('promoteCommand', userId, groupId)}*
+• 💠 *${global.t('demoteCommand', userId, groupId)}*
+• 💠 *${global.t('warnCommands', userId, groupId)}*
+• 💠 *${global.t('muteCommands', userId, groupId)}*
+• 💠 *${global.t('setNameCommand', userId, groupId)}*
+• 💠 *${global.t('hidetagCommand', userId, groupId)}*
+• 💠 *${global.t('tagallCommand', userId, groupId)}*
+• 💠 *${global.t('kickCommand', userId, groupId)}*
+• 💠 *${global.t('adminsCommand', userId, groupId)}*
+• 💠 *${global.t('openCloseCommand', userId, groupId)}*
+• 💠 *${global.t('setWelcomeCommand', userId, groupId)}*
+• 💠 *${global.t('setByeCommand', userId, groupId)}*
+• 💠 *${global.t('inactiveCommand', userId, groupId)}*
+• 💠 *${global.t('listNumCommand', userId, groupId)}*
+• 💠 *${global.t('cleanupCommand', userId, groupId)}*
+• 💠 *${global.t('rulesCommand', userId, groupId)}*
+• 💠 *${global.t('listWarnCommand', userId, groupId)}*
+• 💠 *${global.t('linkCommand', userId, groupId)}*
+• 💠 *${global.t('linkQrCommand', userId, groupId)}*
+• 💠 *${global.t('requestsCommand', userId, groupId)}*
     `.trim();
 
     return `
 ⋆ ︵ ★ ${menuTitle} ★ ︵ ⋆
 
 ${commandList.split('\n').map(line => `୧ ${line.trim()}`).join('\n')}
-꒷꒦ ✦ ୧・︶ : ︶ ꒷꒦ ‧₊ ୧
+
 > © ${global.t('poweredBy', userId, groupId)} 𝐑𝐋𝐘 𝐑𝐈𝐋𝐄𝐘 𝐁𝐎𝐓
 `.trim();
 }
