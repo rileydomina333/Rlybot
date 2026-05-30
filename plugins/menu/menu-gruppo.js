@@ -11,10 +11,10 @@ const handler = async (message, { conn, usedPrefix, command }) => {
     const menuText = generateMenuText(usedPrefix, userId, groupId);
         const imagePath = path.join(__dirname, '../../media/WA_1780014722970.jpeg');
         const footerText = global.t('chooseMenu', userId, groupId) || 'Scegli un menu:';
-        const mainMenuText = global.t('mainMenuButton', userId, groupId) || '🏠 Menu Principale';
-        const adminMenuText = global.t('menuAdmin', userId, groupId) || '🛡️ Menu Admin';
-        const ownerMenuText = global.t('menuOwner', userId, groupId) || '👑 Menu Owner';
-        const securityMenuText = global.t('menuSecurity', userId, groupId) || '🚨 Menu Sicurezza';
+        const mainMenuText = global.t('mainMenuButton', userId, groupId) || '💠 Menu Principale';
+        const adminMenuText = global.t('menuAdmin', userId, groupId) || '💠 Menu Admin';
+        const ownerMenuText = global.t('menuOwner', userId, groupId) || '💠 Menu Owner';
+        const securityMenuText = global.t('menuSecurity', userId, groupId) || '💠 Menu Sicurezza';
     
     await conn.sendMessage(message.chat, {
         image: { url: imagePath },
@@ -159,36 +159,36 @@ function generateMenuText(prefix, userId, groupId) {
         createSection(global.t('personalityTestSection', userId, groupId), `
 💠 *.alcolizzato*
 💠 *.drogato*`),
-        createSection('👨‍👧 Famiglia & Adozione', `
+        createSection('Famiglia & Adozione', `
 💠 *.adotta* @utente (500 UC)
 💠 *.abbandona* @utente
 💠 *.orfanotrofio*
 💠 *.famiglia*
 💠 *.diseredita* @utente
 💠 *.scappa*`),
-        createSection('⚔️ RPG & Avventura', `
+        createSection('RPG & Avventura', `
 💠 *.duello* @utente <UC>
 💠 *.mostro*
-🗺️💠 *.esplora*
+💠 *.esplora*
 💠 *.zaino*
 💠 *.vendizaino*
 💠 *.pesca*
 💠 *.inventariopesca*
 💠 *.vendipesce*`),
-        createSection('🔫 Lavoro & Crimine', `
+        createSection('Lavoro & Crimine', `
 💠 *.lavora*
 💠 *.crimini*
 💠 *.crimine* <num>
 💠 *.rapina* @utente
 💠 *.fedinapenale*`),
-        createSection('🐾 Pet', `
+        createSection('Pet', `
 💠 *.cercapet*
 💠 *.pet*
 💠 *.sfamapet* <num>
 💠 *.coccolapet* <num>
 💠 *.rilasciapet* <num>
 💠 *.arenapet* @utente`),
-        createSection('📊 Profilo & Classifiche', `
+        createSection('Profilo & Classifiche', `
 💠 *.profilo* [@utente]
 💠 *.classifica*
 💠 *.clasxp*
@@ -197,7 +197,7 @@ function generateMenuText(prefix, userId, groupId) {
     
     return `
 ╭┈ ─ ─ ✦ ─ ─ ┈╮
-   ୧ 👑 ୭ *${menuTitle}*
+   ୧ 💠 ୭ *${menuTitle}*
 ╰┈ ─ ─ ✦ ─ ─ ┈╯
 
 ꒷꒦ ✦ ${global.t('memberCommands', userId, groupId)} ✦ ꒷꒦
@@ -205,7 +205,7 @@ function generateMenuText(prefix, userId, groupId) {
 ${sections.join('\n\n')}
 
 ╭★────★────★╮
-│ ୭ ˚. ᵎᵎ 🎀
+│ ୭ ˚. ᵎᵎ 💠
 │ ${global.t('versionLabel', userId, groupId)}: ${vs}
 ╰★────★────★╯`.trim();
 }
