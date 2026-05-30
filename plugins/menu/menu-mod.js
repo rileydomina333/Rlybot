@@ -65,7 +65,7 @@ function generateMenuText(prefix, userId, groupId) {
 │ 💠 *${prefix}listmod* — Lista moderatori
 ╰★───────────★╯
 
-╭★ Non disponibili per mod ★╮
+╭★ Non disponibili per mod
 │ 💠 *promuovi* — Solo admin
 │ 💠 *retrocedi* — Solo admin
 ╰★───────────★╯
