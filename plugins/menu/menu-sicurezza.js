@@ -13,7 +13,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     const botName = "ℝ𝕃𝕐 𝔹𝕆𝕋";
     const menuText = generateMenuText(chat, userId, groupId, botName, usedPrefix);
     
-    const footerText = `𝕊𝕖𝕝𝕖𝕫𝕚𝕠𝕟𝕒 𝕦𝕟𝕒 𝕔𝕒𝕥𝕖𝕘𝕠𝕣𝕚𝕒 ✨`;
+    const footerText = `𝕊𝕖𝕝𝕖𝕫𝕚𝕠𝕟𝕒 𝕦𝕟𝕒 𝕔𝕒𝕥𝕖𝕘𝕠𝕣𝕚𝕒 💠`;
 
     await conn.sendMessage(m.chat, {
         image: { url: imagePath },
@@ -65,20 +65,20 @@ function generateMenuText(chat, userId, groupId, botName, usedPrefix) {
         .join('\n');
 
     return `
-┏━━〔 ✨ *${botName}* ✨ 〕━━┓
+┏━━〔 💠 *${botName}* 💠 〕━━┓
 ┃
-┃ 🛡️ *SICUREZZA & FUNZIONI*
+┃ 💠 *SICUREZZA & FUNZIONI*
 ┃
-┣━━〔 💡 *GUIDA* 〕━━┓
+┣━━〔 💠 *GUIDA* 〕━━┓
 ┃ 🟢 .attiva <funzione>
 ┃ 🔴 .disabilita <funzione>
 ┃
-┣━━〔 ⚙️ *STATO* 〕━━┓
+┣━━〔 💠 *STATO* 〕━━┓
 ${statusList}
 ┃
-┣━━〔 📊 *INFO* 〕━━┓
-┃ 🧬 *Versione:* ${vs}
-┃ 👤 *ID:* @${userId.split('@')[0]}
+┣━━〔 💠 *INFO* 〕━━┓
+┃ 💠 *Versione:* ${vs}
+┃ 💠 *ID:* @${userId.split('@')[0]}
 ┃
 ┗━━━━━━━━━━━━━━━━━━┛`.trim();
 }
