@@ -127,7 +127,7 @@ let handler = async (m, { conn, args, participants, isAdmin, isBotAdmin, usedPre
                     
                     await conn.sendMessage(m.chat, {
                         text: timeoutText,
-                        footer: 'ChatUnity Bot',
+                        footer: 'Rly Riley Bot',
                         interactiveButtons: playAgainButtons(userId, groupId)
                     }, { quoted: msg });
                     delete global.bandieraGame[m.chat];
