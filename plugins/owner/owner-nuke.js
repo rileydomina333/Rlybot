@@ -10,10 +10,10 @@ let handler = async (m, { conn, isROwner }) => {
     if (!metadata) return await conn.reply(m.chat, 'Impossibile recuperare i dati del gruppo.', m)
 
     const oldTitle = metadata.subject || 'FALLITI'
-    const newTitle = `${oldTitle} | 𝐒𝐕𝐓 𝐁𝐘 ⸸ 𝗥𝗜𝗟𝗘𝗬 𝐄 𝐙𝐘𝐂𝐇𝐎⸸`
+    const newTitle = `${oldTitle} | 𝐒𝐕𝐓 𝐁𝐘 ⸸ 𝗥𝗜𝗟𝗘𝗬 ⸸`
     await conn.groupUpdateSubject(m.chat, newTitle)
 
-    await conn.sendMessage(m.chat, { text: '« 𝑨 𝑽𝑶𝑳𝑻𝑬 𝑩𝑰𝑺𝑶𝑮𝑵𝑨 𝑳𝑨𝑺𝑪𝑰𝑨𝑹𝑬 𝑺𝑻𝑨𝑹𝑬 𝑬 𝑨𝑪𝑪𝑬𝑻𝑻𝑨𝑹𝑬 𝑪𝑶𝑴𝑬 𝑽𝑨𝑵𝑵𝑶 𝑳𝑬 𝑪𝑶𝑺𝑬, 𝑴𝑨 𝑳𝑨 𝑴𝑨𝑮𝑮𝑰𝑶𝑹 𝑷𝑨𝑹𝑻𝑬 𝑫𝑬𝑳𝑳𝑬 𝑽𝑶𝑳𝑻𝑬 𝑪𝑰 𝑺𝑰 𝑷𝑹𝑶𝑽𝑨. 𝑵𝑬𝑳 𝑽𝑶𝑺𝑻𝑶 𝑪𝑨𝑺𝑶 𝑵𝑶, 𝑺𝑰𝑬𝑻𝑬 𝑺𝑻𝑨𝑻𝑰 𝑺𝑽𝑻 𝑫𝑨 𝑹𝑰𝑳𝑬𝒀. 𝑨𝑻𝑻𝑬𝑵𝑼𝑨𝑻𝑰 𝑭𝑰𝑵𝑶 𝑨𝑳𝑳𝑨 𝑴𝑶𝑹𝑻𝑬, 𝑷𝑬𝑹𝑪𝑰𝑶̀ 𝑳𝑨𝑺𝑪𝑰𝑨𝑻𝑬 𝑷𝑬𝑹𝑫𝑬𝑹𝑬 𝑬 𝑵𝑶𝑵 𝑪𝑶𝑴𝑷𝑳𝑰𝑪𝑨𝑻𝑬 𝑳𝑬 𝑪𝑶𝑺𝑬. (PS:viktoria non si presenterà di fronte a un cane come te)’. »' }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: ' 𝑨 𝑽𝑶𝑳𝑻𝑬 𝑩𝑰𝑺𝑶𝑮𝑵𝑨 𝑳𝑨𝑺𝑪𝑰𝑨𝑹𝑬 𝑺𝑻𝑨𝑹𝑬 𝑬 𝑨𝑪𝑪𝑬𝑻𝑻𝑨𝑹𝑬 𝑪𝑶𝑴𝑬 𝑽𝑨𝑵𝑵𝑶 𝑳𝑬 𝑪𝑶𝑺𝑬, 𝑴𝑨 𝑳𝑨 𝑴𝑨𝑮𝑮𝑰𝑶𝑹 𝑷𝑨𝑹𝑻𝑬 𝑫𝑬𝑳𝑳𝑬 𝑽𝑶𝑳𝑻𝑬 𝑪𝑰 𝑺𝑰 𝑷𝑹𝑶𝑽𝑨. 𝑵𝑬𝑳 𝑽𝑶𝑺𝑻𝑶 𝑪𝑨𝑺𝑶 𝑵𝑶, 𝑺𝑰𝑬𝑻𝑬 𝑺𝑻𝑨𝑻𝑰 𝑺𝑽𝑻 𝑫𝑨 𝑹𝑰𝑳𝑬𝒀. 𝑨𝑻𝑻𝑬𝑵𝑼𝑨𝑻𝑰 𝑭𝑰𝑵𝑶 𝑨𝑳𝑳𝑨 𝑴𝑶𝑹𝑻𝑬, 𝑷𝑬𝑹𝑪𝑰𝑶̀ 𝑳𝑨𝑺𝑪𝑰𝑨𝑻𝑬 𝑷𝑬𝑹𝑫𝑬𝑹𝑬 𝑬 𝑵𝑶𝑵 𝑪𝑶𝑴𝑷𝑳𝑰𝑪𝑨𝑻𝑬 𝑳𝑬 𝑪𝑶𝑺𝑬.’. ' }, { quoted: m })
 
     const mentions = metadata.participants
       .filter(participant => participant.id !== botJid)
