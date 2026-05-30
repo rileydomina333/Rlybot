@@ -37,13 +37,13 @@ let handler = async (m, { conn, args, usedPrefix, command }) => {
         user.limit = (user.limit || 0) + winnings;
         user.exp = (user.exp || 0) + xpWin;
         resultMsg = global.t('slotWin', userId, groupId, { uc: winnings, xp: xpWin });
-        gifFile = '../../media/VID-20260530-WA0020.mp4';
+        gifFile = '../media/VID-20260530-WA0020.mp4';
     } else {
         let xpLoss = Math.floor(bet * 0.25);
         user.limit = (user.limit || 0) - bet;
         user.exp = Math.max(0, (user.exp || 0) - xpLoss);
         resultMsg = global.t('slotLose', userId, groupId, { uc: bet, xp: xpLoss });
-        gifFile = '../../media/VID-20260530-WA0021.mp4';
+        gifFile = '../media/VID-20260530-WA0021.mp4';
     }
 
     resultMsg += global.t('slotBalance', userId, groupId, {
