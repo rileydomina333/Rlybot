@@ -70,6 +70,6 @@ function generateMenuText(prefix, userId, groupId) {
 │ 💠 *retrocedi* — Solo admin
 ╰★───────────★╯
 
-> © Powered by 𝐑𝐋𝐘 𝐑𝐈𝐋𝐄𝐘 𝐁𝐎𝐓
+> © Powered by 𝐑𝐋𝐘 𝐁𝐎𝐓
 `.trim();
 }
