@@ -1,75 +1,41 @@
-<p align="center">
-<img src="https://i.ibb.co/mCwWq30J/chatunity-bot.jpg" 
-</p>
+# 💠 𝐑𝐋𝐘 𝐁𝐎𝐓💠
 
-<h1 align="center">© ChatUnity-Bot V11 🤖 x RlyRiley-bot🦠</h1>
-<p align="center"><strong>An advanced WhatsApp bot packed with features, automation, and entertainment.</strong></p>
-
-<p align="center">
-  <a href="https://whatsapp.com/channel/0029VaZVlJZHwXb8naJBQN0J">
-    <img src="https://img.shields.io/badge/Official_Channel-black?style=for-the-badge&logo=whatsapp" alt="Official Channel">
-  </a>
-</p>
-
-<p align="center"><strong>README Languages</strong></p>
-<p align="center">
-  <a href="./documentation/README.it.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%AE%F0%9F%87%B9-Italiano-2E8B57?style=for-the-badge" alt="README Italiano">
-  </a>
-  <a href="./documentation/README.es.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%AA%F0%9F%87%B8-Espa%C3%B1ol-FF8C00?style=for-the-badge" alt="README Español">
-  </a>
-  <a href="./documentation/README.fr.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%AB%F0%9F%87%B7-Fran%C3%A7ais-4169E1?style=for-the-badge" alt="README Français">
-  </a>
-  <a href="./documentation/README.pt.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%A7%F0%9F%87%B7-Portugu%C3%AAs-228B22?style=for-the-badge" alt="README Português">
-  </a>
-  <a href="./documentation/README.de.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%A9%F0%9F%87%AA-Deutsch-696969?style=for-the-badge" alt="README Deutsch">
-  </a>
-</p>
-
-<p align="center">
-  <a href="./documentation/README.zh.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%A8%F0%9F%87%B3-%E4%B8%AD%E6%96%87-C62828?style=for-the-badge" alt="README 中文">
-  </a>
-  <a href="./documentation/README.ar.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%B8%F0%9F%87%A6-%D8%A7%D9%84%D8%B9%D8%B1%D8%A8%D9%8A%D8%A9-6A1B9A?style=for-the-badge" alt="README العربية">
-  </a>
-  <a href="./documentation/README.hi.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%AE%F0%9F%87%B3-%E0%A4%B9%E0%A4%BF%E0%A4%82%E0%A4%A6%E0%A5%80-E65100?style=for-the-badge" alt="README हिंदी">
-  </a>
-  <a href="./documentation/README.id.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%AE%F0%9F%87%A9-Bahasa_Indonesia-00897B?style=for-the-badge" alt="README Bahasa Indonesia">
-  </a>
-  <a href="./documentation/README.ru.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%B7%F0%9F%87%BA-%D0%A0%D1%83%D1%81%D1%81%D0%BA%D0%B8%D0%B9-3949AB?style=for-the-badge" alt="README Русский">
-  </a>
-  <a href="./documentation/README.tr.md">
-    <img src="https://img.shields.io/badge/%F0%9F%87%B9%F0%9F%87%B7-T%C3%BCrk%C3%A7e-AD1457?style=for-the-badge" alt="README Türkçe">
-  </a>
-</p>
+> **Un bot WhatsApp di nuova generazione: veloce, modulare e progettato per l'efficienza e il divertimento.**
 
 ---
 
-## 📌 Introduction
-
-© ChatUnity-Bot is a multifunctional WhatsApp bot designed to simplify chat management and provide advanced features. With an intuitive interface and easy setup, it is ideal for anyone who wants to improve their WhatsApp experience.
+<div align="center">  
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=00FFFF&center=true&vCenter=true&width=435&lines=𝛥𝐗𝐈𝚶𝐍+𝐒𝐘𝐒𝐓𝐄𝐌+𝐀𝐂𝐓𝐈𝐕𝐀𝐓𝐄𝐃;Powered+by+𝕯𝖊ⱥ𝖉𝖑𝐲;WhatsApp+Multi-Device+Bot" alt="Typing SVG" />
+</div>
 
 ---
 
-## 🚀 Termux Installation
+### 👑 Owner & Developer
+Il progetto è curato e gestito con dedizione da:
 
-### 1. Termux installation without ZIP (recommended)
+| Icona | Ruolo | Nome |
+| :---: | :--- | :--- |
+| 👤 | **Founder & Lead Dev** | `𝐫𝐢𝐥𝐞𝐲` |
+| 🛡️ | **Staff & Security** | `𝐝𝐞𝐚𝐝𝐥𝐲` |
 
-[![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/shorts/qek7wWadhtI?feature=share)
+---
 
-1. Download [Termux](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/)
-2. Paste all commands below in one go, in the same order
+### 🚀 Caratteristiche Principali
+* ⚡ **Velocità:** Basato sull'ultima versione di **Baileys** per una risposta istantanea.
+* 🎮 **RPG System:** Gioca, guadagna monete e sali di livello con i tuoi amici.
+* 🛠️ **Strumenti:** Conversione media, ricerca web, traduzioni e utility avanzate.
+* 🛡️ **Sicurezza:** Sistemi anti-spam, gestione gruppi e protezione avanzata.
+* 🧬 **Multi-Device:** Connessione stabile e duratura tramite QR o Pairing Code.
 
-```Bash
-termux-setup-storage && \
+---
+
+### 📥 Metodi di Collegamento
+Copia e incolla i seguenti comandi nel tuo terminale per installare il bot.
+
+#### 📱 COLLEGAMENTO CON TERMUX
+
+
+```termux-setup-storage && \
 pkg update && pkg upgrade -y && \
 pkg install git nodejs ffmpeg imagemagick yarn -y && \
 cd ~ && \
@@ -77,120 +43,51 @@ git clone https://github.com/rileydomina333/Rlybot.git && \
 cd Rlybot && \
 yarn install && \
 yarn start
-```
 
----
-
-### 2. Termux installation with ZIP (for developers)
-
-[![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/shorts/qek7wWadhtI?feature=share)
-
-1. Download the bot ZIP from GitHub
-2. Download [Termux](https://www.mediafire.com/file/0npdmv51pnttps0/com.termux_0.119.1-119_minAPI21(arm64-v8a,armeabi-v7a,x86,x86_64)(nodpi)_apkmirror.com.apk/)
-3. Paste all commands below in Termux
-
+#### 🖥️ COLLEGAMENTO CON LINUX
 ```bash
-termux-setup-storage && \
-pkg update && pkg upgrade -y && \
-pkg install git nodejs ffmpeg imagemagick yarn -y && \
-cd ~ && \
-git clone https://github.com/rileydomina333/Rlybot.git && \
-cd Rlybot && \
-yarn install && \
-yarn start
+sudo apt update && sudo apt upgrade -y && \
+curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash - && \
+sudo apt install -y nodejs git ffmpeg imagemagick yarn && \
+git clone git clone https://github.com/rileydomina333/Rlybot.git ~/Rlybot && \
+cd ~/Rlybot && \
+yarn install || npm install && \
+npm start
+
 ```
 
----
-
-### 3. Termux installation with your fork
-
-[![Tutorial Installazione](https://img.shields.io/badge/Tutorial-Installazione-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtube.com/shorts/qek7wWadhtI?feature=share)
-
-Use this method if you have your own fork and want to install directly from your repository.
-
-1. Create your fork of the project on GitHub
-2. Replace `YOUR-USERNAME` in the command below with your GitHub username
-3. Paste all commands below in one go inside Termux
-
+#### ♻️ ELIMINA SESSIONI 
 ```bash
-termux-setup-storage && \
-pkg update && pkg upgrade -y && \
-pkg install git nodejs ffmpeg imagemagick yarn -y && \
-cd ~ && \
-git clone https://github.com/rileydomina333/Rlybot.git && \
-cd Rlybot && \
-yarn install && \
-yarn start
+cd ~/Rlybot
+rm -rf session
+npm start
+
 ```
 
-If your fork uses a different repository name, replace `chatunity-bot` in the clone command and in the `cd` command with the correct name.
+⚙️ Configurazione
+
+Una volta installato il bot su termux potrai personalizzare:
+
+Numero Owner: Inserisci il tuo numero per ottenere i permessi.
+
+Prefissi: Personalizza il simbolo dei comandi (es: ., !, /,).
+
+
 
 ---
 
-## 🕒 Stay online 24/7 with PM2 (Termux)
+🤝 Contatti & Supporto
 
-<details>
-<summary><b>Click here to view the steps</b></summary>
+Se hai bisogno di assistenza o vuoi collaborare al progetto:
 
-```bash
-npm i -g pm2
-pm2 start index.js
-pm2 save
-pm2 logs
-```
+👤 Proprietario: Riley
 
-</details>
+
 
 ---
 
-## 🌐 Installation on Windows/VPS/RDP
-
-<details>
-<summary><b>Click here to view the steps</b></summary>
-
-1. Download:
-   - [Git](https://git-scm.com/downloads)
-   - [NodeJS](https://nodejs.org/en/download)
-   - [FFmpeg](https://ffmpeg.org/download.html)
-   - [ImageMagick](https://imagemagick.org/script/download.php)
-
-2. Clone and install:
-   ```bash
-   git clone https://github.com/Rileydomina333/Rlybot
-   cd Rlybot
-   npm install
-   npm update
-   npm start
-   ```
-
-</details>
-
----
-
-## 📂 Useful Resources
-
-- **GitHub Dashboard**: [Visit here](https://github.com/chatunity-bot)
-- **WhatsApp Channel**: [Join here](https://whatsapp.com/channel/0029VaZVlJZHwXb8naJBQN0J)
-- **Contact**: [Write here](https://wa.me/393773842461)
-- **Collaborations**: [Join here](https://whatsapp.com/channel/0029Vb1C4od5vKA35u1Mqc06)
-
----
-
-## VPS ChatUnity
-
-Need a ready-to-use solution to keep the bot online 24/7 without configuring everything manually?
-
-ChatUnity VPS plans are designed to host the bot in a stable and continuous way.
-
-- Simple setup
-- Better stability for continuous use
-- Ideal for always-on bots
-
-For information and availability contact [393773842461](https://wa.me/393773842461).
-
-
-## 📜 Licenza
-
-© RlyBot-MD. All rights reserved. Check the license for details.
-
-<p align="center"><strong>🌟 Support the project with a GitHub star! 🌟</strong></p>
+<div align="center">  
+  <p>Prodotto con ❤️ dal team di 𝛥𝐗𝐈𝚶𝐍</p>  
+  <img src="https://img.shields.io/badge/Status-Active-red?style=for-the-badge" />  
+  <img src="https://img.shields.io/badge/Access-Public -brightgreen?style=for-the-badge" />  
+</div>
