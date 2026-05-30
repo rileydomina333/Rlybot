@@ -27,11 +27,11 @@ const handler = async (message, { conn, usedPrefix, command }) => {
             caption: menuText,
             footer: footerText,
             buttons: [
-                { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '👮‍♂️ Admin' }, type: 1 },
-                { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '👑 Owner' }, type: 1 },
-                { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: '🛡️ Sicurezza' }, type: 1 },
-                { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '👥 Gruppo' }, type: 1 },
-                { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '🛠️ Mod' }, type: 1 },
+                { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '💠 Admin' }, type: 1 },
+                { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '💠 Owner' }, type: 1 },
+                { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: '💠 Sicurezza' }, type: 1 },
+                { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '💠 Gruppo' }, type: 1 },
+                { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '💠 Mod' }, type: 1 },
             ],
             viewOnce: true,
             headerType: 4
@@ -50,7 +50,7 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
     const vs = global.vs || '1.5.0';
     
     return `
-┏━━〔 ✨ *${botName}* ✨ 〕━━┓
+┏━━〔 💠 *${botName}* 💠 〕━━┓
 ┃
 ┃  💠 *Utente:* @${userId.split('@')[0]}
 ┃  💠 *Database:* ${userCount}
