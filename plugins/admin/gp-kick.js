@@ -52,9 +52,9 @@ async function handler(m, { isBotAdmin, conn }) {
     await conn.groupParticipantsUpdate(m.chat, [mention], 'remove')
 
     await conn.sendMessage(m.chat, {
-      text: `*╭━━━━━━━💨━━━━━━━╮*
+      text: `*╭━━━━━━━💠━━━━━━━╮*
 *✦ 𝐔𝐓𝐄𝐍𝐓𝐄 𝐑𝐈𝐌𝐎𝐒𝐒𝐎 ✦*
-*╰━━━━━━━💨━━━━━━━╯*
+*╰━━━━━━━💠━━━━━━━╯*
 
 *@${mention.split('@')[0]} 𝐞̀ 𝐬𝐭𝐚𝐭𝐨 𝐫𝐢𝐦𝐨𝐬𝐬𝐨 𝐝𝐚𝐥 𝐠𝐫𝐮𝐩𝐩𝐨.*`,
       mentions: [mention]
