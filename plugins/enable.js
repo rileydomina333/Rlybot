@@ -24,6 +24,7 @@ const features = [
   { key: 'antiCall',        label: 'AntiCall' },
   { key: 'antiinsta',       label: 'Antiinsta' },
   { key: 'antiporno',       label: 'Antiporno' },
+  { key: 'antigore',        label: 'AntiGore' },
   { key: 'antitrava',       label: 'Antitrava' },
   { key: 'antivirus',       label: 'Antivirus' },
   { key: 'antivoip',        label: 'Antivoip' },
