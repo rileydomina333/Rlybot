@@ -11,8 +11,8 @@ let handler = async (m, { conn }) => {
   );
 };
 
-handler.help = ['bot'];
+handler.help = ['bot che ne pensi?'];
 handler.tags = ['giochi'];
-handler.command = ['bot'];
+handler.command = ['bot che ne pensi?'];
 
 export default handler;
