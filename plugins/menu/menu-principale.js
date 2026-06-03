@@ -3,14 +3,14 @@ import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-
+        await m.react('🔥');
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const handler = async (message, { conn, usedPrefix, command }) => {
     const userId = message.sender;
     const groupId = message.isGroup ? message.chat : null;
-        await m.react('🔥');
+        
     const userCount = Object.keys(global.db.data.users).length;
     const botName = "ℝ𝕃𝕐 𝔹𝕆𝕋"; 
 
