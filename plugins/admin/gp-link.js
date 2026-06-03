@@ -1,72 +1,48 @@
-// by 𝕯𝖊ⱥ𝖉𝖑𝐲 × Bonzino
-
-import fetch from 'node-fetch'
-import fs from 'fs'
-import path from 'path'
-
+// by elixir
 const handler = async (m, { conn }) => {
-  const metadata = await conn.groupMetadata(m.chat)
-  const participants = Array.isArray(metadata.participants) ? metadata.participants : []
-
-  const totalAdmins = participants.filter(p => p.admin).length
-  const totalMembers = participants.length
-
-  let inviteCode
-  try {
-    inviteCode = await conn.groupInviteCode(m.chat)
-  } catch {
-    inviteCode = null
-  }
-
-  const link = inviteCode
-    ? `https://chat.whatsapp.com/${inviteCode}`
-    : '𝐍𝐨𝐧 𝐝𝐢𝐬𝐩𝐨𝐧𝐢𝐛𝐢𝐥𝐞'
-
-  let thumbnailBuffer = null
-
-  try {
-    const groupThumb = await conn.profilePictureUrl(m.chat, 'image')
-    thumbnailBuffer = await (await fetch(groupThumb)).buffer()
-  } catch {}
-
-  if (!thumbnailBuffer) {
     try {
-      const mediaPath = path.join(process.cwd(), 'media', 'group-pic.png')
-      if (fs.existsSync(mediaPath)) {
-        thumbnailBuffer = fs.readFileSync(mediaPath)
-      }
-    } catch {}
-  }
+        const metadata = await conn.groupMetadata(m.chat);
+        const groupName = metadata.subject;
+        const inviteCode = await conn.groupInviteCode(m.chat);
+        const linkgruppo = 'https://chat.whatsapp.com/' + inviteCode;
+        const memberCount = metadata.participants.length;
 
-  const text = `*╭━━━━━━━🔗━━━━━━━╮*
-*✦ 𝐈𝐧𝐟𝐨 𝐠𝐫𝐮𝐩𝐩𝐨 ✦*
-*╰━━━━━━━🔗━━━━━━━╯*
+        let ppUrl;
+        try {
+            ppUrl = await conn.profilePictureUrl(m.chat, 'image');
+        } catch {
+            ppUrl = 'https://ibb.co';
+        }
 
-*👥 𝐌𝐞𝐦𝐛𝐫𝐢:* ${totalMembers}
+        const messageText = `> ⛓️‍💥 *LINK GENERATO CON SUCCESSO*\n\n` +
+                            `*〢 𝖨𝖭𝖥𝖮𝖱𝖬𝖠𝖹𝖨𝖮𝖭𝖨 𝖦𝖱𝖴𝖯𝖯𝖮*\n` +
+                            `  » *Nome:* ${groupName}\n` +
+                            `  » *Utenti all'interno:* ${memberCount}\n\n` +
+                            `*〢 𝖢𝖮𝖭𝖭𝖤𝖲𝖲𝖨𝖮𝖭𝖤 𝖣𝖨𝖱𝖤𝖳𝖳𝖠*\n` +
+                            `  ${linkgruppo}\n\n` +
+                            `＿\n` +
+                            `⌗ Richiesta elaborata per @${m.sender.split('@')[0]}`;
 
-*🔗 𝐋𝐢𝐧𝐤 𝐠𝐫𝐮𝐩𝐩𝐨:*
-${link}`
+        await conn.sendMessage(
+            m.chat,
+            {
+                image: { url: ppUrl },
+                caption: messageText,
+                mentions: [m.sender]
+            },
+            { quoted: m }
+        );
 
-  await conn.sendMessage(m.chat, {
-    text,
-    contextInfo: {
-      ...(global.rcanal?.contextInfo || {}),
-      externalAdReply: {
-        title: metadata.subject || 'Gruppo',
-        body: ' ',
-        ...(thumbnailBuffer ? { thumbnail: thumbnailBuffer } : {}),
-        mediaType: 1,
-        renderLargerThumbnail: false,
-        showAdAttribution: false
-      }
+    } catch (error) {
+        console.error(error);
+        m.reply('❌ Errore nel recupero del link. Assicurati che il bot sia amministratore.');
     }
-  }, { quoted: m })
-}
+};
 
-handler.help = ['link']
-handler.tags = ['group']
-handler.command = /^link$/i
-handler.group = true
-handler.botAdmin = true
+handler.help = ['link'];
+handler.tags = ['gruppo'];
+handler.command = /^link$/i;
+handler.group = true;
+handler.botAdmin = true;
 
-export default handler
+export default handler;
