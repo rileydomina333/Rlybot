@@ -11,8 +11,7 @@ let handler = async (m, { conn }) => {
   );
 };
 
-handler.help = ['bot sono riley'];
-handler.tags = ['giochi'];
-handler.command = ['bot sono riley'];
+handler.command = /bot sono riley^$/
+handler.help = [bot sono riley]
 
 export default handler;
