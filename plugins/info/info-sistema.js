@@ -60,7 +60,7 @@ const handler = async (m, { conn }) => {
 
     const message = `${title}
 
-꒷꒦ ✦ ୧・︶ : ︶ ꒷꒦ ‧₊ ୧
+
 ୧ ${hostLabel} ⪼ ${hostname}
 ୧ ${osLabel} ⪼ ${platform}
 ୧ ${archLabel} ⪼ ${arch}
@@ -68,7 +68,7 @@ const handler = async (m, { conn }) => {
 ୧ ${freeRAMLabel} ⪼ ${formatBytes(freeMem)}
 ୧ ${usedRAMLabel} ⪼ ${formatBytes(usedMem)}
 ୧ ${uptimeLabel} ⪼ ${muptime}
-꒷꒦ ✦ ୧・︶ : ︶ ꒷꒦ ‧₊ ୧
+
 
 ╭﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱
 ${nodeMemoryLabel}
@@ -87,9 +87,8 @@ ${diskSpaceLabel}
 → ${diskPercentLabel}: ${diskSpace.usePercent}
 ╰﹕₊˚ ★ ⁺˳ꕤ₊⁺・꒱` : diskErrorLabel}
 
-╰♡꒷ ๑ ⋆˚₊⋆──ʚ˚ɞ──⋆˚₊⋆ ๑ ⪩
-୧・© ChatUnity Bot
-╰♡꒷ ๑ ⋆˚₊⋆──ʚ˚ɞ──⋆˚₊⋆ ๑ ⪩
+RLY BOT
+
 `;
 
     await conn.sendMessage(m.chat, {
@@ -98,7 +97,7 @@ ${diskSpaceLabel}
             forwardingScore: 999,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363259442839354@newsletter',
+                newsletterJid: '',
                 serverMessageId: '',
                 newsletterName: `${nomeDelBot}`
             }
