@@ -11,7 +11,7 @@ let handler = async (m, { conn }) => {
   );
 };
 
-handler.command = /bot sono riley^$/
-handler.help = [bot sono riley]
+handler.command = /sonoriley^$/
+handler.help = [sonoriley]
 
 export default handler;
