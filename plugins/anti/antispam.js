@@ -8,11 +8,6 @@ const handler = m => m;
 
 handler.before = async function (m, { conn, isAdmin, isBotAdmin, isOwner, isSam }) {
     if (!m.isGroup) return;
-
-    // Bypass whitelist locale
-    const chatWhitelist = global.db.data.chats[m.chat]?.whitelist || [];
-    if (chatWhitelist.includes(m.sender)) return;
-
     const chat = global.db.data.chats[m.chat] || {};
 
     // Filtri di esclusione

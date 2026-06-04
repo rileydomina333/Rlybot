@@ -96,10 +96,6 @@ handler.all = async function (m) {
   if (!m?.isGroup || !m?.key?.id) return
   if (m.mtype !== 'imageMessage' && m.mtype !== 'stickerMessage') return
 
-  // Bypass whitelist locale
-  const chatWhitelist = global.db?.data?.chats?.[m.chat]?.whitelist || [];
-  if (chatWhitelist.includes(m.sender)) return;
-
   const chat = global.db?.data?.chats?.[m.chat] || {}
   if (!chat.antiporno) return
 

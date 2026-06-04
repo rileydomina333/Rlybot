@@ -18,10 +18,6 @@ export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isSam }) {
     if (m.isBaileys && m.fromMe) return true;
     if (!m.isGroup || !m.sender) return false;
 
-    // Bypass whitelist locale
-    const chatWhitelist = global.db.data.chats[m.chat]?.whitelist || [];
-    if (chatWhitelist.includes(m.sender)) return true;
-
     const chat = global.db.data.chats[m.chat];
     if (!chat || !chat.antitrava) return true;
 
