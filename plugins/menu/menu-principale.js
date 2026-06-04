@@ -3,41 +3,46 @@ import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-        await m.react('🔥');
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const handler = async (message, { conn, usedPrefix, command }) => {
-    const userId = message.sender;
-    const groupId = message.isGroup ? message.chat : null;
-        
-    const userCount = Object.keys(global.db.data.users).length;
-    const botName = "ℝ𝕃𝕐 𝔹𝕆𝕋"; 
+    try {
+        const userId = message.sender;
+        const groupId = message.isGroup ? message.chat : null;
+            
+        const userCount = Object.keys(global.db.data.users).length;
+        const botName = "ℝ𝕃𝕐 𝔹𝕆𝕋"; 
 
-    const menuText = generateMenuText(usedPrefix, botName, userCount, userId, groupId);
+        const menuText = generateMenuText(usedPrefix, botName, userCount, userId, groupId);
 
-    const photopath = path.join(__dirname, '../../media/IMG-20260603-WA0067.jpg'); 
+        const photopath = path.join(__dirname, '../../media/IMG-20260603-WA0067.jpg'); 
 
-    const footerText = `Powered by ℝ𝕃𝕐 𝔹𝕆𝕋 ✨`;
+        const footerText = `Powered by ℝ𝕃𝕐 𝔹𝕆𝕋 ✨`;
 
-    await conn.sendMessage(
-        message.chat,
-        {
-            image: { url: photopath },
-            caption: menuText,
-            footer: footerText,
-            buttons: [
-                { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '💠 Admin' }, type: 1 },
-                { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '💠 Owner' }, type: 1 },
-                { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: '💠 Sicurezza' }, type: 1 },
-                { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '💠 Gruppo' }, type: 1 },
-                { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '💠 Mod' }, type: 1 },
-            ],
-            viewOnce: true,
-            headerType: 4
-        },
-        { quoted: message }
-    );
+        await conn.sendMessage(
+            message.chat,
+            {
+                image: { url: photopath },
+                caption: menuText,
+                footer: footerText,
+                buttons: [
+                    { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '💠 Admin' }, type: 1 },
+                    { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '💠 Owner' }, type: 1 },
+                    { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: '💠 Sicurezza' }, type: 1 },
+                    { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '💠 Gruppo' }, type: 1 },
+                    { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '💠 Mod' }, type: 1 },
+                ],
+                viewOnce: true,
+                headerType: 4
+            },
+            { quoted: message }
+        );
+    } catch (e) {
+        console.error('❌ Errore nel menu principale:', e);
+        conn.reply(message.chat, '❌ Errore nel caricamento del menu. Controlla la console.', message);
+    }
 };
 
 handler.help = ['menu'];
