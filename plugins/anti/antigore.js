@@ -12,6 +12,10 @@ handler.before = async function (m, { conn, isAdmin, isOwner, isBotAdmin, isROwn
   if (!m.isGroup) return false
   if (!m.message) return true
 
+  // Bypass whitelist locale
+  const chatWhitelist = global.db.data.chats[m.chat]?.whitelist || [];
+  if (chatWhitelist.includes(m.sender)) return true;
+
   const chat = global.db.data.chats[m.chat] || {}
   if (!chat.antigore) return true
   if (isAdmin || isOwner || isROwner || m.fromMe) return true
