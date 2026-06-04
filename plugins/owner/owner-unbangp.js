@@ -42,7 +42,7 @@ let handler = async (m, { conn, args, isOwner }) => {
 *🔓 Azione:* Unban accesso bot
 *📅 Data:* ${new Date().toLocaleString('it-IT')}
 
-> elixir ✧ bot`)
+> rly ✧ bot`)
 }
 
 handler.help = ['unbangp']
