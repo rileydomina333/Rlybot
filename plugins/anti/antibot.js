@@ -16,11 +16,16 @@ function rilevaDispositivoCheck(msgID = '') {
 }
 
 export async function before(m, { conn, isAdmin, isOwner, isSam }) {
+  if (!m.isGroup || !m.sender || !m.key?.id) return;
+
+  // Bypass whitelist locale
+  const chatWhitelist = global.db.data.chats[m.chat]?.whitelist || [];
+  if (chatWhitelist.includes(m.sender)) return;
+
   const chat = global.db.data.chats[m.chat];
   
   // Controllo attivazione Antibot
   if (!chat?.antiBot) return;
-  if (!m.isGroup || !m.sender || !m.key?.id) return;
   
   // Gli admin, Blood e il bot stesso sono immuni
   if (isAdmin || isOwner || isSam || m.fromMe) return;
