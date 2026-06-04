@@ -3,68 +3,33 @@
 // ║        Sviluppato da: Elixir              ║
 // ║        ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ‎ ║
 // ╚═══════════════════════════════════════════╝
-let handler = async (m, { conn, args, isOwner }) => {
+let handler = async (m, { conn, isOwner }) => {
     try {
         if (!isOwner) {
-            let errorMsg = `*❌ ERRORE COMANDO*\n`
-            errorMsg += `━━━━━━━━━━━━━━━━\n\n`
-            errorMsg += `*⚠️ Motivo:*\n`
-            errorMsg += `└─⭓ Comando riservato al proprietario\n\n`
-            errorMsg += `> RLY BOT`
-            return m.reply(errorMsg)
+            return m.reply('*❌ ERRORE*\n━━━━━━━━━━━━━━━━\n\n*⚠️ Motivo:*\n└─⭓ Comando riservato al proprietario\n\n> RLY BOT')
         }
         if (!m.isGroup) {
-            let errorMsg = `*❌ ERRORE COMANDO*\n`
-            errorMsg += `━━━━━━━━━━━━━━━━\n\n`
-            errorMsg += `*⚠️ Motivo:*\n`
-            errorMsg += `└─⭓ Utilizzabile solo nei gruppi\n\n`
-            errorMsg += `> RLY BOT`
-            return m.reply(errorMsg)
-        }
-        if (!global.db.data) {
-            global.db.data = {
-                users: {},
-                chats: {},
-                stats: {},
-                msgs: {},
-                sticker: {},
-                settings: {}
-            }
-        }
-        if (!global.db.data.chats[m.chat]) {
-            global.db.data.chats[m.chat] = {
-                isBanned: false,
-                welcome: false,
-                detect: false,
-                sWelcome: '',
-                sBye: '',
-                sPromote: '',
-                sDemote: '',
-                delete: true,
-                antiLink: false,
-                viewonce: false,
-                antiToxic: false,
-                expired: 0
-            }
+            return m.reply('*❌ ERRORE*\n━━━━━━━━━━━━━━━━\n\n*⚠️ Motivo:*\n└─⭓ Utilizzabile solo nei gruppi\n\n> RLY BOT')
         }
 
+        // Inizializzazione sicura chat database
+        if (!global.db.data.chats) global.db.data.chats = {}
+        if (!global.db.data.chats[m.chat]) global.db.data.chats[m.chat] = {}
+
         let chat = global.db.data.chats[m.chat]
+
         if (chat.isBanned) {
-            let errorMsg = `*❌ ERRORE COMANDO*\n`
-            errorMsg += `━━━━━━━━━━━━━━━━\n\n`
-            errorMsg += `*⚠️ Motivo:*\n`
-            errorMsg += `└─⭓ Questo gruppo è già bannato\n\n`
-            errorMsg += `> RLY BOT`
-            return m.reply(errorMsg)
+            return m.reply('*❌ ERRORE*\n━━━━━━━━━━━━━━━━\n\n*⚠️ Motivo:*\n└─⭓ Questo gruppo è già bannato\n\n> RLY BOT')
         }
 
         chat.isBanned = true
         await global.db.write()
-        let groupInfo = await conn.groupMetadata(m.chat)
-        let memberCount = groupInfo.participants.length
-        let adminCount = groupInfo.participants.filter(p => p.admin).length
 
-        m.reply(`*🚫 GRUPPO BANNATO*
+        let groupInfo = await conn.groupMetadata(m.chat).catch(() => null)
+        let memberCount = groupInfo ? groupInfo.participants.length : '?'
+        let adminCount = groupInfo ? groupInfo.participants.filter(p => p.admin).length : '?'
+
+        await m.reply(`*🚫 GRUPPO BANNATO*
 ━━━━━━━━━━━━━━━━
 
 *📝 Stato:* Bannato
@@ -79,26 +44,19 @@ let handler = async (m, { conn, args, isOwner }) => {
 ├─⭓ Solo owner possono usare il bot
 └─⭓ Ban attivo fino a revoca
 
-> rly ✧ bot`)
-        let admins = groupInfo.participants.filter(p => p.admin)
-        let adminMsg = `*⚠️ NOTIFICA ADMIN*\n`
-        adminMsg += `━━━━━━━━━━━━━━━━\n\n`
-        adminMsg += `*📝 Info:*\n`
-        adminMsg += `└─⭓ Questo gruppo è stato bannato\n\n`
-        adminMsg += `*📌 Note:*\n`
-        adminMsg += `└─⭓ Il bot non risponderà ai comandi\n\n`
-        adminMsg += `> rly ✧ bot`
+> RLY BOT`)
 
-        for (let admin of admins) {
-            await conn.sendMessage(admin.id, { text: adminMsg })
+        // Notifica admin del gruppo
+        if (groupInfo) {
+            let admins = groupInfo.participants.filter(p => p.admin)
+            let adminMsg = `*⚠️ NOTIFICA ADMIN*\n━━━━━━━━━━━━━━━━\n\n*📝 Info:*\n└─⭓ Questo gruppo è stato bannato\n\n*📌 Note:*\n└─⭓ Il bot non risponderà ai comandi\n\n> RLY BOT`
+            for (let admin of admins) {
+                await conn.sendMessage(admin.id, { text: adminMsg }).catch(() => {})
+            }
         }
     } catch (e) {
-        console.error(e)
-        return m.reply(`*❌ ERRORE*\n` +
-                      `━━━━━━━━━━━━━━━━\n\n` +
-                      `*⚠️ Si è verificato un errore*\n` +
-                      `*📝 Tipo:* ${e.message}\n\n` +
-                      `> RLY BOT`)
+        console.error('❌ Errore in bangp:', e)
+        await m.reply('*❌ ERRORE*\n━━━━━━━━━━━━━━━━\n\n*⚠️ Si è verificato un errore*\n\n> RLY BOT').catch(() => {})
     }
 }
 
