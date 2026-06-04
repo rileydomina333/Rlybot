@@ -101,6 +101,9 @@ async function handleViolation(conn, m, reason, isBotAdmin) {
 export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isSam }) {
     if (!m.isGroup || isAdmin || isOwner || isSam || m.fromMe) return false;
 
+    const chatWhitelist = global.db.data.chats[m.chat]?.whitelist || [];
+    if (chatWhitelist.includes(m.sender)) return false;
+
     const chat = global.db.data.chats[m.chat];
     if (!chat?.antiLink) return false;
 
