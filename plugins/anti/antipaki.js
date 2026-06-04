@@ -1,19 +1,11 @@
-
-
+@@ -3,6 +3,10 @@
 let handler = m => m
 handler.before = async function (m, {conn, isAdmin, isBotAdmin, isOwner, isROwner}) {
     if (!m.isGroup) return !1
-
-    const chatWhitelist = global.db.data.chats[m.chat]?.whitelist || [];
-    if (chatWhitelist.includes(m.sender)) return;
-
     let chat = global.db.data.chats[m.chat]
     let bot = global.db.data.settings[conn.user.jid] || {}
-    
-    if (isBotAdmin && chat.antipaki && !isAdmin && !isOwner && !isROwner && bot.restrict) {
-        if (m.sender.startsWith('92')) {
-            let responseb = await conn.groupParticipantsUpdate(m.chat, [m.sender], 'remove')
-            if (responseb[0].status === "404") return
+
+@@ -13,4 +17,4 @@ handler.before = async function (m, {conn, isAdmin, isBotAdmin, isOwner, isROwne
         }
     }
 }
