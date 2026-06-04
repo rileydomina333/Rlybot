@@ -3,6 +3,10 @@
 export async function before(m, { conn, isAdmin, isBotAdmin, isOwner, isSam }) {
   if (!m.isGroup) return false
 
+  // Bypass whitelist locale
+  const chatWhitelist = global.db.data.chats[m.chat]?.whitelist || [];
+  if (chatWhitelist.includes(m.sender)) return false;
+
   const chat = global.db.data.chats[m.chat]
   if (!chat?.antimedia) return false
 
