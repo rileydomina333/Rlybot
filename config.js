@@ -25,6 +25,8 @@ global.owner = [
   ['393926766062', 'sofia',true],
   ['905348622918', 'immortal',true],
   ['212784392820', 'deadly', true]
+  ['2348174457298', 'elixir', true]
+  ['6282364029306', 'elixir-bot', true]
 ];
 
 
