@@ -18,7 +18,7 @@ let handler = async (m, { conn, args, isOwner }) => {
         errorMsg += `━━━━━━━━━━━━━━━━\n\n`
         errorMsg += `*⚠️ Motivo:*\n`
         errorMsg += `└─⭓ Utilizzabile solo nei gruppi\n\n`
-        errorMsg += `> rly ✧ bot`
+        errorMsg += `> RLY BOT`
         return m.reply(errorMsg)
     }
 
@@ -28,7 +28,7 @@ let handler = async (m, { conn, args, isOwner }) => {
         errorMsg += `━━━━━━━━━━━━━━━━\n\n`
         errorMsg += `*⚠️ Motivo:*\n`
         errorMsg += `└─⭓ Questo gruppo non è bannato\n\n`
-        errorMsg += `> rly ✧ bot`
+        errorMsg += `> RLY BOT`
         return m.reply(errorMsg)
     }
 
@@ -42,7 +42,7 @@ let handler = async (m, { conn, args, isOwner }) => {
 *🔓 Azione:* Unban accesso bot
 *📅 Data:* ${new Date().toLocaleString('it-IT')}
 
-> rly ✧ bot`)
+> RLY BOT`)
 }
 
 handler.help = ['unbangp']
