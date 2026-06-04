@@ -10,7 +10,7 @@ let handler = async (m, { conn, args, isOwner }) => {
             errorMsg += `━━━━━━━━━━━━━━━━\n\n`
             errorMsg += `*⚠️ Motivo:*\n`
             errorMsg += `└─⭓ Comando riservato al proprietario\n\n`
-            errorMsg += `> rly ✧ bot`
+            errorMsg += `> RLY BOT`
             return m.reply(errorMsg)
         }
         if (!m.isGroup) {
@@ -18,7 +18,7 @@ let handler = async (m, { conn, args, isOwner }) => {
             errorMsg += `━━━━━━━━━━━━━━━━\n\n`
             errorMsg += `*⚠️ Motivo:*\n`
             errorMsg += `└─⭓ Utilizzabile solo nei gruppi\n\n`
-            errorMsg += `> rly ✧ bot`
+            errorMsg += `> RLY BOT`
             return m.reply(errorMsg)
         }
         if (!global.db.data) {
@@ -54,7 +54,7 @@ let handler = async (m, { conn, args, isOwner }) => {
             errorMsg += `━━━━━━━━━━━━━━━━\n\n`
             errorMsg += `*⚠️ Motivo:*\n`
             errorMsg += `└─⭓ Questo gruppo è già bannato\n\n`
-            errorMsg += `> rly ✧ bot`
+            errorMsg += `> RLY BOT`
             return m.reply(errorMsg)
         }
 
@@ -98,7 +98,7 @@ let handler = async (m, { conn, args, isOwner }) => {
                       `━━━━━━━━━━━━━━━━\n\n` +
                       `*⚠️ Si è verificato un errore*\n` +
                       `*📝 Tipo:* ${e.message}\n\n` +
-                      `> rly ✧ bot`)
+                      `> RLY BOT`)
     }
 }
 
