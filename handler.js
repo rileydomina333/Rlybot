@@ -321,12 +321,14 @@ async function processMessage(m, chatUpdate, stats, activePlugins) {
         if (!('welcome' in chat)) chat.welcome = true
         if (!('bye' in chat)) chat.bye = 'welcome' in chat ? !!chat.welcome : true
         if (!Array.isArray(chat.moderators)) chat.moderators = []
+        if (!Array.isArray(chat.whitelist)) chat.whitelist = []
       } else {
         global.db.data.chats[m.chat] = {
           name: this.getName(m.chat), isBanned: false, detect: true,
           delete: false, antiLink: true, antiTraba: true, expired: 0,
           messaggi: 0, antispamcomandi: true, welcome: true, bye: true,
-          moderators: []
+          moderators: [],
+          whitelist: []
         }
       }
 
