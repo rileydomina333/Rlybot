@@ -98,7 +98,7 @@ let handler = async (m, { conn, args, isOwner }) => {
                       `━━━━━━━━━━━━━━━━\n\n` +
                       `*⚠️ Si è verificato un errore*\n` +
                       `*📝 Tipo:* ${e.message}\n\n` +
-                      `> elixir ✧ bot`)
+                      `> rly ✧ bot`)
     }
 }
 
