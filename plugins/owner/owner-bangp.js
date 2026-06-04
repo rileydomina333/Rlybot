@@ -10,7 +10,7 @@ let handler = async (m, { conn, args, isOwner }) => {
             errorMsg += `━━━━━━━━━━━━━━━━\n\n`
             errorMsg += `*⚠️ Motivo:*\n`
             errorMsg += `└─⭓ Comando riservato al proprietario\n\n`
-            errorMsg += `> elixir ✧ bot`
+            errorMsg += `> rly ✧ bot`
             return m.reply(errorMsg)
         }
         if (!m.isGroup) {
@@ -18,7 +18,7 @@ let handler = async (m, { conn, args, isOwner }) => {
             errorMsg += `━━━━━━━━━━━━━━━━\n\n`
             errorMsg += `*⚠️ Motivo:*\n`
             errorMsg += `└─⭓ Utilizzabile solo nei gruppi\n\n`
-            errorMsg += `> elixir ✧ bot`
+            errorMsg += `> rly ✧ bot`
             return m.reply(errorMsg)
         }
         if (!global.db.data) {
@@ -54,7 +54,7 @@ let handler = async (m, { conn, args, isOwner }) => {
             errorMsg += `━━━━━━━━━━━━━━━━\n\n`
             errorMsg += `*⚠️ Motivo:*\n`
             errorMsg += `└─⭓ Questo gruppo è già bannato\n\n`
-            errorMsg += `> elixir ✧ bot`
+            errorMsg += `> rly ✧ bot`
             return m.reply(errorMsg)
         }
 
@@ -79,7 +79,7 @@ let handler = async (m, { conn, args, isOwner }) => {
 ├─⭓ Solo owner possono usare il bot
 └─⭓ Ban attivo fino a revoca
 
-> elixir ✧ bot`)
+> rly ✧ bot`)
         let admins = groupInfo.participants.filter(p => p.admin)
         let adminMsg = `*⚠️ NOTIFICA ADMIN*\n`
         adminMsg += `━━━━━━━━━━━━━━━━\n\n`
@@ -87,7 +87,7 @@ let handler = async (m, { conn, args, isOwner }) => {
         adminMsg += `└─⭓ Questo gruppo è stato bannato\n\n`
         adminMsg += `*📌 Note:*\n`
         adminMsg += `└─⭓ Il bot non risponderà ai comandi\n\n`
-        adminMsg += `> elixir ✧ bot`
+        adminMsg += `> rly ✧ bot`
 
         for (let admin of admins) {
             await conn.sendMessage(admin.id, { text: adminMsg })
