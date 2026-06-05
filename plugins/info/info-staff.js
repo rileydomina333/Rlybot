@@ -1,58 +1,87 @@
-//plugin by Giuse
-let handler = async (m, { conn }) => {
+let handler = async (m, { conn, command, usedPrefix }) => {
+    let staff = `
+💠『 𝐒𝐓𝐀𝐅𝐅 𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏』💠
 
-    // Newsletter globale ChatUnity
-    const cuContext = {
-        isForwarded: true,
-        forwardingScore: 999,
-        forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363259442839354@newsletter',
-            serverMessageId: 100,
-            newsletterName: `𝐑𝐋𝐘𝐁𝐎𝐓-𝐌𝐃 ⸸ Staff Ufficiale`
+╭───────────────╮
+│ 🤖 Bot: ${global.nomebot}
+│ 🆚 Versione: ${global.versione}
+╰───────────────╯
+
+╭─── 👑 *_CREATORE_* ───╮
+│ ✦ Nome: Riley
+│ ✦ Ruolo: Creatore / Dev
+│ ✦ Contatto: @25776236110
+╰────────────────────╯
+
+╭─── 🛡️ *_STAFF_* ───╮
+│ ✦ Elixir
+│   ├ Ruolo: *Staffer*
+│   └ Contatto: @2348174457298
+│
+│ ✦ deadly
+│   ├ Ruolo: *Staffer*
+│   └Contatto: @212784392820
+│
+│
+│ ✦ Moon
+│   ├ Ruolo: *Collaboratore*
+│   └Contatto: @393509594333
+╰────────────────────╯
+
+╭─── 📌 INFO UTILI ───╮
+│ ✦ GitHub: github.com/rileydomina333
+│ ✦ Supporto: @584163724695
+╰────────────────────╯
+
+💠 𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏 💠
+
+    await conn.reply(
+        m.chat, 
+        staff.trim(), 
+        m, 
+        { 
+            contextInfo: {
+                mentionedJid: ['393509594333@s.whatsapp.net', '25776236110@s.whatsapp.net', '212784392820@s.whatsapp.net']
+            }
         }
-    };
+    );
 
-    // Schede di contatto (vCard)
-    const vcards = [
-        { vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;𝚁𝚒𝚕𝚎𝚢;;;\nFN:𝚁𝚒𝚕𝚎𝚢 𝙾𝚆𝙽\nORG:𝐑𝐥𝐲𝐁𝐨𝐭\nTITLE:CEO\nitem1.TEL;waid=81 8016522578\nitem1.X-ABLabel:Cellulare\nEND:VCARD` },
-        { vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;𝙻𝚎𝚡𝚊;;;\nFN:𝙻𝚎𝚡𝚊\nORG:𝐑𝐥𝐲𝐁𝐨𝐭\nTITLE:Staff\nitem1.TEL;waid=81 70-9491-4530\nitem1.X-ABLabel:Cellulare\nEND:VCARD` },
-        { vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;𝙸𝚖𝚖𝚘𝚛𝚝𝚊𝚕;;;\nFN:𝙸𝚖𝚖𝚘𝚛𝚝𝚊𝚕\nORG:𝐑𝐥𝐲𝐁𝐨𝐭\nTITLE:Staff\nitem1.TEL;waid=90 534 862 29 18\nitem1.X-ABLabel:Cellulare\nEND:VCARD` },
-        { vcard: `BEGIN:VCARD\nVERSION:3.0\nN:;𝙴𝚗𝚍𝚢;;;\nFN:𝙴𝚗𝚍𝚢\nORG:𝐑𝐥𝐲𝐁𝐨𝐭\nTITLE:Staff\nitem1.TEL;waid=39 350 198 9497\nitem1.X-ABLabel:Cellulare\nEND:VCARD` }
-    ];
-
-    // Testo elegante con i numeri in chiaro
-    let testo = `
-୧・︶ ⸸ 𝐑𝐋𝐘𝐁𝐎𝐓-𝐌𝐃 ⸸ ︶・୨
-꒷꒦ ‧₊ 🛡️ 𝐒 𝐓 𝐀 𝐅 𝐅 🛡️ ₊‧ ꒷꒦
-୧・︶ : ︶ : ︶ : ︶ : ︶ : ︶・୨
-
-⸸ 👑 +81 8016522578 ~ Riley |OWN|
-⸸ 👨‍💻 +39 350 198 9497 ~ endy
-⸸ 👨‍💻 +81 70-9491-4530 ~ lexa
-⸸ 👨‍💻 +90 534 862 29 18 ~ immortal
-
-👑 _Il team dietro 𝐑𝐋𝐘𝐁𝐎𝐓-𝐌𝐃._
-୧・︶ : ︶ ꒷꒦ ‧₊ ୧`.trim();
-
-    // 1. Invia le schede contatto (rubrica)
     await conn.sendMessage(m.chat, {
         contacts: {
-            displayName: 'Staff 𝐑𝐋𝐘𝐁𝐎𝐓-𝐌𝐃',
-            contacts: vcards
-        },
-        contextInfo: cuContext
+            contacts: [
+                {
+                    vcard: `BEGIN:VCARD
+VERSION:3.0
+FN:Riley
+ORG:𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏 - Creatore
+TEL;type=CELL;type=VOICE;waid=+25776236110:+584163724695
+END:VCARD`
+                },
+                {
+                    vcard: `BEGIN:VCARD
+VERSION:3.0
+FN:Deadly
+ORG:𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏 - Staffer
+TEL;type=CELL;type=VOICE;waid=393509594333:+212784392820
+END:VCARD`
+                },
+                {
+                    vcard: `BEGIN:VCARD
+VERSION:3.0
+FN:elixir
+ORG:𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏 - Staffer
+TEL;type=CELL;type=VOICE;waid=2348174457298:+2348174457298
+END:VCARD`
+                }
+            ]
+        }
     }, { quoted: m });
 
-    // 2. Invia il testo stilizzato
-    await conn.sendMessage(m.chat, {
-        text: testo,
-        contextInfo: cuContext
-    });
-
+    m.react('💠');
 };
 
-handler.help = ['staff', 'owner', 'creatori'];
-handler.tags = ['info'];
-handler.command = /^(staff|owner|creatori|founder)$/i;
+handler.help = ['staff'];
+handler.tags = ['main'];
+handler.command = ['staff', 'moderatori', 'collaboratori'];
 
 export default handler;
