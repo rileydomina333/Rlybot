@@ -1,91 +1,97 @@
-import { performance } from 'perf_hooks'
+import path from 'path';
+import { fileURLToPath } from 'url';
+ 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const handler = async (message, { conn, usedPrefix = '.' }) => {
-  const userId = message.sender
-  const uptimeMs = process.uptime() * 1000
-  const uptimeStr = clockString(uptimeMs)
-  const totalUsers = Object.keys(global.db?.data?.users || {}).length
+const handler = async (message, { conn, usedPrefix, command }) => {
+    const userId = message.sender;
+    const groupId = message.isGroup ? message.chat : null;
 
-  const menuBody = `
-『 𝐌𝐄𝐍𝐔 𝐀𝐃𝐌𝐈𝐍 』
-╼━━━━━━━━━━━━━━╾
-  ◈ *ᴜsᴇʀ:* @${userId.split('@')[0]}
-  ◈ *ᴜᴘᴛɪᴍᴇ:* ${uptimeStr}
-  ◈ *ᴜᴛᴇɴᴛɪ:* ${totalUsers}
-  ◈ *ᴀᴄᴄᴇssᴏ:* ᴀᴅᴍɪɴ
-╼━━━━━━━━━━━━━━╾
+    const menuText = generateMenuText(usedPrefix, userId, groupId);
+    const imagePath = path.join(__dirname, '../../media/IMG-20260603-WA0058.jpg');
+    const footerText = global.t('chooseMenu', userId, groupId);
+    const mainMenuText = global.t('mainMenuButton', userId, groupId);
+    const ownerMenuText = global.t('ownerMenuButton', userId, groupId);
+    const securityMenuText = global.t('securityMenuButton', userId, groupId);
+    const groupMenuText = global.t('groupMenuButton', userId, groupId);
 
-╭━━━〔 💠 ɢᴇsᴛɪᴏɴᴇ 〕━⬣
-┃ 💠 ${usedPrefix}promuovi <reply/tag>
-┃ 💠 ${usedPrefix}retrocedi <reply/tag>
-┃ 💠 ${usedPrefix}admins
-┃ 💠 ${usedPrefix}pin <messaggio>
-┃ 💠 ${usedPrefix}richieste
-╰━━━━━━━━━━━━━━━━⬣
+    await conn.sendMessage(message.chat, {
+        image: { url: imagePath },
+        caption: menuText,
+        footer: footerText,
+        buttons: [
+            { buttonId: `${usedPrefix}menu`, buttonText: { displayText: mainMenuText }, type: 1 },
+            { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: ownerMenuText }, type: 1 },
+            { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: securityMenuText }, type: 1 },
+            { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: groupMenuText }, type: 1 },
+            { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '🛡️ Menu Mod' }, type: 1 },
+        ],
+        viewOnce: true,
+        headerType: 4,
+    }, { quoted: message });
+};
 
-╭━━━〔 💠 ᴡᴀʀɴ 〕━⬣
-┃ 💠 ${usedPrefix}warn <reply/tag>
-┃ 💠 ${usedPrefix}unwarn <reply/tag>
-┃ 💠 ${usedPrefix}resetwarn <reply/tag>
-┃ 💠 ${usedPrefix}listawarn <reply/tag>
-╰━━━━━━━━━━━━━━━━⬣
+handler.help = [
+  'menuadmin',
+  'adminmenu',
+  'menúadmin',
+  'menúadministrador',
+  'menuadministrador',
+  'menuowner',
+  'menúpropietario',
+  'menupainel',
+  'adminmenü',
+  '管理菜单',
+  '菜单管理员',
+  'менюадмин',
+  'менюадминистратора',
+  'قائمةالمدير',
+  'قائمةالمسؤول',
+  'प्रशासनमेनू',
+  'एडमिनमेनू',
+  'menuadmin_fr',
+  'menuadministrateur',
+  'menuadmin_id',
+  'menuadmin_tr'
+];
+handler.tags = ['menuadmin'];
+handler.command = /^(menuadmin|adminmenu|menúadmin|menúadministrador|menuadministrador|menupainel|adminmenü|管理菜单|菜单管理员|менюадмин|менюадминистратора|قائمةالمدير|قائمةالمسؤول|प्रशासनमेनू|एडमिनमेनू|menuadmin_fr|menuadministrateur|menuadmin_id|menuadmin_tr)$/i;
 
-╭━━━〔 💠 ᴄᴏᴍᴀɴᴅɪ 〕━⬣
-┃ 💠 ${usedPrefix}muta <reply/tag>
-┃ 💠 ${usedPrefix}smuta <reply/tag>
-┃ 💠 ${usedPrefix}tag <messaggio>
-┃ 💠 ${usedPrefix}pic <reply/tag>
-┃ 💠 ${usedPrefix}rivela <media>
-╰━━━━━━━━━━━━━━━━⬣
 
-╭━━━〔 💠 ɪᴍᴘᴏsᴛᴀᴢɪᴏɴɪ 〕━⬣
-┃ 💠 ${usedPrefix}aperto
-┃ 💠 ${usedPrefix}chiuso
-┃ 💠 ${usedPrefix}listamod
-╰━━━━━━━━━━━━━━━━⬣
+export default handler;
 
-╭━━━〔 💠 ɢᴇsᴛɪᴏɴᴇ ᴜᴛᴇɴᴛɪ 〕━⬣
-┃ 💠 ${usedPrefix}kick
-┃ 💠 ${usedPrefix}resuscita
-┃ 💠 ${usedPrefix}info <utente>
-╰━━━━━━━━━━━━━━━━⬣
+function generateMenuText(prefix, userId, groupId) {
+    const menuTitle = global.t('adminMenuTitle', userId, groupId);
 
-╭━━━〔 💠 ʟɪɴᴋ ɢʀᴜᴘᴘᴏ 〕━⬣
-┃ 💠 ${usedPrefix}link
-┃ 💠 ${usedPrefix}linkqr
-╰━━━━━━━━━━━━━━━━⬣
+    const commandList = `
+• 💠 *${global.t('promoteCommand', userId, groupId)}*
+• 💠 *${global.t('demoteCommand', userId, groupId)}*
+• 💠 *${global.t('warnCommands', userId, groupId)}*
+• 💠 *${global.t('muteCommands', userId, groupId)}*
+• 💠 *${global.t('setNameCommand', userId, groupId)}*
+• 💠 *${global.t('hidetagCommand', userId, groupId)}*
+• 💠 *${global.t('tagallCommand', userId, groupId)}*
+• 💠 *${global.t('kickCommand', userId, groupId)}*
+• 💠 *${global.t('adminsCommand', userId, groupId)}*
+• 💠 *${global.t('openCloseCommand', userId, groupId)}*
+• 💠 *${global.t('setWelcomeCommand', userId, groupId)}*
+• 💠 *${global.t('setByeCommand', userId, groupId)}*
+• 💠 *${global.t('inactiveCommand', userId, groupId)}*
+• 💠 *${global.t('listNumCommand', userId, groupId)}*
+• 💠 *${global.t('cleanupCommand', userId, groupId)}*
+• 💠 *${global.t('rulesCommand', userId, groupId)}*
+• 💠 *${global.t('listWarnCommand', userId, groupId)}*
+• 💠 *${global.t('linkCommand', userId, groupId)}*
+• 💠 *${global.t('linkQrCommand', userId, groupId)}*
+• 💠 *${global.t('requestsCommand', userId, groupId)}*
+    `.trim();
 
-╭━━━〔 💠 ɪɴғᴏ 〕━⬣
-┃ ᴠᴇʀsɪᴏɴᴇ: ${global.versione}
-┃ sᴛᴀᴛᴜs: ᴏɴʟɪɴᴇ ⚡
-╰━━━━━━━━━━━━━━━━⬣
-`.trim()
+    return `
+⋆ ︵ ★ ${menuTitle} ★ ︵ ⋆
 
-  await conn.sendMessage(message.chat, {
-    text: menuBody,
-    mentions: [userId],
-    footer: '> *𝐑𝐋𝐘 𝐁𝐎𝐓`*',
-    buttons: [
-      {
-        buttonId: `${usedPrefix}menu`,
-        buttonText: { displayText: '⬅️ Menu Principale' },
-        type: 1
-      }
-    ],
-    headerType: 1
-  }, { quoted: message })
+${commandList.split('\n').map(line => `୧ ${line.trim()}`).join('\n')}
+
+> © ${global.t('poweredBy', userId, groupId)} 𝐑𝐋𝐘 𝐑𝐈𝐋𝐄𝐘 𝐁𝐎𝐓
+`.trim();
 }
-
-function clockString(ms) {
-  const d = Math.floor(ms / 86400000)
-  const h = Math.floor(ms / 3600000) % 24
-  const m = Math.floor(ms / 60000) % 60
-  const s = Math.floor(ms / 1000) % 60
-  return `${d}d ${h}h ${m}m ${s}s`
-}
-
-handler.help = ['menuadmin']
-handler.tags = ['menu']
-handler.command = /^(menuadmin)$/i
-
-export default handler
