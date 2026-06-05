@@ -17,37 +17,45 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
 ┃ 💠 ${usedPrefix}mytop
 ╰━━━━━━━━━━━━━━━━⬣
 
-╭━━━〔 🏆 𝐂𝐋𝐀𝐒𝐒𝐈𝐅𝐈𝐂𝐇𝐄 〕━⬣
+╭━━━〔 💠 𝐂𝐋𝐀𝐒𝐒𝐈𝐅𝐈𝐂𝐇𝐄 〕━⬣
 ┃ 💠 ${usedPrefix}top
 ┃ 💠 ${usedPrefix}topall
 ┃ 💠 ${usedPrefix}topbandiera
 ┃ 💠 ${usedPrefix}topic
 ╰━━━━━━━━━━━━━━━━⬣
 
-╭━━━〔 🕹️ 𝐆𝐈𝐎𝐂𝐇𝐈 〕━⬣
+╭━━━〔 💠 𝐆𝐈𝐎𝐂𝐇𝐈 〕━⬣
 ┃ 💠💠 ${usedPrefix}tris
 ┃ 💠 ${usedPrefix}bandiera
 ┃ 💠 ${usedPrefix}battaglianavale
+┃ 💠 ${usedPrefix}auto
+┃ 💠 ${usedPrefix}bomba
+┃ 💠 ${usedPrefix}impiccato
 ╰━━━━━━━━━━━━━━━━⬣
 
 
-╭━━━〔 🎲 𝐅𝐔𝐍 〕━⬣
+╭━━━〔 💠 𝐅𝐔𝐍 〕━⬣
 ┃ 💠 ${usedPrefix}bacia <reply/tag>
 ┃ 💠 ${usedPrefix}abbraccia <reply/tag>
 ┃ 💠 ${usedPrefix}sega <reply/tag>
 ┃ 💠 ${usedPrefix}ditalino <reply/tag>
-┃ 💠 ${usedPrefix}sesso <reply/tag>
+┃ 💠 ${usedPrefix}scopa <reply/tag>
 ┃ 💠 ${usedPrefix}dox <reply/tag>
 ┃ 6️⃣7️⃣ ${usedPrefix}67 
+┃ 💠 ${usedPrefix}kebab 
+┃ 💠 ${usedPrefix}unghia
+┃ 💠 ${usedPrefix}insulta 
+┃ 💠 ${usedPrefix}abusa
+┃ 💠 ${usedPrefix}stupra
 ╰━━━━━━━━━━━━━━━━⬣
-┃ 
+ 
 
 ╭━━━〔 💠 𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎 〕━⬣
 ┃ 💠 ${usedPrefix}supporto <motivo>
 ┃ 💠 ${usedPrefix}segnala <problema>
 ╰━━━━━━━━━━━━━━━━⬣
 
-╭━━━〔 📌 𝐈𝐍𝐅𝐎 〕━⬣
+╭━━━〔 💠 𝐈𝐍𝐅𝐎 〕━⬣
 ┃ ᴠᴇʀsɪᴏɴᴇ: ${global.versione}
 ┃ sᴛᴀᴛᴜs: ᴏɴʟɪɴᴇ ⚡
 ╰━━━━━━━━━━━━━━━━⬣
