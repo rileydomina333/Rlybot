@@ -5,7 +5,7 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
   const totalUsers = Object.keys(global.db?.data?.users || {}).length
 
   const menuBody = `
-『 𝐑𝐋𝐘 𝐁𝐎𝐓 - 𝐌𝐄𝐍𝐔 𝐆𝐑𝐔𝐏𝐏𝐎 』
+『 𝐌𝐄𝐍𝐔 𝐆𝐑𝐔𝐏𝐏𝐎 』
 ╼━━━━━━━━━━━━━━╾
   ◈ *ᴜsᴇʀ:* @${userId.split('@')[0]}
   ◈ *ᴜᴘᴛɪᴍᴇ:* ${uptimeStr}
@@ -13,38 +13,38 @@ const handler = async (message, { conn, usedPrefix = '.' }) => {
   ◈ *ᴄᴀᴛᴇɢᴏʀɪᴀ:* ᴄᴏᴍᴀɴᴅɪ ᴜᴛᴇɴᴛᴇ
 ╼━━━━━━━━━━━━━━╾
 
-╭━━━〔 👤 𝐏𝐑𝐎𝐅𝐈𝐋𝐎 〕━⬣
-┃ 🏅 ${usedPrefix}mytop
+╭━━━〔 💠 𝐏𝐑𝐎𝐅𝐈𝐋𝐎 〕━⬣
+┃ 💠 ${usedPrefix}mytop
 ╰━━━━━━━━━━━━━━━━⬣
 
 ╭━━━〔 🏆 𝐂𝐋𝐀𝐒𝐒𝐈𝐅𝐈𝐂𝐇𝐄 〕━⬣
-┃ 🏆 ${usedPrefix}top
-┃ 🌐 ${usedPrefix}topall
-┃ 🚩 ${usedPrefix}topbandiera
-┃ 📊 ${usedPrefix}topic
+┃ 💠 ${usedPrefix}top
+┃ 💠 ${usedPrefix}topall
+┃ 💠 ${usedPrefix}topbandiera
+┃ 💠 ${usedPrefix}topic
 ╰━━━━━━━━━━━━━━━━⬣
 
 ╭━━━〔 🕹️ 𝐆𝐈𝐎𝐂𝐇𝐈 〕━⬣
-┃ ❌⭕ ${usedPrefix}tris
-┃ 🚩 ${usedPrefix}bandiera
-┃ 🚢 ${usedPrefix}battaglianavale
+┃ 💠💠 ${usedPrefix}tris
+┃ 💠 ${usedPrefix}bandiera
+┃ 💠 ${usedPrefix}battaglianavale
 ╰━━━━━━━━━━━━━━━━⬣
 
 
 ╭━━━〔 🎲 𝐅𝐔𝐍 〕━⬣
-┃ 💋 ${usedPrefix}bacia <reply/tag>
-┃ 🤗 ${usedPrefix}abbraccia <reply/tag>
-┃ 😏 ${usedPrefix}sega <reply/tag>
-┃ 🤟 ${usedPrefix}ditalino <reply/tag>
-┃ 😝 ${usedPrefix}sesso <reply/tag>
-┃ 📰 ${usedPrefix}dox <reply/tag>
+┃ 💠 ${usedPrefix}bacia <reply/tag>
+┃ 💠 ${usedPrefix}abbraccia <reply/tag>
+┃ 💠 ${usedPrefix}sega <reply/tag>
+┃ 💠 ${usedPrefix}ditalino <reply/tag>
+┃ 💠 ${usedPrefix}sesso <reply/tag>
+┃ 💠 ${usedPrefix}dox <reply/tag>
 ┃ 6️⃣7️⃣ ${usedPrefix}67 
 ╰━━━━━━━━━━━━━━━━⬣
 ┃ 
 
-╭━━━〔 🆘 𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎 〕━⬣
-┃ 🆘 ${usedPrefix}supporto <motivo>
-┃ 🚨 ${usedPrefix}segnala <problema>
+╭━━━〔 💠 𝐒𝐔𝐏𝐏𝐎𝐑𝐓𝐎 〕━⬣
+┃ 💠 ${usedPrefix}supporto <motivo>
+┃ 💠 ${usedPrefix}segnala <problema>
 ╰━━━━━━━━━━━━━━━━⬣
 
 ╭━━━〔 📌 𝐈𝐍𝐅𝐎 〕━⬣
