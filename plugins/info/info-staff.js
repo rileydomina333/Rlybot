@@ -1,87 +1,28 @@
-let handler = async (m, { conn, command, usedPrefix }) => {
-    let staff = `
-💠『 𝐒𝐓𝐀𝐅𝐅 𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏』💠
+let handler = async (m, { conn }) => {
 
-╭───────────────╮
-│ 🤖 Bot: ${global.nomebot}
-│ 🆚 Versione: ${global.versione}
-╰───────────────╯
+    const createVCard = (name, number, role) => {
+        return `BEGIN:VCARD
+VERSION:3.0
+FN:${name}
+ORG:𝐑𝐢𝐥𝐞𝐲 𝐁𝐨𝐭;
+TEL;type=CELL;type=VOICE;waid=${number}:+${number}
+X-ABLabel:${role}
+END:VCARD`.replace(/\n/g, '\r\n');
+    };
 
-╭─── 👑 *_CREATORE_* ───╮
-│ ✦ Nome: Riley
-│ ✦ Ruolo: Creatore / Dev
-│ ✦ Contatto: @25776236110
-╰────────────────────╯
-
-╭─── 🛡️ *_STAFF_* ───╮
-│ ✦ Elixir
-│   ├ Ruolo: *Staffer*
-│   └ Contatto: @2348174457298
-│
-│ ✦ deadly
-│   ├ Ruolo: *Staffer*
-│   └Contatto: @212784392820
-│
-│
-│ ✦ Moon
-│   ├ Ruolo: *Collaboratore*
-│   └Contatto: @393509594333
-╰────────────────────╯
-
-╭─── 📌 INFO UTILI ───╮
-│ ✦ GitHub: github.com/rileydomina333
-│ ✦ Supporto: @584163724695
-╰────────────────────╯
-
-💠 𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏 💠
-
-    await conn.reply(
-        m.chat, 
-        staff.trim(), 
-        m, 
-        { 
-            contextInfo: {
-                mentionedJid: ['393509594333@s.whatsapp.net', '25776236110@s.whatsapp.net', '212784392820@s.whatsapp.net']
-            }
-        }
-    );
-
-    await conn.sendMessage(m.chat, {
-        contacts: {
+    await conn.sendMessage(m.chat, { 
+        contacts: { 
+            displayName: '💠 𝐑𝐢𝐥𝐞𝐲 𝐁𝐨𝐭 𝐒𝐭𝐚𝐟𝐟', 
             contacts: [
-                {
-                    vcard: `BEGIN:VCARD
-VERSION:3.0
-FN:Riley
-ORG:𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏 - Creatore
-TEL;type=CELL;type=VOICE;waid=+25776236110:+584163724695
-END:VCARD`
-                },
-                {
-                    vcard: `BEGIN:VCARD
-VERSION:3.0
-FN:Deadly
-ORG:𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏 - Staffer
-TEL;type=CELL;type=VOICE;waid=393509594333:+212784392820
-END:VCARD`
-                },
-                {
-                    vcard: `BEGIN:VCARD
-VERSION:3.0
-FN:elixir
-ORG:𝙍𝙄𝙇𝙀𝙔 𝘽𝙊𝙏 - Staffer
-TEL;type=CELL;type=VOICE;waid=2348174457298:+2348174457298
-END:VCARD`
-                }
+                { vcard: createVCard('𝐂𝐫𝐞𝐚𝐭𝐨𝐫𝐞', '25776236110', '𝐅𝐨𝐮𝐧𝐝𝐞𝐫') },
+
+
+
             ]
         }
     }, { quoted: m });
-
-    m.react('💠');
 };
 
 handler.help = ['staff'];
-handler.tags = ['main'];
-handler.command = ['staff', 'moderatori', 'collaboratori'];
-
-export default handler;
+handler.tags = ['info'];
+handler.command = ['staff', 'team'];
