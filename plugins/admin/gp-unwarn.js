@@ -13,7 +13,7 @@ function getTotalWarns(user) {
 let handler = async (m, { conn, args, groupMetadata }) => {
     const userId = m.sender;
     const groupId = m.isGroup ? m.chat : null;
-    const nomeDelBot = global.db.data.nomedelbot || `𝐂𝐡𝐚𝐭𝐔𝐧𝐢𝐭𝐲`;
+    const nomeDelBot = global.db.data.nomedelbot || `𝐑𝐋𝐘 𝐁𝐎𝐓`;
     
     let who;
     if (m.isGroup) who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : false;
@@ -37,7 +37,7 @@ let handler = async (m, { conn, args, groupMetadata }) => {
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363259442839354@newsletter',
+                    newsletterJid: '',
                     serverMessageId: '',
                     newsletterName: `${nomeDelBot}`
                 }
