@@ -1,4 +1,4 @@
-//Plugin fatto da Axtral_WiZaRd
+//Plugin fatto da Rlybot
 import fs from 'fs';
 
 const handler = m => m;
