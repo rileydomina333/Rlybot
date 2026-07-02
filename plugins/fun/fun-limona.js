@@ -1,4 +1,4 @@
-// limona by Bonzino
+// limona by riley
 
 const norm=jid=>String(jid||'').split(':')[0].replace('@c.us','@s.whatsapp.net')
 const tag=(jid='')=>'@'+String(jid).split('@')[0].split(':')[0]
