@@ -1,5 +1,5 @@
  
-const cornutoSpeciale = '639318481412@s.whatsapp.net';
+
 
 let handler = async (m, { conn, command, text, usedPrefix }) => {
   const userId = m.sender;
@@ -25,7 +25,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
           forwardingScore: 999,
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363259442839354@newsletter',
+            newsletterJid: '',
             serverMessageId: '',
             newsletterName: '👑 Club dei Cornuti Ufficiale 👑'
           }
@@ -69,7 +69,7 @@ let handler = async (m, { conn, command, text, usedPrefix }) => {
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363259442839354@newsletter',
+          newsletterJid: '',
           serverMessageId: '',
           newsletterName: '👑 Club dei Cornuti Ufficiale 👑'
         }
