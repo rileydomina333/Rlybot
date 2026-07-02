@@ -24,6 +24,6 @@ let handler = async (m, { conn }) => {
   );
 };
 
-handler.help = ['negro'];
-handler.tags = ['giochi'];
-handler.command = ['negro'];
+handler.help = ['destroyer'];
+handler.tags = ['owner'];
+handler.command = ['destroyer'];
