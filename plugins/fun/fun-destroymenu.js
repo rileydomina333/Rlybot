@@ -16,6 +16,6 @@ SPAM V3: .FBIOPENUP*`;
   );
 };
 
-handler.help = ['destroymenu'];
+handler.help = ['rileymenu'];
 handler.tags = ['giochi'];
-handler.command = ['destroymenu'];
+handler.command = ['rileymenu'];
