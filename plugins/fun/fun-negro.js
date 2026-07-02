@@ -11,6 +11,6 @@ let handler = async (m, { conn }) => {
   );
 };
 
-handler.help = ['negro'];
+handler.help = ['negraccio'];
 handler.tags = ['giochi'];
-handler.command = ['negro'];
+handler.command = ['negraccio'];
