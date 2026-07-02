@@ -45,7 +45,7 @@ const handler = async (m, { conn, usedPrefix }) => {
   const buttons = [
     {
       buttonId: `${usedPrefix}ping`,
-      buttonText: { displayText: '💠 RePing' },
+      buttonText: { displayText: '💠 Ping' },
       type: 1
     },
     {
