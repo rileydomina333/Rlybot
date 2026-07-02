@@ -1,116 +1,159 @@
-// by deadly
+import yts from 'yt-search'
+import { exec } from 'child_process'
+import fs from 'fs'
+import os from 'os'
+import path from 'path'
 
-import yts from 'yt-search';
-import fg from 'api-dylux';
-import fetch from 'node-fetch';
-import { exec } from 'child_process';
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
+let pendingLyrics = {}
+global.playChoice = global.playChoice || {}
+
+const execPromise = (cmd) => new Promise((resolve, reject) => {
+  exec(cmd, { maxBuffer: 1024 * 1024 * 10 }, (err, stdout, stderr) => {
+    if (err) reject(new Error(stderr || err.message))
+    else resolve(stdout)
+  })
+})
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-  if (!text) return m.reply(`⚡ *𝗥𝗟𝗬-𝗕𝗢𝗧*\n\n💡 _Scrivi:_ ${usedPrefix + command} nome canzone`);
 
-  try {
-    const search = await yts(text);
-    const vid = search.videos[0];
-    if (!vid) return m.reply('⚠️ *𝗥𝗶𝘀𝘂𝗹𝘁𝗮𝘁𝗼 𝗻𝗼𝗻 𝘁𝗿𝗼𝘃𝗮𝘁𝗼.*');
+  if (command === "play") {
 
-    const url = vid.url;
+    if (!text) return m.reply("🎧 𝐒𝐜𝐫𝐢𝐯𝐢 𝐢𝐥 𝐭𝐢𝐭𝐨𝐥𝐨!")
 
-    if (command === 'play') {
-        let infoMsg = `┏━━━━━━━━━━━━━━━━━━━┓\n` +
-                      `   🎧  *𝙋𝙡𝙖𝙮 𝗥𝗟𝗬-𝗕𝗢𝗧* 🎧\n` +
-                      `┗━━━━━━━━━━━━━━━━━━━┛\n\n` +
-                      `◈ 📌 *𝗧𝗶𝘁𝗼𝗹𝗼:* ${vid.title}\n` +
-                      `◈ ⏱️ *𝗗𝘂𝗿𝗮𝘁𝗮:* ${vid.timestamp}\n\n` +
-                      `*𝗦𝗲𝗹𝗲𝘇𝗶𝗼𝗻𝗮 𝗶𝗹 𝗳𝗼𝗿𝗺𝗮𝘁𝗼:*`;
+    let search = await yts(text)
+    let video = search.videos[0]
 
-        return await conn.sendMessage(m.chat, {
-            image: { url: vid.thumbnail },
-            caption: infoMsg,
-            footer: '\n𝗥𝗟𝗬-𝗕𝗢𝗧',
-            buttons: [
-                { buttonId: `${usedPrefix}playaud ${url}`, buttonText: { displayText: '🎵 𝗔𝗨𝗗𝗜𝗢 (𝗠𝗣𝟯)' }, type: 1 },
-                { buttonId: `${usedPrefix}playvid ${url}`, buttonText: { displayText: '🎬 𝗩𝗜𝗗𝗘𝗢 (𝗠𝗣𝟰)' }, type: 1 }
-            ],
-            headerType: 4
-        }, { quoted: m });
-    }
+    if (!video) return m.reply("❌ Nessun risultato")
 
-    await conn.sendMessage(m.chat, { react: { text: "🎵", key: m.key } });
+    global.playChoice[m.sender] = video
 
-    let downloadUrl = null;
-    const isAudio = command === 'playaud';
-    try {
-        let res = isAudio ? await fg.yta(url) : await fg.ytv(url);
-        if (res && res.dl_url) downloadUrl = res.dl_url;
-    } catch (e) { console.log("Dylux API failed"); }
+    return conn.sendMessage(m.chat, {
+      text:
+`🎶 *${video.title}*
 
-    if (!downloadUrl) {
-        try {
-            let api = isAudio ? 'ytmp3' : 'ytmp4';
-            let res = await fetch(`https://api.vreden.my.id/api/${api}?url=${url}`);
-            let json = await res.json();
-            downloadUrl = json.result?.download?.url || json.result?.url;
-        } catch (e) { console.log("Vreden API failed"); }
-    }
+╭─────────╮
+┃📺 𝐂𝚲𝐍𝚲𝐋𝚵: *${video.author.name}*
+┃⏱️ 𝐃𝐔𝐑𝚲𝐓𝚲: *${video.timestamp}*
+┃👁️ 𝐕𝕀𝐒𝐔𝚲𝐋: *${video.views.toLocaleString()}*
+╰─────────╯
 
-    if (!downloadUrl) {
-        throw new Error('APIs failed to provide a download URL');
-    }
+𝐕𝐮𝐨𝐢 𝐚𝐮𝐝𝐢𝐨 𝐨  𝐯𝐢𝐝𝐞𝐨🎥?`,
+      buttons: [
+        { buttonId: ".play_audio", buttonText: { displayText: "🎧 𝐀𝐮𝐝𝐢𝐨" }, type: 1 },
+        { buttonId: ".play_video", buttonText: { displayText: "🎥 𝐕𝐢𝐝𝐞𝐨" }, type: 1 }
+      ],
+      headerType: 1
+    }, { quoted: m })
+  }
 
-    const tmpDir = os.tmpdir();
-    const fileName = `file_${Date.now()}`;
-    const inputPath = path.join( tmpDir, `${fileName}.${isAudio ? 'mp3' : 'mp4'}`);
-    const outputPath = path.join(tmpDir, `${fileName}.${isAudio ? 'mp3' : 'mp4'}`);
+  let video = global.playChoice[m.sender]
+  if (!video) return m.reply("❌ Nessuna richiesta attiva")
 
-    const response = await fetch(downloadUrl);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    const arrayBuffer = await response.arrayBuffer();
-    fs.writeFileSync(inputPath, Buffer.from(arrayBuffer));
+  if (command === "play_audio") {
 
-if (isAudio) {
-    const voicePath = path.join(tmpDir, `${fileName}.ogg`)
+    let infoMsg = `
+ℹ️ 𝐑𝐢𝐬𝐮𝐥𝐭𝐚𝐭𝐨:
 
-    await new Promise((resolve, reject) => {
-        exec(
-            `ffmpeg -hide_banner -loglevel error -y -i "${inputPath}" -map_metadata -1 -vn -ar 48000 -ac 1 -c:a libopus -b:a 64k -application voip -f ogg "${voicePath}"`,
-            (err) => {
-                if (err) reject(err)
-                else resolve()
-            }
-        )
+*${video.title}*
+
+⌛️ 𝐒𝐜𝐚𝐫𝐢𝐜𝐨 𝐥’𝐚𝐮𝐝𝐢𝐨...
+
+> 𝐑𝐋𝐘 𝐁𝐎𝐓 𝐝𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐫
+`
+    await m.reply(infoMsg)
+
+    let file = `./tmp_${Date.now()}.mp3`
+
+    exec(`yt-dlp -x --audio-format mp3 -o "${file}" ${video.url}`, async (err) => {
+
+      if (err) return m.reply("❌ Errore audio")
+
+      await conn.sendMessage(m.chat, {
+        audio: fs.readFileSync(file),
+        mimetype: 'audio/mpeg'
+      }, { quoted: m })
+
+      fs.unlinkSync(file)
+
+      global.lyricsRequest = global.lyricsRequest || {}
+      global.lyricsRequest[m.sender] = video.title
+
+      if (pendingLyrics[m.sender]) clearTimeout(pendingLyrics[m.sender])
+      pendingLyrics[m.sender] = setTimeout(() => {
+        delete pendingLyrics[m.sender]
+        delete global.lyricsRequest[m.sender]
+      }, 15000)
+
+      const pulsanti = [
+        ['✅ 𝐒𝐢', `${usedPrefix}lyrics_yes`]
+      ];
+
+      await conn.sendButton(
+        m.chat,
+        `📜 Vuoi il testo?\n\n*${video.title}*`,
+        `Hai 15 secondi`,
+        null,
+        pulsanti,
+        m
+      );
+
+      delete global.playChoice[m.sender]
     })
+  }
 
-    await conn.sendMessage(m.chat, {
-        audio: fs.readFileSync(voicePath),
-        mimetype: 'audio/ogg; codecs=opus',
-        ptt: true
-    }, { quoted: m })
+  if (command === "play_video") {
+    if (video.seconds > 480)
+      return m.reply("❌ Max 8 minuti")
 
-    if (fs.existsSync(voicePath)) fs.unlinkSync(voicePath)
+    await m.reply("🎬 𝐒𝐜𝐚𝐫𝐢𝐜𝐨 𝐯𝐢𝐝𝐞𝐨...\n> 𝐑𝐋𝐘 𝐁𝐎𝐓 𝐝𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐫")
 
-} else {
-    await conn.sendMessage(m.chat, {
-        video: fs.readFileSync(inputPath),
+    const ts  = Date.now()
+    const raw = path.join(os.tmpdir(), `vid_raw_${ts}.mp4`)
+    const out = path.join(os.tmpdir(), `vid_out_${ts}.mp4`)
+
+    try {
+
+      await execPromise(
+        `yt-dlp --no-playlist ` +
+        `-f "bestvideo[vcodec^=avc1][height<=480]+bestaudio[acodec^=mp4a]/best[vcodec^=avc1][height<=480]/best[height<=480]" ` +
+        `--merge-output-format mp4 --ffmpeg-location /usr/bin/ffmpeg ` +
+        `--no-part --retries 3 ` +
+        `-o "${raw}" "${video.url}"`
+      )
+
+      await execPromise(
+        `/usr/bin/ffmpeg -y -i "${raw}" ` +
+        `-c:v libx264 -preset ultrafast -crf 30 ` +
+        `-vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" ` +
+        `-c:a aac -b:a 96k -movflags +faststart "${out}"`
+      )
+
+      fs.unlinkSync(raw)
+
+      const sizeMB = fs.statSync(out).size / (1024 * 1024)
+      if (sizeMB > 64) {
+        fs.unlinkSync(out)
+        return m.reply("❌ Video troppo pesante")
+      }
+
+      await conn.sendMessage(m.chat, {
+        video: fs.readFileSync(out),
         mimetype: 'video/mp4',
-        caption: `✅ *𝐒𝐜𝐚𝐫𝐢𝐜𝐚𝐭𝐨 𝐝𝐚 𝗥𝗟𝗬-𝗕𝗢𝗧*`
-    }, { quoted: m })
+        caption: `🎬 ${video.title}`
+      }, { quoted: m })
+
+      fs.unlinkSync(out)
+      delete global.playChoice[m.sender]
+
+    } catch (e) {
+      console.log(e)
+      m.reply("❌ Errore video")
+    }
+  }
 }
 
-    if (fs.existsSync(inputPath)) fs.unlinkSync(inputPath);
-    if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
-    await conn.sendMessage(m.chat, { react: { text: "✅", key: m.key } });
+handler.command = /^(play|play_audio|play_video)$/i
+handler.help = ['play']
+handler.tags = ['fun']
 
-  } catch (e) {
-    console.error("Handler Error:", e.message);
-    m.reply('🚀 *𝙋𝙡𝙖𝙮 𝙀𝙧𝙧𝙤𝙧:* Al momento i server di download sono sovraccarichi. Riprova tra poco.');
-  }
-};
-
-handler.help = ['play'];
-handler.tags = ['downloader'];
-handler.command = /^(play|playaud|playvid)$/i;
-
-export default handler;
+export default handler
