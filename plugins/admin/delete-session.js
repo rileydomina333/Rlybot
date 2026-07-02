@@ -64,7 +64,7 @@ const handler = async (message, { conn, usedPrefix }) => {
   }, { quoted: quotedMessage });
 };
 
-handler.help = ['.𝐝𝐬'];
+handler.help = ['.ds'];
 handler.tags = ["admin"];
 handler.command = /^(deletession|ds|clearallsession)$/i;
 handler.admin = true;
