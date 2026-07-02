@@ -57,6 +57,7 @@ function generateMenuText(chat, userId, groupId, botName, usedPrefix) {
         "Anti TikTok": !!chat?.antitiktok,
         "Anti Bot": !!chat?.antibot,
         "Anti gore": !!chat?.antigore,
+        "anti pedo": !!chat?.antipedo,
         "Anti nuke": !!chat?.antinuke
     };
 
