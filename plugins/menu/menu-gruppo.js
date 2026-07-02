@@ -144,6 +144,8 @@ function generateMenuText(prefix, userId, groupId) {
 💠 *.divorzia* (${global.t('endRelationshipCommand', userId, groupId)})
 💠 *.amore* @${global.t('userCommand', userId, groupId)} (${global.t('affinityCommand', userId, groupId)})
 💠 *.bacia* @${global.t('userCommand', userId, groupId)}
+💠 *.limona* @${global.t('userCommand', userId, groupId)}
+💠 *.palpa* @${global.t('userCommand', userId, groupId)}
 💠 *.odio* @${global.t('userCommand', userId, groupId)}
 💠 *.rizz* @${global.t('userCommand', userId, groupId)} (${global.t('charmCommand', userId, groupId)})
 💠 *.minaccia* @${global.t('userCommand', userId, groupId)}
