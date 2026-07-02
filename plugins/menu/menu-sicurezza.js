@@ -8,7 +8,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     const userId = m.sender;
     const groupId = m.isGroup ? m.chat : null;
     const chat = global.db.data.chats[m.chat] || {};
-    const imagePath = path.join(__dirname, '../../media/WA_1782994892103.jpeg');
+    const imagePath = path.join(__dirname, '../../media/WA_1782994913707.jpeg');
 
     const botName = "ℝ𝕃𝕐 𝔹𝕆𝕋";
     const menuText = generateMenuText(chat, userId, groupId, botName, usedPrefix);
