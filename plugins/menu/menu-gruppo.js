@@ -124,6 +124,7 @@ function generateMenuText(prefix, userId, groupId) {
 💠 *.scf* (${global.t('rockPaperScissorsCommand', userId, groupId)})
 💠 *.pokedex* (${global.t('pokemonInfoCommand', userId, groupId)})
 💠 *.bandiera*
+💠 *.obbligo/verità*
 💠 *.indovinacanzone*
 💠 *.auto*
 💠 *.missioni*`),
