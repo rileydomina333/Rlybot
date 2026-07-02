@@ -1,4 +1,4 @@
-// plugin pompino by Bonzino
+// plugin pompino by riley
 import { performance } from 'perf_hooks'
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
