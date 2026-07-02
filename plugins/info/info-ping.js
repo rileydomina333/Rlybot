@@ -1,4 +1,4 @@
-// by riley
+// by 𝕯𝖊ⱥ𝖉𝖑𝐲 × Bonzino
 
 import { performance } from 'perf_hooks'
 
@@ -42,6 +42,18 @@ const handler = async (m, { conn, usedPrefix }) => {
 > *𝐑𝐋𝐘 𝐁𝐎𝐓*
 `.trim()
 
+  const buttons = [
+    {
+      buttonId: `${usedPrefix}ping`,
+      buttonText: { displayText: '💠 RePing' },
+      type: 1
+    },
+    {
+      buttonId: `${usedPrefix}menu`,
+      buttonText: { displayText: '💠 Menu' },
+      type: 1
+    }
+  ]
 
   await conn.sendMessage(m.chat, {
     text: info,
