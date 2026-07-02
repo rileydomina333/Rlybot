@@ -1,4 +1,4 @@
-// Plug-in creato da elixir
+// Plug-in creato da riley
 let handler = async (m, { conn, participants }) => {
     if (!m.mentionedJid || !m.mentionedJid[0]) {
         return conn.reply(m.chat, "❌ Usa: `.abusa @persona`", m);
