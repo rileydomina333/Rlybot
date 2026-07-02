@@ -9,7 +9,7 @@ const handler = async (message, { conn, usedPrefix, command }) => {
     const groupId = message.isGroup ? message.chat : null;
 
     const menuText = generateMenuText(usedPrefix, userId, groupId);
-    const imagePath = path.join(__dirname, '../../media/IMG-20260608-WA0100.jpg');
+    const imagePath = path.join(__dirname, '../../media/WA_1782994943475.jpeg');
     const footerText = global.t('chooseMenu', userId, groupId);
     const mainMenuText = global.t('mainMenuButton', userId, groupId);
     const ownerMenuText = global.t('ownerMenuButton', userId, groupId);
