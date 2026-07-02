@@ -1,4 +1,4 @@
-// by Bonzino
+// by Riley
 
 import axios from 'axios'
 
