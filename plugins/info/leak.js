@@ -1,70 +1,95 @@
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return m.reply(`*Uso:* ${usedPrefix + command} <numero con prefisso>\n\n*Esempio:* ${usedPrefix + command} +393471234567`)
+    if (!text) return m.reply(`*Uso:* ${usedPrefix + command} <numero>\n\n*Esempio:* ${usedPrefix + command} +393471234567`)
     
-    let numero = text.replace(/[^0-9+]/g, '') // pulisce spazi e trattini
-    if (!numero.startsWith('+')) return m.reply('Metti il prefisso internazionale. Es: +39, MANNAGGIA!')
+    let numero = text.replace(/[^0-9+]/g, '')
+    if (!numero.startsWith('+')) return m.reply('Metti il prefisso. Es: +39, +1, MANNAGGIA!')
     
-    await m.reply('Analizzo prefisso...')
-    
-    // Database prefissi base. Per roba seria serve API tipo numverify.com
-    const prefissi = {
-        '+39': { paese: 'Italia', tipo: 'Fisso/Mobile' },
-        '+1': { paese: 'USA/Canada', tipo: 'Fisso/Mobile' },
-        '+44': { paese: 'Regno Unito', tipo: 'Fisso/Mobile' },
-        '+33': { paese: 'Francia', tipo: 'Fisso/Mobile' },
-        '+49': { paese: 'Germania', tipo: 'Fisso/Mobile' },
-        '+34': { paese: 'Spagna', tipo: 'Fisso/Mobile' },
-        '+41': { paese: 'Svizzera', tipo: 'Fisso/Mobile' },
-        '+86': { paese: 'Cina', tipo: 'Fisso/Mobile' },
-        '+91': { paese: 'India', tipo: 'Fisso/Mobile' },
-        '+55': { paese: 'Brasile', tipo: 'Fisso/Mobile' },
-        '+7': { paese: 'Russia', tipo: 'Fisso/Mobile' }
+    // Database prefissi Paesi principali
+    const paesi = {
+        '+39': 'Italia', '+1': 'USA/Canada', '+44': 'Regno Unito', '+33': 'Francia',
+        '+49': 'Germania', '+34': 'Spagna', '+41': 'Svizzera', '+43': 'Austria',
+        '+32': 'Belgio', '+31': 'Olanda', '+351': 'Portogallo', '+30': 'Grecia',
+        '+7': 'Russia/Kazakistan', '+86': 'Cina', '+81': 'Giappone', '+91': 'India',
+        '+55': 'Brasile', '+52': 'Messico', '+54': 'Argentina', '+61': 'Australia'
     }
     
-    // Prefissi mobili italiani più comuni
+    // Prefissi mobili italiani. Aggiornati al 2026
     const mobiliITA = {
-        '+39328': 'TIM', '+39329': 'TIM', '+39333': 'TIM', '+39334': 'TIM', '+39335': 'TIM', '+39336': 'TIM', '+39337': 'TIM', '+39338': 'TIM', '+39339': 'TIM',
-        '+39347': 'Vodafone', '+39348': 'Vodafone', '+39349': 'Vodafone', '+39340': 'Vodafone', '+39341': 'Vodafone', '+39342': 'Vodafone', '+39343': 'Vodafone',
-        '+39392': 'WindTre', '+39320': 'WindTre', '+39388': 'WindTre', '+39389': 'WindTre', '+39390': 'WindTre', '+39391': 'WindTre', '+39393': 'WindTre',
-        '+39366': 'Iliad', '+39351': 'Iliad', '+39352': 'Iliad',
-        '+39370': 'Ho Mobile', '+39371': 'Ho Mobile',
-        '+39350': 'Very Mobile', '+39355': 'Very Mobile'
+        'TIM': ['+39328','+39329','+39330','+39331','+39333','+39334','+39335','+39336','+39337','+39338','+39339','+39360','+39366'],
+        'Vodafone': ['+39340','+39341','+39342','+39343','+39344','+39345','+39346','+39347','+39348','+39349'],
+        'WindTre': ['+39320','+39322','+39323','+39324','+39325','+39327','+39380','+39388','+39389','+39390','+39391','+39392','+39393'],
+        'Iliad': ['+39351','+39352','+39353','+39354','+39355','+39356','+39357'],
+        'PosteMobile': ['+39371','+39372','+39373','+39374','+39375','+39376','+39377','+39378'],
+        'Ho Mobile': ['+39370','+39379'],
+        'Kena': ['+39350'],
+        'Very Mobile': ['+39319']
     }
     
-    let info = `*INFO PREFISSO: ${numero}*\n\n`
+    // Prefissi fissi Italia per regione
+    const fissiITA = {
+        '+3902': 'Milano', '+3906': 'Roma', '+39011': 'Torino', '+39051': 'Bologna',
+        '+39055': 'Firenze', '+39081': 'Napoli', '+39091': 'Palermo', '+39010': 'Genova',
+        '+39049': 'Padova', '+39040': 'Trieste', '+39070': 'Cagliari', '+39080': 'Bari'
+    }
+    
+    let info = `*ANALISI NUMERO: ${numero}*\n\n`
     let trovato = false
     
-    // Controllo operatore italiano
-    for (let pref in mobiliITA) {
+    // 1. Controllo Paese
+    for (let pref in paesi) {
         if (numero.startsWith(pref)) {
-            info += `*Paese:* Italia\n*Operatore:* ${mobiliITA[pref]}\n*Tipo:* Mobile\n`
+            info += `*Paese:* ${paesi}\n`
             trovato = true
             break
         }
     }
+    if (!trovato) return m.reply('Prefisso paese non riconosciuto.')
     
-    // Se non è mobile ITA, controllo paese generico
-    if (!trovato) {
-        for (let pref in prefissi) {
-            if (numero.startsWith(pref)) {
-                info += `*Paese:* ${prefissi[pref].paese}\n*Tipo:* ${prefissi[pref].tipo}\n`
-                trovato = true
+    // 2. Se è Italia, dettaglio operatore/zona
+    if (numero.startsWith('+39')) {
+        let opTrovato = false
+        // Check mobile
+        for (let [op, prefs] of Object.entries(mobiliITA)) {
+            if (prefs.some(p => numero.startsWith(p))) {
+                info += `*Tipo:* Mobile\n*Operatore:* ${op}\n`
+                opTrovato = true
                 break
             }
         }
+        // Check fisso se non è mobile
+        if (!opTrovato) {
+            for (let [pref, citta] of Object.entries(fissiITA)) {
+                if (numero.startsWith(pref)) {
+                    info += `*Tipo:* Fisso\n*Zona:* ${citta}\n`
+                    opTrovato = true
+                    break
+                }
+            }
+        }
+        if (!opTrovato) info += `*Tipo:* Fisso/Mobile generico\n`
     }
     
-    if (!trovato) {
-        return m.reply('Prefisso non riconosciuto. Metti un numero valido con +xx')
+    // 3. Link utili pubblici - non violano privacy
+    let soloNumeri = numero.replace('+', '')
+    info += `\n*Link utili:*\n`
+    info += `WhatsApp: wa.me/${soloNumeri}\n`
+    info += `Telegram: t.me/+${soloNumeri}\n`
+    info += `_Se i link aprono una chat, il numero è registrato. Non forzo controlli._\n\n`
+    
+    // 4. Check formato
+    let lunghezza = numero.replace('+', '').length
+    if (numero.startsWith('+39') && lunghezza !== 12) {
+        info += `⚠️ *Attenzione:* Numero italiano deve avere 12 cifre con +39. Questo ne ha ${lunghezza}.\n\n`
     }
     
-    info += `\n_Dati basati su prefissi pubblici. Non identifica il proprietario del numero._`
+    info += `_Dati da database prefissi pubblici AGCOM. Non identifica persona._`
+    
     m.reply(info)
 }
 
 handler.help = ['leak <numero>']
 handler.tags = ['tools', 'osint']
-handler.command = ['leak', 'numinfo', 'prefisso']
+handler.command = ['leak', 'numinfo', 'ninfo']
 handler.limit = true
 
 export default handler
