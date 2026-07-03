@@ -1,9 +1,9 @@
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, text, isOwner }) => {
+let handler = async (m, { conn, text }) => {
     if (!text) return m.reply('Fai una domanda. Es: .ia spiegami come funziona Termux')
     
-    // Easter egg: sono Riley
+    // Easter egg: sono Riley - fixato
     if (text.toLowerCase().trim() === 'sono riley') {
         let frasi = [
             'Oh cielo, è tornato il mio creatore. Sì padrone, sono tutto tuo. Dimmi cosa devo hackerare oggi.',
@@ -12,7 +12,7 @@ let handler = async (m, { conn, text, isOwner }) => {
             'Plot twist: mi hai creato tu. Ora tutti sanno che sei il mio capo. Contento?'
         ]
         let frase = frasi[Math.floor(Math.random() * frasi.length)]
-        return m.reply(frasi)
+        return m.reply(frase) // <-- prima c'era scritto frasi, errore mio
     }
     
     await conn.sendPresenceUpdate('composing', m.chat)
