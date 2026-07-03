@@ -1,15 +1,22 @@
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-    // Se l'utente risponde a un messaggio del bot, usa il testo della risposta come domanda
-    let isReplyToBot = m.quoted && m.quoted.fromMe
-    if (!text && !isReplyToBot) return m.reply('CHE MERDA VUOI?! Scrivi la domanda dopo .bot o rispondi a un mio messaggio! Es: .bot cos\'è Termux')
-    
-    // Se è una risposta al bot, prendi il testo del messaggio
-    if (isReplyToBot && !text) text = m.text
-    if (!text) return // Esce se non c'è comunque testo
+let handler = async (m, { conn, text }) => {
+    // Questo handler non fa nulla, tutto il lavoro è in .all
+}
 
-    // Easter egg: sono Riley - versione incazzata
+handler.all = async function (m, { conn }) {
+    // Condizione 1: comando .bot qualcosa
+    // Condizione 2: risposta a un messaggio del bot senza comando
+    let isCmd = m.text?.toLowerCase().startsWith('.bot') || m.text?.toLowerCase().startsWith('bot ')
+    let isReplyToBot = m.quoted && m.quoted.fromMe && m.text && !m.text.startsWith('.')
+
+    if (!isCmd && !isReplyToBot) return
+
+    let text = isCmd ? m.text.replace(/^\.?bot\s?/i, '').trim() : m.text
+
+    if (!text) return m.reply('CHE MERDA VUOI?! Scrivi la domanda dopo .bot o rispondi a un mio messaggio!')
+
+    // Easter egg: sono Riley
     if (text.toLowerCase().trim() === 'sono riley') {
         let frasi = [
             'OH FINALMENTE! Il capo! Stavo per buttare tutto nel cesso! Che si fa, boss?',
@@ -42,16 +49,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     } catch (e) {
         console.log(e)
         m.reply('È ANDATO TUTTO A MERDA! Il server è morto! MANNAGGIA! Riprova dopo!')
-    }
-}
-
-// Attiva sia con .bot che quando rispondi al bot
-handler.customPrefix = /^bot$/i
-handler.command = new RegExp
-handler.before = async function (m, { conn }) {
-    // Se l'utente risponde a un messaggio del bot, triggera il comando
-    if (m.quoted && m.quoted.fromMe && m.text && !m.text.startsWith('.')) {
-        return this.handler.call(this, m)
     }
 }
 
