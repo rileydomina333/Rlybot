@@ -115,6 +115,10 @@ function generateMenuText(prefix, userId, groupId) {
 💠 *.dado*
 💠 *.slot*
 💠 *.casinò*
+💠 *.annuale*
+💠 *.poker*
+💠 *.blockblast*
+💠 *.scacchi*
 💠 *.scommessa* (${global.t('quantityCommand', userId, groupId)})
 💠 *.blackjack*
 💠 *.wordle*
@@ -147,6 +151,7 @@ function generateMenuText(prefix, userId, groupId) {
 💠 *.bacia* @${global.t('userCommand', userId, groupId)}
 💠 *.picchia* @${global.t('userCommand', userId, groupId)}
 💠 *.limona* @${global.t('userCommand', userId, groupId)}
+💠 *.threesome* @${global.t('userCommand', userId, groupId)}
 💠 *.palpa* @${global.t('userCommand', userId, groupId)}
 💠 *.odio* @${global.t('userCommand', userId, groupId)}
 💠 *.rizz* @${global.t('userCommand', userId, groupId)} (${global.t('charmCommand', userId, groupId)})
@@ -188,6 +193,7 @@ function generateMenuText(prefix, userId, groupId) {
 💠 *.crimini*
 💠 *.crimine* <num>
 💠 *.rapina* @utente
+💠 *.clan* @4/5utenti
 💠 *.fedinapenale*`),
         createSection('Pet', `
 💠 *.cercapet*
