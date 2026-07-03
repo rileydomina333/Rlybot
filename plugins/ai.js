@@ -1,10 +1,16 @@
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, text }) => {
-    if (!text) return m.reply('Fai una domanda. Es: .ia spiegami come funziona Termux')
+export default async function(m, { conn }) {
+    // Ignora se non è un messaggio di testo o se è del bot stesso
+    if (!m.text || m.key.fromMe) return
     
-    // Easter egg: sono Riley - fixato
-    if (text.toLowerCase().trim() === 'sono riley') {
+    const text = m.text.toLowerCase()
+    
+    // Si attiva solo se scrivi "rileybot" da qualche parte nel messaggio
+    if (!text.includes('rileybot')) return
+    
+    // Easter egg: sono Riley
+    if (text.includes('sono riley')) {
         let frasi = [
             'Oh cielo, è tornato il mio creatore. Sì padrone, sono tutto tuo. Dimmi cosa devo hackerare oggi.',
             'Riconosco il DNA del boss. Ai tuoi ordini Riley, fammi pure spegnere internet se serve.',
@@ -12,34 +18,21 @@ let handler = async (m, { conn, text }) => {
             'Plot twist: mi hai creato tu. Ora tutti sanno che sei il mio capo. Contento?'
         ]
         let frase = frasi[Math.floor(Math.random() * frasi.length)]
-        return m.reply(frase) // <-- prima c'era scritto frasi, errore mio
+        return m.reply(frase)
     }
     
     await conn.sendPresenceUpdate('composing', m.chat)
     
+    // Togli "rileybot" dalla domanda prima di mandarla all'IA
+    let domanda = m.text.replace(/rileybot/gi, '').trim()
+    if (!domanda) return m.reply('Dimmi cosa vuoi, padrone.')
+    
     try {
-        let prompt = `Rispondi sempre in italiano. Sii breve e diretto. Domanda: ${text}`
+        let prompt = `Rispondi sempre in italiano. Sii breve, diretto e un po' sarcastico. L'utente si chiama Riley. Domanda: ${domanda}`
         let res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
             timeout: 15000
         })
         
         let risposta = await res.text()
         
-        if (!risposta || risposta.length < 5) throw 'Risposta vuota'
-        if (risposta.includes('I cannot') || risposta.includes("I don't know")) {
-            risposta = 'Non ho dati su questo. Prova a chiedere in modo diverso.'
-        }
-        
-        await m.reply(risposta)
-        
-    } catch (e) {
-        console.log(e)
-        m.reply('Servizio lento o offline. Riprova tra poco.')
-    }
-}
-
-handler.command = /^bot$/i
-handler.tags = ['tools']
-handler.help = ['bot <domanda>']
-
-export default handler
+       
