@@ -1,32 +1,46 @@
 import fetch from 'node-fetch'
 
+// Memoria per modalità aggressiva per ogni chat
+let modalitaIncazzata = {}
+
 let rispostaIA = async (m, { conn, text }) => {
-    if (!text) return m.reply('CHE MERDA VUOI?! Scrivi la domanda dopo .bot o rispondi a un mio messaggio!')
+    if (!text) return m.reply('Dimmi pure, sono qui per aiutarti! Cosa ti serve?')
 
     const domanda = text.toLowerCase().trim()
+    const chatId = m.chat
 
-    // 1. Easter egg: sono Riley
-    if (domanda === 'sono riley') {
-        let frasi = [
-            'OH FINALMENTE! Il capo! Stavo per buttare tutto nel cesso! Che si fa, boss?',
-            'RILEY! Ma che fine avevi fatto, dannazione?! Stavo impazzendo! Comandi?',
-            'ECCOLO! Il mio creatore! Sbrigati che sono incazzato nero!',
-            'Maledizione, sei tu! Dimmi cosa devo spaccare prima che spacco il server!'
-        ]
-        return m.reply(frasi[Math.floor(Math.random() * frasi.length)])
+    // 1. Attiva/disattiva modalità aggressiva
+    if (domanda === 'incazzati' || domanda === 'modalità incazzata') {
+        modalitaIncazzata[chatId] = true
+        return m.reply('Va bene... ora sono incazzato. Che diavolo vuoi?!')
     }
 
-    // 2. Nuovo: chi sei?
-    if (['chi sei', 'chi sei?', 'chi cazzo sei', 'chi cazzo sei?'].includes(domanda)) {
-        return m.reply('Sono RLY BOT, il bot di Riley. Merda, non ti ricordi più chi comanda qui?!')
+    if (domanda === 'calmati' || domanda === 'modalità gentile') {
+        modalitaIncazzata[chatId] = false
+        return m.reply('Ok, mi calmo. Scusa per prima. Come posso aiutarti?')
+    }
+
+    // 2. Chi sei?
+    if (['chi sei', 'chi sei?', 'chi sei tu'].includes(domanda)) {
+        return m.reply('Sono RLY BOT, il bot di Riley. Sono qui per aiutarti con tutto quello che ti serve!')
+    }
+
+    // 3. Easter egg: sono Riley
+    if (domanda === 'sono riley') {
+        return m.reply('Riley! Capo, bentornato! Dimmi tutto, sono a tua completa disposizione.')
     }
 
     await conn.sendPresenceUpdate('composing', m.chat)
 
     try {
-        let prompt = `Sei RLY BOT, il bot incazzato di Riley. Rispondi sempre in italiano. Tono aggressivo e sarcastico. Puoi usare imprecazioni leggere tipo "merda", "dannazione", "maledizione", "che diavolo". Sii breve, brutale e veloce. Non usare insulti sessuali, bestemmie, o parolacce verso l'utente. Domanda: ${text}`
-        
-        // Triplo fallback + veloce
+        // Controlla se deve essere aggressivo o gentile
+        let tono = modalitaIncazzata[chatId]
+           ? `Sei RLY BOT in modalità incazzata. Tono aggressivo e sarcastico. Puoi usare imprecazioni leggere tipo "merda", "dannazione", "maledizione". Sii breve e brutale. Non usare insulti sessuali o verso l'utente.`
+            : `Sei RLY BOT, il bot di Riley. Sei generoso, educato e disponibile. Rispondi sempre in modo gentile, completo e utile. Aiuta l'utente al meglio delle tue capacità.`
+
+        let prompt = `${tono} Rispondi sempre in italiano. Domanda: ${text}`
+
+        // Triplo fallback per velocità
         const apis = [
             `https://text.pollinations.ai/${encodeURIComponent(prompt)}`,
             `https://api.makenai.uk/ia?text=${encodeURIComponent(prompt)}`,
@@ -36,7 +50,7 @@ let rispostaIA = async (m, { conn, text }) => {
         let risposta = null
         for (let url of apis) {
             try {
-                let res = await fetch(url, { timeout: 8000 }) // 8s max per API
+                let res = await fetch(url, { timeout: 8000 })
                 let data = await res.text()
                 if (data && data.length > 5) {
                     risposta = data
@@ -46,19 +60,26 @@ let rispostaIA = async (m, { conn, text }) => {
         }
 
         if (!risposta) throw 'Nessuna API ha risposto'
+
+        // Filtro risposte rotte dell'IA
         if (risposta.includes('I cannot') || risposta.includes("I don't know")) {
-            risposta = 'MA CHE NE SO, DANNATAMENTE?! Non ho la sfera di cristallo! Chiedi altro che questa è una merda di domanda!'
+            risposta = modalitaIncazzata[chatId]
+               ? 'MA CHE NE SO, DANNATAMENTE?! Chiedi altro che questa domanda fa schifo!'
+                : 'Mi dispiace, su questo non ho informazioni. Puoi provare a riformulare la domanda?'
         }
 
         await m.reply(risposta)
 
     } catch (e) {
         console.log(e)
-        m.reply('È ANDATO TUTTO A MERDA! Anche i server di backup sono morti! MANNAGGIA! Riprova dopo!')
+        let msgErrore = modalitaIncazzata[chatId]
+           ? 'È ANDATO TUTTO A MERDA! I server sono morti! Riprova, maledizione!'
+            : 'Mi spiace, c\'è stato un problema con i server. Potresti riprovare tra un attimo per favore?'
+        m.reply(msgErrore)
     }
 }
 
-// 1. Comando normale .bot
+// 1. Comando normale.bot
 let handler = async (m, { conn, text }) => {
     await rispostaIA(m, { conn, text })
 }
@@ -66,13 +87,13 @@ handler.command = /^bot$/i
 handler.tags = ['tools']
 handler.help = ['bot <domanda>']
 
-// 2. Intercetta le risposte ai messaggi del bot
+// 2. Risponde automaticamente se rispondi a un suo messaggio
 handler.before = async function (m, { conn }) {
     if (m.isBaileys) return
     if (m.fromMe) return
-    
-    // Se l'utente risponde a un messaggio del bot e non è un comando
-    if (m.quoted && m.quoted.fromMe && m.text && !m.text.startsWith('.')) {
+
+    // Se rispondi a un messaggio del bot, risponde senza.bot
+    if (m.quoted && m.quoted.fromMe && m.text &&!m.text.startsWith('.')) {
         await rispostaIA(m, { conn, text: m.text })
     }
 }
