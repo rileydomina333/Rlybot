@@ -11,8 +11,7 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
             'ECCOLO! Il mio creatore! Sbrigati che sono incazzato nero!',
             'Maledizione, sei tu! Dimmi cosa devo spaccare prima che spacco il server!'
         ]
-        let frase = frasi[Math.floor(Math.random() * frasi.length)]
-        return m.reply(frase)
+        return m.reply(frasi[Math.floor(Math.random() * frasi.length)])
     }
 
     // Comando modifica info gruppo
@@ -47,7 +46,6 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
         let risposta = await res.text()
 
         if (!risposta || risposta.length < 5) throw 'Risposta vuota'
-
         if (risposta.includes('I cannot') || risposta.includes("I don't know") || risposta.includes("I'm sorry")) {
             risposta = 'PARLO SOLO ITALIANO, DANNATAMENTE! Rifai la domanda in italiano o vai a quel paese!'
         }
@@ -60,39 +58,42 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
     }
 }
 
-// Funzione per prendere admin sicura
-async function getAdminStatus(conn, m) {
-    if (!m.isGroup) return { isAdmin: false, isBotAdmin: false }
+// Funzione per prendere permessi senza crashare
+async function getPermessi(conn, m) {
+    if (!m.isGroup) return { isGroup: false, isAdmin: false, isBotAdmin: false }
     try {
         const groupMetadata = await conn.groupMetadata(m.chat)
-        const participants = groupMetadata.participants || []
-        const user = participants.find(u => u.id === m.sender)
-        const bot = participants.find(u => u.id === conn.user.jid)
+        const user = groupMetadata.participants.find(u => u.id === m.sender)
+        const bot = groupMetadata.participants.find(u => u.id === conn.user.jid)
         const isAdmin = user?.admin === 'admin' || user?.admin === 'superadmin'
         const isBotAdmin = bot?.admin === 'admin' || bot?.admin === 'superadmin'
-        return { isAdmin, isBotAdmin }
+        return { isGroup: true, isAdmin, isBotAdmin }
     } catch (e) {
-        console.error('Errore metadata gruppo:', e)
-        return { isAdmin: false, isBotAdmin: false }
+        console.log('Errore groupMetadata:', e)
+        return { isGroup: true, isAdmin: false, isBotAdmin: false }
     }
 }
 
 // 1. Comando normale.bot
 let handler = async (m, { conn, text }) => {
-    const { isAdmin, isBotAdmin } = await getAdminStatus(conn, m)
-    await rispostaIA(m, { conn, text, isGroup: m.isGroup, isAdmin, isBotAdmin })
+    let permessi = await getPermessi(conn, m)
+    await rispostaIA(m, { conn, text,...permessi })
 }
 handler.command = /^bot$/i
 handler.tags = ['tools']
 handler.help = ['bot <domanda>']
 
-// 2. Intercetta SOLO se risponde al bot e il messaggio quotato contiene una domanda
+// 2. Intercetta le risposte - FIX per non rispondere a caso
 handler.before = async function (m, { conn }) {
-    if (m.isBaileys || m.fromMe) return
-    if (!m.quoted ||!m.quoted.fromMe) return // Risponde al bot?
-    if (!m.text || m.text.startsWith('.')) return // Ignora comandi
-    if (m.text.length < 2) return // Ignora messaggi troppo corti tipo "ok"
+    if (m.isBaileys || m.fromMe ||!m.text) return
+    if (m.text.startsWith('.') || m.text.startsWith('!') || m.text.startsWith('#')) return
 
-    // FIX: Controlla che il messaggio quotato sia davvero del bot IA e non un altro comando
-    if (!m.quoted.text) return
-    const botMessages = ['CHE MERDA VUOI', 'FATTO, CAZZO',
+    // FIX: Risponde SOLO se il messaggio quotato è del bot E contiene il tag [BOT]
+    // Così non rompe le palle su altri messaggi
+    if (m.quoted && m.quoted.fromMe && m.quoted.text?.includes('[BOT]')) {
+        let permessi = await getPermessi(conn, m)
+        await rispostaIA(m, { conn, text: m.text,...permessi })
+    }
+}
+
+export default handler
