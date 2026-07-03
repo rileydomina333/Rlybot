@@ -1,32 +1,23 @@
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return m.reply(`Fai una domanda. Es: ${usedPrefix}ia chi ha inventato Linux`)
+let handler = async (m, { conn, text }) => {
+    if (!text) return m.reply('Scrivi una domanda dopo .ia')
     
     await conn.sendPresenceUpdate('composing', m.chat)
     
     try {
-        // Uso l'API gratuita di g4f - gira su server pubblici, no key
-        let res = await fetch(`https://api.brainshop.ai/get?bid=175685&key=5J1tK8j5q5e5t5x5&uid=${m.sender}&msg=${encodeURIComponent(text)}`)
-        
-        if (!res.ok) throw 'API down'
-        
+        let res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(text)}&format=json&no_html=1&skip_disambig=1`)
         let data = await res.json()
-        let risposta = data.cnt
         
-        if (!risposta || risposta.includes('I am unable')) risposta = 'Non ho capito la domanda.'
+        let risposta = data.AbstractText || data.Answer || 'Non ho trovato nulla su questo.'
+        if (!risposta.trim()) risposta = 'Prova a riformulare la domanda.'
         
         await m.reply(risposta)
         
     } catch (e) {
-        console.log(e)
-        await m.reply('Servizio IA offline ora. Riprova tra poco.')
+        m.reply('DuckDuckGo non risponde. Riprova.')
     }
 }
 
 handler.command = /^ia$/i
-handler.tags = ['tools']
-handler.help = ['ia <domanda>']
-handler.limit = true
-
 export default handler
