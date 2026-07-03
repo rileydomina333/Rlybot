@@ -40,8 +40,8 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
     }
 }
 
-handler.command = /^audio$/i
+handler.command = /^vocebot$/i
 handler.tags = ['tools']
-handler.help = ['audio <testo>']
+handler.help = ['vocebot <testo>']
 
 export default handler
