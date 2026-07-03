@@ -27,8 +27,8 @@ let handler = async (m, { conn, text }) => {
     }
 }
 
-handler.command = /^ia$/i
+handler.command = /^bot$/i
 handler.tags = ['tools']
-handler.help = ['ia <domanda>']
+handler.help = ['bot <domanda>']
 
 export default handler
