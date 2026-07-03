@@ -1,117 +1,82 @@
-import { performance } from 'perf_hooks'
-import os from 'os'
-import path from 'path'
-import { fileURLToPath } from 'url'
-import fs from 'fs'
+import { performance } from 'perf_hooks';
+import fetch from 'node-fetch';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-let statoIA = {}
-let modalitaIncazzata = {}
-try {
-    const botData = await import('./bot.js')
-    statoIA = botData.iaAttiva || {}
-    modalitaIncazzata = botData.modalitaIncazzata || {}
-} catch {}
+const handler = async (message, { conn, usedPrefix, command }) => {
+    try {
+        const userId = message.sender;
+        const groupId = message.isGroup ? message.chat : null;
 
-function formatUptime() {
-    let uptime = process.uptime() * 1000
-    let d = Math.floor(uptime / 86400000)
-    let h = Math.floor(uptime / 3600000) % 24
-    let m = Math.floor(uptime / 60000) % 60
-    return `${d}d ${h}h ${m}m`
-}
+        const userCount = Object.keys(global.db.data.users).length;
+        const botName = "ℝ𝕃𝕐 𝔹𝕆𝕋"; 
 
-function getIAStatus(chatId) {
-    if (statoIA[chatId] === false) return '[OFFLINE]'
-    if (modalitaIncazzata[chatId]) return '[RAGE MODE]'
-    if (statoIA[chatId] === true) return '[ONLINE]'
-    return '[STANDBY]'
-}
+        const menuText = generateMenuText(usedPrefix, botName, userCount, userId, groupId);
 
-const handler = async (m, { conn, usedPrefix }) => {
-    let start = performance.now()
-    let speed = (performance.now() - start).toFixed(2)
+        const photopath = path.join(__dirname, '../../media/WA_1782994892103.jpeg'); 
 
-    let totalRAM = (os.totalmem() / 1024 / 1024 / 1024).toFixed(1)
-    let usedRAM = (process.memoryUsage().heapUsed / 1024).toFixed(1)
-    let cpu = os.cpus()[0].model.split(' ')[0]
+        const footerText = `Powered by ℝ𝕃𝕐 𝔹𝕆𝕋 ✨`;
 
-    const users = Object.keys(global.db.data.users).length
-    const chats = Object.keys(global.db.data.chats).length
-    const user = m.sender
-    const botName = "RLY//CORE"
-    const iaStatus = getIAStatus(m.chat)
-
-    const menuText = `
-╔═══════════════════════╗
-║ ◢◤ ${botName} v2.1 ◥◣ ║
-╚═══════════════════════╝
-
-> USER: @${user.split('@')[0]}
-> PING: ${speed}ms
-> UPTIME: ${formatUptime()}
-
-┌─[ CORE STATUS ]─────────┐
-│ RAM: ${usedRAM}MB / ${totalRAM}GB
-│ CPU: ${cpu}
-│ USERS: ${users} CHATS: ${chats}
-│ IA CORE: ${iaStatus}
-└─────────────────────────┘
-
-┌─[ AI MODULE ]───────────
-│ ${usedPrefix}bot on/off
-│ ${usedPrefix}bot incazzati/calmati
-│ ${usedPrefix}bot <query>
-└─────────────────────────
-
-┌─[ AUDIO MODULE ]────────
-│ ${usedPrefix}vocebot <txt>
-│ ${usedPrefix}palermo <txt>
-└─────────────────────────
-
-┌─[ SYSTEM MODULE ]───────
-│ ${usedPrefix}ping
-│ ${usedPrefix}owner
-│ ${usedPrefix}report <bug>
-└─────────────────────────
-
-╚══[ SELECT OPTION ]══╝`.trim()
-
-    const imgPath = path.join(__dirname, '../../media/menu.jpg')
-
-    // Messaggio base senza immagine
-    let messageContent = {
-        text: menuText,
-        footer: `© ${botName} | Riley Systems`,
-        buttons: [
-            { buttonId: `${usedPrefix}bot on`, buttonText: { displayText: '🟢 ATTIVA IA' }, type: 1 },
-            { buttonId: `${usedPrefix}bot off`, buttonText: { displayText: '🔴 STOP IA' }, type: 1 },
-            { buttonId: `${usedPrefix}ping`, buttonText: { displayText: '📊 STATUS' }, type: 1 },
-            { buttonId: `${usedPrefix}owner`, buttonText: { displayText: '👑 OWNER' }, type: 1 },
-        ],
-        headerType: 1,
-        mentions: [user]
+        await conn.sendMessage(
+            message.chat,
+            {
+                image: { url: photopath },
+                caption: menuText,
+                footer: footerText,
+                buttons: [
+                    { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '💠 Admin' }, type: 1 },
+                    { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '💠 Owner' }, type: 1 },
+                    { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: '💠 Sicurezza' }, type: 1 },
+                    { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '💠 Gruppo' }, type: 1 },
+                    { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '💠 Mod' }, type: 1 },
+                ],
+                viewOnce: true,
+                headerType: 4
+            },
+            { quoted: message }
+        );
+    } catch (e) {
+        console.error('❌ Errore nel menu principale:', e);
+        conn.reply(message.chat, '❌ Errore nel caricamento del menu. Controlla la console.', message);
     }
+};
 
-    // Aggiungi immagine SOLO se il file esiste davvero
-    if (fs.existsSync(imgPath)) {
-        messageContent = {
-            image: fs.readFileSync(imgPath),
-            caption: menuText,
-            footer: `© ${botName} | Riley Systems`,
-            buttons: messageContent.buttons,
-            headerType: 4,
-            mentions: [user]
-        }
-    }
+handler.help = ['menu'];
+handler.tags = ['menu'];
+handler.command = /^(menu|comandi|commands|menú|comandos)$/i;
 
-    await conn.sendMessage(m.chat, messageContent, { quoted: m })
+export default handler;
+
+function generateMenuText(prefix, botName, userCount, userId, groupId) {
+    const vs = global.vs || '1.5.0';
+
+    return `
+┏━━〔 💠 *${botName}* 💠 〕━━┓
+┃
+┃  💠 *Utente:* @${userId.split('@')[0]}
+┃  💠 *Database:* ${userCount}
+┃  💠 *Versione:* ${vs}
+┃
+┣━━〔 💠 *SISTEMA* 〕━━┓
+┃ 💠 \`${prefix}installa\`
+┃ 💠 \`${prefix}sistema\`
+┃ 💠 \`${prefix}ping\`
+┃
+┣━━━〔 💠*INTELLIGENZA BOT* 〕━┫
+┃ 💠 .bot <testo>  → RLY BOT
+┃ 💠.bot → on/off
+┃
+┣━━〔 💠 *INTELLIGENZA* 〕━━┓
+┃ 💠 \`${prefix}rlybot\`
+┃ 💠 \`${prefix}lingua\`
+┃
+┣━━〔 💠 *ASSISTENZA* 〕━━┓
+┃ 💠 \`${prefix}report\`
+┃ 💠 \`${prefix}suggerisci\`
+┃
+┗━━━━━━━━━━━━━━━━━━┛`.trim();
 }
-
-handler.help = ['menu']
-handler.tags = ['main']
-handler.command = /^(menu|help|comandi)$/i
-
-export default handler
