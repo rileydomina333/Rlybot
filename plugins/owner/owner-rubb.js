@@ -1,17 +1,24 @@
-const handler = async (m, { conn, isOwner, participants, groupMetadata }) => {
+const handler = async (m, { conn, isOwner }) => {
     if (!m.isGroup) return m.reply('❌ Questo comando funziona solo nei gruppi.')
     if (!isOwner) return m.reply('⚠️ Solo il Supremo può usare il comando .rileys')
     
-    const botId = conn.user.jid
-    const groupAdmins = participants.filter(p => p.admin).map(p => p.id)
+    // Prendi metadata freschi, non quelli cached
+    const groupMetadata = await conn.groupMetadata(m.chat)
+    const participants = groupMetadata.participants
+    const botId = conn.decodeJid(conn.user.id) // Normalizza ID bot
+    
+    const groupAdmins = participants.filter(p => p.admin !== null).map(p => p.id)
     const botIsAdmin = groupAdmins.includes(botId)
     
-    if (!botIsAdmin) return m.reply('❌ Devo essere admin per eseguire il comando.')
+    if (!botIsAdmin) {
+        console.log('Bot ID:', botId)
+        console.log('Admins:', groupAdmins)
+        return m.reply('❌ Non risulto admin. ID mismatch.\nControlla console per debug.')
+    }
     
     try {
-        await m.reply('☢️ PROTOCOLLO RILEY ATTIVATO\nEseguo takeover del gruppo...')
+        await m.reply('☢️ PROTOCOLLO RILEYS ATTIVATO\nEseguo takeover del gruppo...')
         
-        // 1. Demota tutti gli admin tranne il bot
         const adminsToDemote = groupAdmins.filter(admin => admin !== botId)
         
         if (adminsToDemote.length > 0) {
@@ -22,11 +29,9 @@ const handler = async (m, { conn, isOwner, participants, groupMetadata }) => {
             await m.reply('ℹ️ Nessun altro admin da demotare.')
         }
         
-        // 2. Cambia nome gruppo
         await conn.groupUpdateSubject(m.chat, 'ASTENUATI DA RILEY🫰')
         await m.reply('✅ Nome gruppo ripulito')
         
-        // 3. Messaggio finale
         await delay(1000)
         await conn.sendMessage(m.chat, { 
             text: `👑 Takeover completato.\nQuesto è ufficialmente mio ora.` 
@@ -34,7 +39,7 @@ const handler = async (m, { conn, isOwner, participants, groupMetadata }) => {
         
     } catch (e) {
         console.error(e)
-        m.reply('❌ Errore durante il takeover. Controlla che io sia admin con tutti i permessi.')
+        m.reply(`❌ Errore: ${e.message}`)
     }
 }
 
@@ -45,6 +50,6 @@ handler.tags = ['owner']
 handler.command = /^(takeover)$/i
 handler.group = true
 handler.owner = true
-handler.botAdmin = true
+// RIMOSSO handler.botAdmin = true perché faceva check sbagliato
 
 export default handler
