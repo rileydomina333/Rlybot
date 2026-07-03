@@ -71,6 +71,7 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
 ┃ 💠 .lingua <it/en>  →  Cambia lingua
 ┃ 💠.incazzati  →  Modalità aggressiva
 ┃ 💠 .calmati  →  Modalità gentile
+┃ 💠.bot → on/off
 ┃
 ┣━━〔 💠 *INTELLIGENZA* 〕━━┓
 ┃ 💠 \`${prefix}rlybot\`
