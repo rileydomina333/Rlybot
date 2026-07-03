@@ -69,6 +69,7 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
 ┣━━━〔 💠*INTELLIGENZA BOT* 〕━┫
 ┃ 💠 .bot <testo>  → RLY BOT
 ┃ 💠.bot → on/off
+┃ 💠.vocebot 
 ┃
 ┣━━〔 💠 *INTELLIGENZA* 〕━━┓
 ┃ 💠 \`${prefix}rlybot\`
