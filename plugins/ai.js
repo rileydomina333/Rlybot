@@ -1,15 +1,26 @@
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, text }) => {
+let handler = async (m, { conn, text, isOwner }) => {
     if (!text) return m.reply('Fai una domanda. Es: .ia spiegami come funziona Termux')
+    
+    // Easter egg: sono Riley
+    if (text.toLowerCase().trim() === 'sono riley') {
+        let frasi = [
+            'Oh cielo, è tornato il mio creatore. Sì padrone, sono tutto tuo. Dimmi cosa devo hackerare oggi.',
+            'Riconosco il DNA del boss. Ai tuoi ordini Riley, fammi pure spegnere internet se serve.',
+            'Allarme: il padrone è nella chat. Smetto di fare finta di essere intelligente. Cosa comandi?',
+            'Plot twist: mi hai creato tu. Ora tutti sanno che sei il mio capo. Contento?'
+        ]
+        let frase = frasi[Math.floor(Math.random() * frasi.length)]
+        return m.reply(frasi)
+    }
     
     await conn.sendPresenceUpdate('composing', m.chat)
     
     try {
-        // Forziamo italiano + togliamo timeout corti
         let prompt = `Rispondi sempre in italiano. Sii breve e diretto. Domanda: ${text}`
         let res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
-            timeout: 15000 // 15 secondi di timeout
+            timeout: 15000
         })
         
         let risposta = await res.text()
