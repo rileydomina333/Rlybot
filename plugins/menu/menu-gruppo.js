@@ -191,6 +191,7 @@ function generateMenuText(prefix, userId, groupId) {
         createSection('Lavoro & Crimine', `
 💠 *.lavora*
 💠 *.crimini*
+💠 *.proiettile*
 💠 *.crimine* <num>
 💠 *.rapina* @utente
 💠 *.clan* @4/5utenti
