@@ -1,47 +1,39 @@
 import gTTS from 'gtts'
-import fs from 'fs'
-import { randomUUID } from 'crypto'
-import path from 'path'
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return m.reply(`*Esempio:* ${usedPrefix + command} come va?`)
-    if (text.length > 200) return m.reply('Max 200 caratteri.')
+let handler = async (m, { conn, text, usedPrefix }) => {
+    if (!text) return m.reply(`Esempio: ${usedPrefix}audio come va`)
+    if (text.length > 200) return m.reply('Max 200 caratteri')
 
     await conn.sendPresenceUpdate('recording', m.chat)
 
-    const tmpDir = './tmp'
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir)
-    
-    const filePath = path.join(tmpDir, `${randomUUID()}.mp3`)
-
     try {
-        // Genera audio con gtts
         const gtts = new gTTS(text, 'it')
         
-        await new Promise((resolve, reject) => {
-            gtts.save(filePath, (err) => {
-                if (err) reject(err)
-                else resolve()
-            })
+        // Invece di salvare su file, usiamo lo stream
+        let stream = gtts.stream()
+        let chunks = []
+        
+        stream.on('data', (chunk) => chunks.push(chunk))
+        
+        stream.on('end', async () => {
+            let buffer = Buffer.concat(chunks)
+            await conn.sendMessage(m.chat, { 
+                audio: buffer, 
+                mimetype: 'audio/mpeg',
+                ptt: true 
+            }, { quoted: m })
         })
 
-        let audioBuffer = fs.readFileSync(filePath)
-        await conn.sendMessage(m.chat, { 
-            audio: audioBuffer, 
-            mimetype: 'audio/mpeg',
-            ptt: true 
-        }, { quoted: m })
+        stream.on('error', (err) => {
+            console.log('ERRORE STREAM GTTS:', err)
+            m.reply(`Errore audio: ${err.message}`)
+        })
 
     } catch (e) {
-        console.log(e)
-        m.reply('❌ Errore TTS. Prova: `npm install gtts`')
-    } finally {
-        if (fs.existsSync(filePath)) fs.unlinkSync(filePath)
+        console.log('ERRORE GENERALE:', e)
+        m.reply(`Crash: ${e.message}\nHai fatto npm install gtts?`)
     }
 }
 
 handler.command = /^vocebot$/i
-handler.tags = ['tools']
-handler.help = ['vocebot <testo>']
-
 export default handler
