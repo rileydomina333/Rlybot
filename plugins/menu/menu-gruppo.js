@@ -156,6 +156,7 @@ function generateMenuText(prefix, userId, groupId) {
 💠 *.sega* @
 💠 *.cazzo* @${global.t('userCommand', userId, groupId)}
 💠 *.figa* @${global.t('userCommand', userId, groupId)}
+💠 *.twerk* @${global.t('userCommand', userId, groupId)}
 💠 *.tette* @${global.t('userCommand', userId, groupId)}
 💠 *.insulta* @
 💠 *.amicizia/listamici* @`),
