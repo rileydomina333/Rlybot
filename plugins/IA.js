@@ -15,7 +15,7 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
         return m.reply(frase)
     }
 
-    // NUOVO: Comando modifica info gruppo
+    // Comando modifica info gruppo
     let regexInfo = /^modifica (?:la )?info del gruppo scrivendo (.+)/i
     let matchInfo = text.match(regexInfo)
     if (matchInfo) {
@@ -38,7 +38,6 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
     await conn.sendPresenceUpdate('composing', m.chat)
 
     try {
-        // Prompt forzato in italiano + filtro anti-inglese
         let prompt = `Sei un assistente incazzato e scurrile. REGOLA ASSOLUTA: rispondi SOLO in italiano. Vietato usare inglese. Se la domanda è in inglese, rispondi comunque in italiano dicendo che parli solo italiano. Tono aggressivo e sarcastico. Puoi usare imprecazioni leggere tipo "merda", "dannazione", "maledizione", "che diavolo". Sii breve e brutale. Non usare insulti sessuali, bestemmie, o parolacce verso l'utente. Domanda: ${text}`
 
         let res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
@@ -49,7 +48,6 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
 
         if (!risposta || risposta.length < 5) throw 'Risposta vuota'
 
-        // Filtro anti-inglese: se risponde in inglese la blocco
         if (risposta.includes('I cannot') || risposta.includes("I don't know") || risposta.includes("I'm sorry")) {
             risposta = 'PARLO SOLO ITALIANO, DANNATAMENTE! Rifai la domanda in italiano o vai a quel paese!'
         }
@@ -62,37 +60,39 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
     }
 }
 
-// 1. Comando normale.bot
-let handler = async (m, { conn, text, isGroup }) => {
-    const groupMetadata = isGroup? await conn.groupMetadata(m.chat) : {}
-    const participants = isGroup? groupMetadata.participants : []
-    const user = isGroup? participants.find(u => u.id === m.sender) : {}
-    const bot = isGroup? participants.find(u => u.id === conn.user.jid) : {}
-    const isAdmin = user?.admin === 'admin' || user?.admin === 'superadmin' || false
-    const isBotAdmin = bot?.admin === 'admin' || bot?.admin === 'superadmin' || false
+// Funzione per prendere admin sicura
+async function getAdminStatus(conn, m) {
+    if (!m.isGroup) return { isAdmin: false, isBotAdmin: false }
+    try {
+        const groupMetadata = await conn.groupMetadata(m.chat)
+        const participants = groupMetadata.participants || []
+        const user = participants.find(u => u.id === m.sender)
+        const bot = participants.find(u => u.id === conn.user.jid)
+        const isAdmin = user?.admin === 'admin' || user?.admin === 'superadmin'
+        const isBotAdmin = bot?.admin === 'admin' || bot?.admin === 'superadmin'
+        return { isAdmin, isBotAdmin }
+    } catch (e) {
+        console.error('Errore metadata gruppo:', e)
+        return { isAdmin: false, isBotAdmin: false }
+    }
+}
 
-    await rispostaIA(m, { conn, text, isGroup, isAdmin, isBotAdmin })
+// 1. Comando normale.bot
+let handler = async (m, { conn, text }) => {
+    const { isAdmin, isBotAdmin } = await getAdminStatus(conn, m)
+    await rispostaIA(m, { conn, text, isGroup: m.isGroup, isAdmin, isBotAdmin })
 }
 handler.command = /^bot$/i
 handler.tags = ['tools']
 handler.help = ['bot <domanda>']
-handler.group = false // funziona anche in privato
 
-// 2. Intercetta le risposte ai messaggi del bot
+// 2. Intercetta SOLO se risponde al bot e il messaggio quotato contiene una domanda
 handler.before = async function (m, { conn }) {
-    if (m.isBaileys) return
-    if (m.fromMe) return
+    if (m.isBaileys || m.fromMe) return
+    if (!m.quoted ||!m.quoted.fromMe) return // Risponde al bot?
+    if (!m.text || m.text.startsWith('.')) return // Ignora comandi
+    if (m.text.length < 2) return // Ignora messaggi troppo corti tipo "ok"
 
-    if (m.quoted && m.quoted.fromMe && m.text &&!m.text.startsWith('.')) {
-        const groupMetadata = m.isGroup? await conn.groupMetadata(m.chat) : {}
-        const participants = m.isGroup? groupMetadata.participants : []
-        const user = m.isGroup? participants.find(u => u.id === m.sender) : {}
-        const bot = m.isGroup? participants.find(u => u.id === conn.user.jid) : {}
-        const isAdmin = user?.admin === 'admin' || user?.admin === 'superadmin' || false
-        const isBotAdmin = bot?.admin === 'admin' || bot?.admin === 'superadmin' || false
-
-        await rispostaIA(m, { conn, text: m.text, isGroup: m.isGroup, isAdmin, isBotAdmin })
-    }
-}
-
-export default handler
+    // FIX: Controlla che il messaggio quotato sia davvero del bot IA e non un altro comando
+    if (!m.quoted.text) return
+    const botMessages = ['CHE MERDA VUOI', 'FATTO, CAZZO',
