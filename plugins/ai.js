@@ -1,21 +1,20 @@
 import fetch from 'node-fetch'
 
 let handler = async (m, { conn, text }) => {
-    if (!text) return m.reply('Scrivi una domanda dopo .ia')
+    if (!text) return m.reply('Fai una domanda. Es: .ia scrivi una poesia sul mare')
     
     await conn.sendPresenceUpdate('composing', m.chat)
     
     try {
-        let res = await fetch(`https://api.duckduckgo.com/?q=${encodeURIComponent(text)}&format=json&no_html=1&skip_disambig=1`)
-        let data = await res.json()
+        let res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(text)}`)
+        let risposta = await res.text()
         
-        let risposta = data.AbstractText || data.Answer || 'Non ho trovato nulla su questo.'
-        if (!risposta.trim()) risposta = 'Prova a riformulare la domanda.'
+        if (!risposta || risposta.length < 2) throw 'Vuota'
         
         await m.reply(risposta)
         
     } catch (e) {
-        m.reply('DuckDuckGo non risponde. Riprova.')
+        m.reply('Il servizio IA è offline ora. Riprova tra 1 minuto.')
     }
 }
 
