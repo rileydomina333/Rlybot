@@ -66,8 +66,8 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
 ┃ 💠 \`${prefix}sistema\`
 ┃ 💠 \`${prefix}ping\`
 ┃
-┣━━━〔 💠*INTELLIGENZA BOT* 〕━━━┫
-┃ 💠 .bot <testo>  →  Parla con RLY BOT
+┣━━━〔 💠*INTELLIGENZA BOT* 〕━┫
+┃ 💠 .bot <testo>  → RLY BOT
 ┃ 💠 .lingua <it/en>  →  Cambia lingua
 ┃ 💠.incazzati  →  Modalità aggressiva
 ┃ 💠 .calmati  →  Modalità gentile
