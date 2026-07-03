@@ -7,7 +7,6 @@ import fs from 'fs'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// Prendi lo stato IA dal plugin bot.js
 let statoIA = {}
 let modalitaIncazzata = {}
 try {
@@ -33,12 +32,11 @@ function getIAStatus(chatId) {
 
 const handler = async (m, { conn, usedPrefix }) => {
     let start = performance.now()
-    let end = performance.now()
-    let speed = (end - start).toFixed(2)
+    let speed = (performance.now() - start).toFixed(2)
 
     let totalRAM = (os.totalmem() / 1024 / 1024 / 1024).toFixed(1)
-    let usedRAM = (process.memoryUsage().heapUsed / 1024 / 1024).toFixed(1)
-    let cpu = os.cpus()[0].model
+    let usedRAM = (process.memoryUsage().heapUsed / 1024).toFixed(1)
+    let cpu = os.cpus()[0].model.split(' ')[0]
 
     const users = Object.keys(global.db.data.users).length
     const chats = Object.keys(global.db.data.chats).length
@@ -56,8 +54,8 @@ const handler = async (m, { conn, usedPrefix }) => {
 > UPTIME: ${formatUptime()}
 
 ┌─[ CORE STATUS ]─────────┐
-│ RAM: ${usedRAM}GB / ${totalRAM}GB
-│ CPU: ${cpu.split(' ')[0]}
+│ RAM: ${usedRAM}MB / ${totalRAM}GB
+│ CPU: ${cpu}
 │ USERS: ${users} CHATS: ${chats}
 │ IA CORE: ${iaStatus}
 └─────────────────────────┘
@@ -82,13 +80,10 @@ const handler = async (m, { conn, usedPrefix }) => {
 ╚══[ SELECT OPTION ]══╝`.trim()
 
     const imgPath = path.join(__dirname, '../../media/menu.jpg')
-    const imgBuffer = fs.existsSync(imgPath)
-       ? fs.readFileSync(imgPath)
-        : { url: 'https://i.ibb.co/2dQq8Qp/cyber-bot.jpg' }
 
-    await conn.sendMessage(m.chat, {
-        image: imgBuffer,
-        caption: menuText,
+    // Messaggio base senza immagine
+    let messageContent = {
+        text: menuText,
         footer: `© ${botName} | Riley Systems`,
         buttons: [
             { buttonId: `${usedPrefix}bot on`, buttonText: { displayText: '🟢 ATTIVA IA' }, type: 1 },
@@ -96,9 +91,23 @@ const handler = async (m, { conn, usedPrefix }) => {
             { buttonId: `${usedPrefix}ping`, buttonText: { displayText: '📊 STATUS' }, type: 1 },
             { buttonId: `${usedPrefix}owner`, buttonText: { displayText: '👑 OWNER' }, type: 1 },
         ],
-        headerType: 4,
+        headerType: 1,
         mentions: [user]
-    }, { quoted: m })
+    }
+
+    // Aggiungi immagine SOLO se il file esiste davvero
+    if (fs.existsSync(imgPath)) {
+        messageContent = {
+            image: fs.readFileSync(imgPath),
+            caption: menuText,
+            footer: `© ${botName} | Riley Systems`,
+            buttons: messageContent.buttons,
+            headerType: 4,
+            mentions: [user]
+        }
+    }
+
+    await conn.sendMessage(m.chat, messageContent, { quoted: m })
 }
 
 handler.help = ['menu']
