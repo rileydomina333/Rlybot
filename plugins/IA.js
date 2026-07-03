@@ -1,33 +1,79 @@
-// Lista API in ordine di velocità. Se una fallisce, prova la prossima
+// 4 API gratis senza key. Se muore una, passa alla prossima in 2 secondi
 const API_LIST = [
     {
-        name: 'DuckDuckGo',
+        name: 'Blackbox',
         fetch: async (prompt) => {
-            const tokenRes = await fetch('https://duckduckgo.com/duckchat/v1/status', {
-                headers: { 'User-Agent': 'Mozilla/5.0', 'x-vqd-accept': '1' },
-                signal: AbortSignal.timeout(5000)
-            })
-            const token = tokenRes.headers.get('x-vqd-4')
-            if (!token) throw new Error('No token')
-
-            const res = await fetch('https://duckduckgo.com/duckchat/v1/chat', {
+            const res = await fetch('https://www.blackbox.ai/api/chat', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-vqd-4': token, 'User-Agent': 'Mozilla/5.0' },
-                body: JSON.stringify({ model: 'gpt-4o-mini', messages: [{ role: 'user', content: prompt }] }),
-                signal: AbortSignal.timeout(15000)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: [{ role: 'user', content: prompt, id: 'bot' }],
+                    id: 'bot',
+                    previewToken: null,
+                    userId: null,
+                    codeModelMode: true,
+                    agentMode: {},
+                    trendingAgentMode: {},
+                    isMicMode: false,
+                    isChromeExt: false,
+                    githubToken: null
+                }),
+                signal: AbortSignal.timeout(12000)
             })
-            if (!res.ok) throw new Error('DDG down')
-
+            if (!res.ok) throw new Error('Blackbox down')
+            return await res.text()
+        }
+    },
+    {
+        name: 'YouChat',
+        fetch: async (prompt) => {
+            const res = await fetch('https://you.com/api/streamingSearch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    q: prompt,
+                    page: 1,
+                    count: 10,
+                    safeSearch: 'Moderate',
+                    onShoppingPage: false,
+                    mkt: 'it-IT',
+                    responseFilter: 'WebPages,Translations,TimeZone,Computation,RelatedSearches',
+                    domain: 'youchat',
+                    queryTraceId: null,
+                    chat: []
+                }),
+                signal: AbortSignal.timeout(12000)
+            })
+            if (!res.ok) throw new Error('You down')
             const text = await res.text()
+            // You.com manda eventi SSE, prendo solo la risposta
+            const match = text.match(/"youChatToken":"(.*?)"/g)
+            if (!match) throw new Error('You vuoto')
+            return match.map(m => m.slice(16, -1).replace(/\\n/g, '\n')).join('')
+        }
+    },
+    {
+        name: 'Phind',
+        fetch: async (prompt) => {
+            const res = await fetch('https://api.phind.com/api/infer/answer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: prompt,
+                    options: { skill: 'intermediate', date: new Date().toISOString().split('T')[0] }
+                }),
+                signal: AbortSignal.timeout(12000)
+            })
+            if (!res.ok) throw new Error('Phind down')
+            const text = await res.text()
+            const lines = text.split('\r\n').filter(l => l.startsWith('data: '))
             let out = ''
-            for (const line of text.split('\n')) {
-                if (line.startsWith('data: ') && line.length > 6) {
-                    const data = line.slice(6).trim()
-                    if (data === '[DONE]') break
-                    try { out += JSON.parse(data).message || '' } catch {}
-                }
+            for (const line of lines) {
+                const data = line.slice(6)
+                if (data === '[DONE]') break
+                try { out += JSON.parse(data).choices?.[0]?.delta?.content || '' } catch {}
             }
-            if (!out) throw new Error('DDG vuoto')
+            if (!out) throw new Error('Phind vuoto')
             return out
         }
     },
@@ -35,7 +81,7 @@ const API_LIST = [
         name: 'Pollinations',
         fetch: async (prompt) => {
             const res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
-                signal: AbortSignal.timeout(12000)
+                signal: AbortSignal.timeout(15000)
             })
             if (res.status === 429) throw new Error('Pollinations coda')
             if (!res.ok) throw new Error('Pollinations down')
@@ -43,41 +89,24 @@ const API_LIST = [
             if (!txt) throw new Error('Pollinations vuoto')
             return txt
         }
-    },
-    {
-        name: 'LlamaFree',
-        fetch: async (prompt) => {
-            const res = await fetch('https://api.deepinfra.com/v1/openai/chat/completions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    model: 'meta-llama/Meta-Llama-3-8B-Instruct',
-                    messages: [{ role: 'user', content: prompt }],
-                    stream: false
-                }),
-                signal: AbortSignal.timeout(15000)
-            })
-            if (!res.ok) throw new Error('Llama down')
-            const json = await res.json()
-            return json.choices?.[0]?.message?.content || ''
-        }
     }
 ]
 
-// fetchAI con fallback automatico
 async function fetchAI(prompt) {
-    let ultimoErrore = ''
+    let errori = []
     for (const api of API_LIST) {
         try {
             const res = await api.fetch(prompt)
-            if (res && res.length > 3) return res.trim()
+            if (res && res.length > 5) {
+                console.log(`[BOT] Uso ${api.name}`)
+                return res.trim()
+            }
         } catch (e) {
-            ultimoErrore = `${api.name}: ${e.message}`
-            console.log(`[BOT] ${ultimoErrore}`)
-            continue // Prova la prossima API
+            errori.push(`${api.name}: ${e.message}`)
+            continue
         }
     }
-    throw new Error('Tutte le API sono morte. ' + ultimoErrore)
+    throw new Error('TUTTE MORTE. ' + errori.join(' | '))
 }
 
 async function getPermessi(conn, m) {
@@ -116,7 +145,7 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
     try {
         const prompt = `Sei un assistente incazzato. Rispondi SOLO in italiano. Tono sarcastico. Imprecazioni: merda, dannazione. Sii breve. Domanda: ${text}`
         let risposta = await fetchAI(prompt)
-        if (/^I |^As an AI/i.test(risposta)) risposta = 'PARLO SOLO ITALIANO!'
+        if (/^I |^As an AI|^I'm sorry/i.test(risposta)) risposta = 'PARLO SOLO ITALIANO!'
         await m.reply('[BOT] ' + risposta)
     } catch (e) {
         await m.reply('[BOT] È andato tutto a merda: ' + e.message)
