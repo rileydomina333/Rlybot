@@ -1,7 +1,13 @@
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, text }) => {
-    if (!text) return m.reply('CHE MERDA VUOI?! Scrivi la domanda dopo .bot o levati dalle scatole! Es: .bot cos\'è Termux')
+let handler = async (m, { conn, text, usedPrefix, command }) => {
+    // Se l'utente risponde a un messaggio del bot, usa il testo della risposta come domanda
+    let isReplyToBot = m.quoted && m.quoted.fromMe
+    if (!text && !isReplyToBot) return m.reply('CHE MERDA VUOI?! Scrivi la domanda dopo .bot o rispondi a un mio messaggio! Es: .bot cos\'è Termux')
+    
+    // Se è una risposta al bot, prendi il testo del messaggio
+    if (isReplyToBot && !text) text = m.text
+    if (!text) return // Esce se non c'è comunque testo
 
     // Easter egg: sono Riley - versione incazzata
     if (text.toLowerCase().trim() === 'sono riley') {
@@ -39,7 +45,16 @@ let handler = async (m, { conn, text }) => {
     }
 }
 
-handler.command = /^bot$/i
+// Attiva sia con .bot che quando rispondi al bot
+handler.customPrefix = /^bot$/i
+handler.command = new RegExp
+handler.before = async function (m, { conn }) {
+    // Se l'utente risponde a un messaggio del bot, triggera il comando
+    if (m.quoted && m.quoted.fromMe && m.text && !m.text.startsWith('.')) {
+        return this.handler.call(this, m)
+    }
+}
+
 handler.tags = ['tools']
 handler.help = ['bot <domanda>']
 
