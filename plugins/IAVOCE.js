@@ -1,37 +1,27 @@
 import gTTS from 'gtts'
 
-let handler = async (m, { conn, text, usedPrefix }) => {
-    if (!text) return m.reply(`Esempio: ${usedPrefix}audio come va`)
-    if (text.length > 200) return m.reply('Max 200 caratteri')
-
-    await conn.sendPresenceUpdate('recording', m.chat)
-
+let handler = async (m, { conn, text }) => {
+    if (!text) return m.reply('Scrivi: .audio test')
+    
     try {
         const gtts = new gTTS(text, 'it')
+        const stream = gtts.stream()
         
-        // Invece di salvare su file, usiamo lo stream
-        let stream = gtts.stream()
-        let chunks = []
-        
-        stream.on('data', (chunk) => chunks.push(chunk))
-        
+        let buffers = []
+        stream.on('data', (chunk) => buffers.push(chunk))
         stream.on('end', async () => {
-            let buffer = Buffer.concat(chunks)
             await conn.sendMessage(m.chat, { 
-                audio: buffer, 
-                mimetype: 'audio/mpeg',
+                audio: Buffer.concat(buffers), 
                 ptt: true 
             }, { quoted: m })
         })
-
         stream.on('error', (err) => {
-            console.log('ERRORE STREAM GTTS:', err)
-            m.reply(`Errore audio: ${err.message}`)
+            m.reply(`ERRORE FILE: ${err.code}\n${err.message}`)
+            console.log('ERRORE COMPLETO:', err)
         })
-
     } catch (e) {
-        console.log('ERRORE GENERALE:', e)
-        m.reply(`Crash: ${e.message}\nHai fatto npm install gtts?`)
+        m.reply(`CRASH: ${e.code}\n${e.message}`)
+        console.log('CRASH COMPLETO:', e)
     }
 }
 
