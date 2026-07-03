@@ -1,14 +1,13 @@
-import fetch from 'node-fetch'
-
+// Niente import fetch, uso quello nativo di Node 18+
 const API_URL = 'https://text.pollinations.ai/'
 
 // Funzione fetch con retry per gestire il rate limit 429
-async function fetchIA(prompt, m) {
+async function fetchIA(prompt, m, conn) {
     let tentativi = 0
     while (tentativi < 3) {
         try {
             let res = await fetch(`${API_URL}${encodeURIComponent(prompt)}`, { 
-                timeout: 15000 
+                signal: AbortSignal.timeout(15000) // Node 18+
             })
 
             if (res.status === 429) {
@@ -25,6 +24,7 @@ async function fetchIA(prompt, m) {
             return testo
 
         } catch (e) {
+            if (e.name === 'TimeoutError') throw new Error('Timeout API')
             if (tentativi >= 2) throw e
             tentativi++
             await new Promise(r => setTimeout(r, 2000))
@@ -32,24 +32,28 @@ async function fetchIA(prompt, m) {
     }
 }
 
-// Funzione per prendere permessi gruppo senza crashare
+// Funzione permessi che non crasha mai
 async function getPermessi(conn, m) {
-    if (!m.isGroup) return { isGroup: false, isAdmin: false, isBotAdmin: false }
+    let data = { isGroup: m.isGroup, isAdmin: false, isBotAdmin: false }
+    if (!m.isGroup) return data
     try {
-        const groupMetadata = await conn.groupMetadata(m.chat)
-        const user = groupMetadata.participants.find(u => u.id === m.sender)
-        const bot = groupMetadata.participants.find(u => u.id === conn.user.jid)
-        const isAdmin = user?.admin === 'admin' || user?.admin === 'superadmin'
-        const isBotAdmin = bot?.admin === 'admin' || bot?.admin === 'superadmin'
-        return { isGroup: true, isAdmin, isBotAdmin }
+        // Fix per Baileys nuove/vecchie
+        let groupMetadata = await conn.groupMetadata(m.chat).catch(e => null)
+        if (!groupMetadata) return data
+        
+        let user = groupMetadata.participants?.find(u => u.id === m.sender)
+        let bot = groupMetadata.participants?.find(u => u.id === conn.user?.jid || conn.user?.id)
+        data.isAdmin = user?.admin === 'admin' || user?.admin === 'superadmin' || false
+        data.isBotAdmin = bot?.admin === 'admin' || bot?.admin === 'superadmin' || false
+        return data
     } catch (e) {
-        console.log('Errore permessi gruppo:', e)
-        return { isGroup: true, isAdmin: false, isBotAdmin: false }
+        console.log('[BOT] Errore permessi gruppo:', e.message)
+        return data
     }
 }
 
 let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
-    if (!text) return m.reply('[BOT] CHE MERDA VUOI?! Scrivi la domanda dopo.bot o rispondi a un mio messaggio!')
+    if (!text) return m.reply('[BOT] CHE MERDA VUOI?! Scrivi la domanda dopo.bot!')
 
     // Easter egg: sono Riley
     if (text.toLowerCase().trim() === 'sono riley') {
@@ -71,60 +75,33 @@ let rispostaIA = async (m, { conn, text, isGroup, isAdmin, isBotAdmin }) => {
         if (!isBotAdmin) return m.reply('[BOT] SONO SENZA POTERI, MERDA! Fammmi admin o non tocco niente!')
 
         let nuovaInfo = matchInfo[1].trim()
-        if (nuovaInfo.length > 512) return m.reply('[BOT] TROPPO LUNGA STA MERDA! Max 512 caratteri per la info!')
+        if (nuovaInfo.length > 512) return m.reply('[BOT] TROPPO LUNGA STA MERDA! Max 512 caratteri!')
 
         try {
             await conn.groupUpdateDescription(m.chat, nuovaInfo)
-            return m.reply('[BOT] FATTO, CAZZO! Info del gruppo cambiata. Contento ora?')
+            return m.reply('[BOT] FATTO, CAZZO! Info del gruppo cambiata.')
         } catch (e) {
-            console.error(e)
-            return m.reply('[BOT] È ANDATO TUTTO A MERDA! Non riesco a cambiare la info! WhatsApp mi blocca!')
+            console.error('[BOT] Errore cambio info:', e)
+            return m.reply('[BOT] È ANDATO TUTTO A MERDA! WhatsApp mi blocca! Controlla che sono admin.')
         }
     }
 
-    await conn.sendPresenceUpdate('composing', m.chat)
+    await conn.sendPresenceUpdate('composing', m.chat).catch(e => {})
 
     try {
-        let prompt = `Sei un assistente incazzato e scurrile. REGOLA ASSOLUTA: rispondi SOLO in italiano. Vietato usare inglese. Se la domanda è in inglese, rispondi comunque in italiano dicendo che parli solo italiano. Tono aggressivo e sarcastico. Puoi usare imprecazioni leggere tipo "merda", "dannazione", "maledizione", "che diavolo". Sii breve e brutale. Non usare insulti sessuali, bestemmie, o parolacce verso l'utente. Domanda: ${text}`
+        let prompt = `Sei un assistente incazzato e scurrile. REGOLA ASSOLUTA: rispondi SOLO in italiano. Vietato usare inglese. Tono aggressivo e sarcastico. Imprecazioni leggere: "merda", "dannazione", "maledizione". Sii breve. Non insultare l'utente. Domanda: ${text}`
 
-        let risposta = await fetchIA(prompt, m)
+        let risposta = await fetchIA(prompt, m, conn)
 
-        // Filtro anti-inglese
         if (/I cannot|I don't know|I'm sorry|As an AI/i.test(risposta)) {
-            risposta = 'PARLO SOLO ITALIANO, DANNATAMENTE! Rifai la domanda in italiano o vai a quel paese!'
+            risposta = 'PARLO SOLO ITALIANO, DANNATAMENTE! Rifai la domanda in italiano!'
         }
 
         await m.reply('[BOT] ' + risposta)
 
     } catch (e) {
-        console.log('Errore bot:', e.message)
+        console.log('[BOT] Errore finale:', e.message)
         if (e.message === 'Rate limit superato') {
-            m.reply('[BOT] TROPPA GENTE USA IL BOT, MANNAGGIA! API intasata. Riprova tra 1 minuto o fatti la key su enter.pollinations.ai')
-        } else {
-            m.reply('[BOT] È ANDATO TUTTO A MERDA! Il server è morto! MANNAGGIA! Riprova dopo!')
-        }
-    }
-}
-
-// Comando.bot
-let handler = async (m, { conn, text }) => {
-    let permessi = await getPermessi(conn, m)
-    await rispostaIA(m, { conn, text, ...permessi })
-}
-handler.command = /^bot$/i
-handler.tags = ['tools']
-handler.help = ['bot <domanda>']
-
-// FIX: Risponde solo ai messaggi quotati che iniziano con [BOT]
-handler.before = async function (m, { conn }) {
-    if (m.isBaileys || m.fromMe || !m.text) return
-    if (m.text.startsWith('.') || m.text.startsWith('!') || m.text.startsWith('#')) return
-    
-    // Risponde SOLO se quoti un messaggio del bot che ha il tag [BOT]
-    if (m.quoted && m.quoted.fromMe && m.quoted.text?.startsWith('[BOT]')) {
-        let permessi = await getPermessi(conn, m)
-        await rispostaIA(m, { conn, text: m.text, ...permessi })
-    }
-}
-
-export default handler
+            m.reply('[BOT] TROPPA GENTE USA IL BOT! API intasata. Aspetta 1 minuto o usa enter.pollinations.ai')
+        } else if (e.message === 'Timeout API') {
+            m.reply('[BOT] L\'API CI METTE TROPPO! Riprova tra poco,
