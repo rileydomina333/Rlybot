@@ -4,9 +4,20 @@ import fs from 'fs'
 import { randomUUID } from 'crypto'
 import path from 'path'
 
+function palermitano(text) {
+    return text
+        .replace(/che/g, 'chi')
+        .replace(/perché/g, 'picchì')
+        .replace(/cosa/g, 'che cosa')
+        .replace(/andiamo/g, 'ammu a ghiiri')
+        .replace(/ragazzo/g, 'picciotto')
+        .replace(/bello/g, 'beddu')
+        .replace(/ciao/g, 'ue')
+        .replace(/\?/g, ' ah?')
+}
+
 let handler = async (m, { conn, text, usedPrefix }) => {
-    if (!text) return m.reply(`Esempio: ${usedPrefix}vocebot come va`)
-    if (text.length > 200) return m.reply('Max 200 caratteri')
+    if (!text) return m.reply(`Esempio: ${usedPrefix}palermo come va`)
 
     await conn.sendPresenceUpdate('recording', m.chat)
 
@@ -16,27 +27,26 @@ let handler = async (m, { conn, text, usedPrefix }) => {
     const id = randomUUID()
     const mp3Path = path.join(tmpDir, `${id}.mp3`)
     const oggPath = path.join(tmpDir, `${id}.ogg`)
+    const testoPalermo = palermitano(text.toLowerCase())
 
     try {
-        // 1. Genera MP3 con gtts
+        // 1. Genera con testo modificato
         await new Promise((resolve, reject) => {
-            new gTTS(text, 'it').save(mp3Path, (err) => {
+            new gTTS(testoPalermo, 'it').save(mp3Path, (err) => {
                 if (err) reject(err)
                 else resolve()
             })
         })
 
-        // 2. Converti in OGG OPUS che WhatsApp digerisce sempre
+        // 2. Abbassa pitch + rallenta per fare voce più "grezza" da picciotto
+        // asetrate=44100*0.8 = rallenta, atempo=1.2 = ricompensa durata
         await new Promise((resolve, reject) => {
-            exec(`ffmpeg -i ${mp3Path} -ar 48000 -ac 1 -c:a libopus ${oggPath}`, (err) => {
-                if (err) {
-                    console.log('Errore FFMPEG:', err)
-                    reject('FFMPEG_ERROR')
-                } else resolve()
+            exec(`ffmpeg -i ${mp3Path} -af "asetrate=44100*0.85,aresample=44100,atempo=1.1" -ar 48000 -ac 1 -c:a libopus ${oggPath}`, (err) => {
+                if (err) reject('FFMPEG_ERROR')
+                else resolve()
             })
         })
 
-        // 3. Invia come vocale
         let audioBuffer = fs.readFileSync(oggPath)
         await conn.sendMessage(m.chat, { 
             audio: audioBuffer, 
@@ -46,20 +56,14 @@ let handler = async (m, { conn, text, usedPrefix }) => {
 
     } catch (e) {
         console.log(e)
-        if (e === 'FFMPEG_ERROR') {
-            m.reply('❌ Manca ffmpeg sul server.\nEsegui: `sudo apt install ffmpeg -y`')
-        } else {
-            m.reply(`❌ Errore: ${e.message}\nHai fatto npm install gtts?`)
-        }
+        m.reply(`❌ Errore: serve ffmpeg installato`)
     } finally {
-        // 4. Pulisci i file temporanei
         if (fs.existsSync(mp3Path)) fs.unlinkSync(mp3Path)
         if (fs.existsSync(oggPath)) fs.unlinkSync(oggPath)
     }
 }
 
 handler.command = /^vocebot$/i
-handler.tags = ['tools']
 handler.help = ['vocebot <testo>']
 
 export default handler
