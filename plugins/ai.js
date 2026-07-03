@@ -1,19 +1,6 @@
 import fetch from 'node-fetch'
 
-let handler = async (m, { conn, text }) => {
-    // Questo handler non fa nulla, tutto il lavoro è in .all
-}
-
-handler.all = async function (m, { conn }) {
-    // Condizione 1: comando .bot qualcosa
-    // Condizione 2: risposta a un messaggio del bot senza comando
-    let isCmd = m.text?.toLowerCase().startsWith('.bot') || m.text?.toLowerCase().startsWith('bot ')
-    let isReplyToBot = m.quoted && m.quoted.fromMe && m.text && !m.text.startsWith('.')
-
-    if (!isCmd && !isReplyToBot) return
-
-    let text = isCmd ? m.text.replace(/^\.?bot\s?/i, '').trim() : m.text
-
+let rispostaIA = async (m, { conn, text }) => {
     if (!text) return m.reply('CHE MERDA VUOI?! Scrivi la domanda dopo .bot o rispondi a un mio messaggio!')
 
     // Easter egg: sono Riley
@@ -31,7 +18,7 @@ handler.all = async function (m, { conn }) {
     await conn.sendPresenceUpdate('composing', m.chat)
 
     try {
-        let prompt = `Sei un assistente incazzato e scurrile. Rispondi sempre in italiano. Tono aggressivo e sarcastico. Puoi usare imprecazioni leggere tipo "merda", "dannazione", "maledizione", "che diavolo". Sii breve e brutale. Non usare insulti sessuali, bestemmie, o parolacce verso l'utente. Non offendere gruppi di persone. Domanda: ${text}`
+        let prompt = `Sei un assistente incazzato e scurrile. Rispondi sempre in italiano. Tono aggressivo e sarcastico. Puoi usare imprecazioni leggere tipo "merda", "dannazione", "maledizione", "che diavolo". Sii breve e brutale. Non usare insulti sessuali, bestemmie, o parolacce verso l'utente. Domanda: ${text}`
         
         let res = await fetch(`https://text.pollinations.ai/${encodeURIComponent(prompt)}`, {
             timeout: 15000
@@ -52,7 +39,23 @@ handler.all = async function (m, { conn }) {
     }
 }
 
+// 1. Comando normale .bot
+let handler = async (m, { conn, text }) => {
+    await rispostaIA(m, { conn, text })
+}
+handler.command = /^bot$/i
 handler.tags = ['tools']
 handler.help = ['bot <domanda>']
+
+// 2. Intercetta le risposte ai messaggi del bot
+handler.before = async function (m, { conn }) {
+    if (m.isBaileys) return
+    if (m.fromMe) return
+    
+    // Se l'utente risponde a un messaggio del bot e non è un comando
+    if (m.quoted && m.quoted.fromMe && m.text && !m.text.startsWith('.')) {
+        await rispostaIA(m, { conn, text: m.text })
+    }
+}
 
 export default handler
