@@ -30,58 +30,82 @@ let rispostaIA = async (m, { conn, text }) => {
 
     try {
         let tono = modalitaIncazzata[chatId]
-          ? `Sei RLY BOT in modalità incazzata. Tono aggressivo e sarcastico. Puoi usare imprecazioni leggere tipo "merda", "dannazione", "maledizione". Sii breve e brutale. Non usare insulti sessuali o verso l'utente.`
+         ? `Sei RLY BOT in modalità incazzata. Tono aggressivo e sarcastico. Puoi usare imprecazioni leggere tipo "merda", "dannazione", "maledizione". Sii breve e brutale. Non usare insulti sessuali o verso l'utente.`
             : `Sei RLY BOT, il bot di Riley. Sei generoso, educato e disponibile. Rispondi sempre in modo gentile, completo e utile. Aiuta l'utente al meglio delle tue capacità.`
 
         let prompt = `${tono} Rispondi sempre in italiano. Domanda: ${text}`
 
-        // FIX: endpoint aggiornati + header referrer per Pollinations
+        // FIX: endpoint aggiornati + POST per Pollinations
         const apis = [
             {
-                url: `https://api.pollinations.ai/prompt/${encodeURIComponent(prompt)}`,
-                headers: { 'Referer': 'https://rlybot.xyz' } // metti il tuo dominio/repo
+                name: 'Pollinations',
+                method: 'POST',
+                url: 'https://api.pollinations.ai/prompt',
+                body: { prompt: prompt },
+                headers: { 'Content-Type': 'application/json', 'Referer': 'https://rlybot.xyz' }
             },
-            `https://api.makenai.uk/ia?text=${encodeURIComponent(prompt)}`,
-            `https://api.nyxbot.xyz/ai/gemini?text=${encodeURIComponent(prompt)}`
+            {
+                name: 'MakenAI',
+                method: 'GET',
+                url: `https://api.makenai.uk/ia?text=${encodeURIComponent(prompt)}`
+            },
+            {
+                name: 'NyxBot',
+                method: 'GET',
+                url: `https://api.nyxbot.xyz/ai/gemini?text=${encodeURIComponent(prompt)}`
+            }
         ]
 
         let risposta = null
         for (let api of apis) {
             try {
+                console.log(`Provo ${api.name}...`)
                 let res
-                if (typeof api === 'object') {
+                if (api.method === 'POST') {
                     res = await fetch(api.url, {
+                        method: 'POST',
                         timeout: 8000,
-                        headers: api.headers
+                        headers: api.headers,
+                        body: JSON.stringify(api.body)
                     })
                 } else {
-                    res = await fetch(api, { timeout: 8000 })
+                    res = await fetch(api.url, { timeout: 8000 })
                 }
 
-                if (!res.ok) continue // skippa se 500, 503, ecc
+                console.log(`${api.name} status:`, res.status)
+
+                if (!res.ok) {
+                    console.log(`${api.name} errore: ${res.status}`)
+                    continue
+                }
 
                 let data = await res.text()
-                if (data && data.length > 5 &&!data.includes('ENOSPC')) {
+                console.log(`${api.name} risposta:`, data.slice(0, 100))
+
+                if (data && data.length > 5 &&!data.includes('ENOSPC') &&!data.includes('error')) {
                     risposta = data
                     break
                 }
-            } catch { continue }
+            } catch (err) {
+                console.log(`${api.name} fallita:`, err.message)
+                continue
+            }
         }
 
         if (!risposta) throw 'Nessuna API ha risposto'
 
         if (risposta.includes('I cannot') || risposta.includes("I don't know")) {
             risposta = modalitaIncazzata[chatId]
-              ? 'MA CHE NE SO, DANNATAMENTE?! Chiedi altro che questa domanda fa schifo!'
+             ? 'MA CHE NE SO, DANNATAMENTE?! Chiedi altro che questa domanda fa schifo!'
                 : 'Mi dispiace, su questo non ho informazioni. Puoi provare a riformulare la domanda?'
         }
 
         await m.reply(risposta)
 
     } catch (e) {
-        console.log(e)
+        console.log('Errore finale:', e)
         let msgErrore = modalitaIncazzata[chatId]
-          ? 'È ANDATO TUTTO A MERDA! I server sono morti! Riprova, maledizione!'
+         ? 'È ANDATO TUTTO A MERDA! I server sono morti! Riprova, maledizione!'
             : 'Mi spiace, c\'è stato un problema con i server. Potresti riprovare tra un attimo per favore?'
         m.reply(msgErrore)
     }
