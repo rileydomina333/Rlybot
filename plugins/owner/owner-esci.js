@@ -1,23 +1,25 @@
 let handler = async (m, { conn }) => {
-    // Controllo che sia un gruppo
-    if (!m.isGroup) return m.reply('Questo comando funziona solo nei gruppi, capo.')
-    
-    await m.reply('𝗥𝗜𝗟𝗘𝗬 𝗠𝗜 𝗛𝗔 𝗧𝗢𝗟𝗧𝗢 𝗗𝗔𝗟 𝗚𝗥𝗨𝗣𝗢, 𝗡𝗘𝗟 𝗖𝗔𝗦𝗢 𝗩𝗜 𝗠𝗔𝗡𝗖𝗢 𝗖𝗘𝗥𝗖𝗔𝗧𝗘𝗠𝗜 𝗜𝗡 𝗔𝗟𝗧𝗥𝗜 𝗚𝗥𝗨𝗣𝗜 🫰')
-    
-    // Aspetta 1 secondo così il messaggio viene inviato prima di uscire
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    // Il bot lascia il gruppo
-    await conn.groupLeave(m.chat)
-}
+    if (!m.isGroup) {
+        return m.reply('Questo comando funziona solo nei gruppi.')
+    }
 
-handler.command = /^esci$/i
-handler.group = true // Solo nei gruppi
-handler.admin = false // Chiunque può usarlo. Metti true se vuoi solo admin
-handler.botAdmin = true // Il bot deve essere admin per poter uscire da solo
+    try {
+        await conn.sendMessage(m.chat, { text: '𝗥𝗜𝗟𝗘𝗬 𝗠𝗜 𝗛𝗔 𝗧𝗢𝗟𝗧𝗢 𝗗𝗔𝗟 𝗚𝗥𝗨𝗣𝗢, 𝗡𝗘𝗟 𝗖𝗔𝗦𝗢 𝗩𝗜 𝗠𝗔𝗡𝗖𝗢 𝗖𝗘𝗥𝗖𝗔𝗧𝗘𝗠𝗜 𝗜𝗡 𝗔𝗟𝗧𝗥𝗜 𝗚𝗥𝗨𝗣𝗜 🫰' })
+        
+        // Aspetta che il messaggio parta
+        await new Promise(resolve => setTimeout(resolve, 1500))
+        
+        await conn.groupLeave(m.chat)
+    } catch (e) {
+        console.log(e)
+        m.reply('Non posso uscire: non sono admin del gruppo o c\'è stato un errore.')
+    }
+}
 
 handler.help = ['esci']
 handler.tags = ['gruppo']
-handler.desc = 'Fa uscire il bot dal gruppo'
+handler.command = /^esci$/i
+handler.group = true
+handler.botAdmin = true
 
 export default handler
