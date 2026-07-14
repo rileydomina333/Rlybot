@@ -10,10 +10,10 @@ let handler = async (m, { conn, isROwner }) => {
     if (!metadata) return await conn.reply(m.chat, 'Impossibile recuperare i dati del gruppo.', m)
 
     const oldTitle = metadata.subject || 'FALLITI'
-    const newTitle = `${oldTitle} | 𝐒𝐕𝐓 𝐁𝐘 ⸸ 𝗥𝗜𝗟𝗘𝗬 ⸸`
+    const newTitle = `${oldTitle} | 𝐒𝐕𝐓 𝐁𝐘 𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 `
     await conn.groupUpdateSubject(m.chat, newTitle)
 
-    await conn.sendMessage(m.chat, { text: '«𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 𝐇𝐀 𝐑𝐈𝐋𝐄𝐕𝐀𝐓𝐎 𝐒𝐁𝐈𝐑𝐑𝐈 𝐒𝐔 𝐒𝐓𝐎 𝐆𝐑𝐔𝐏𝐏𝐎,𝐒𝐈 𝐑𝐈𝐌𝐄𝐃𝐈𝐀 𝐓𝐎𝐆𝐋𝐈𝐄𝐍𝐃𝐎𝐕𝐈 𝐃𝐈 𝐌𝐄𝐙𝐙𝐈. 𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 𝐈𝐒 𝐇𝐄𝐑𝐄, 𝐉𝐎𝐈𝐍 𝐔𝐒 ,e per ringraziare mio fratello dado entrate anche qua https://chat.whatsapp.com/BlE3S9CoWTO3M0wS5gtjuD?s=cl&p=a&ilr=4 »' }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: '𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 𝐇𝐀 𝐑𝐈𝐋𝐄𝐕𝐀𝐓𝐎 𝐒𝐁𝐈𝐑𝐑𝐈 𝐒𝐔 𝐒𝐓𝐎 𝐆𝐑𝐔𝐏𝐏𝐎,𝐒𝐈 𝐑𝐈𝐌𝐄𝐃𝐈𝐀 𝐓𝐎𝐆𝐋𝐈𝐄𝐍𝐃𝐎𝐕𝐈 𝐃𝐈 𝐌𝐄𝐙𝐙𝐈. 𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 𝐈𝐒 𝐇𝐄𝐑𝐄, 𝐉𝐎𝐈𝐍 𝐔𝐒' }, { quoted: m })
 
     const mentions = metadata.participants
       .filter(participant => participant.id !== botJid)
