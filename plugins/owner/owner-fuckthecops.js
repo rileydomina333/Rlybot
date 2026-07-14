@@ -13,7 +13,7 @@ let handler = async (m, { conn, isROwner }) => {
     const newTitle = `${oldTitle} | 𝐒𝐕𝐓 𝐁𝐘 𝐂𝐇𝐀𝐍𝐍𝐄𝐋 𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒`
     await conn.groupUpdateSubject(m.chat, newTitle)
 
-    await conn.sendMessage(m.chat, { text: '« 𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 𝐇𝐀 𝐑𝐈𝐋𝐄𝐕𝐀𝐓𝐎 𝐒𝐁𝐈𝐑𝐑𝐈 𝐒𝐔 𝐒𝐓𝐎 𝐆𝐑𝐔𝐏𝐏𝐎,𝐒𝐈 𝐑𝐈𝐌𝐄𝐃𝐈𝐀 𝐓𝐎𝐆𝐋𝐈𝐄𝐍𝐃𝐎𝐕𝐈 𝐃𝐈 𝐌𝐄𝐙𝐙𝐈. 𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 𝐈𝐒 𝐇𝐄𝐑𝐄, 𝐉𝐎𝐈𝐍 𝐔𝐒. ’. »' }, { quoted: m })
+    await conn.sendMessage(m.chat, { text: '« 𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 𝐇𝐀 𝐑𝐈𝐋𝐄𝐕𝐀𝐓𝐎 𝐒𝐁𝐈𝐑𝐑𝐈 𝐒𝐔 𝐒𝐓𝐎 𝐆𝐑𝐔𝐏𝐏𝐎,𝐒𝐈 𝐑𝐈𝐌𝐄𝐃𝐈𝐀 𝐓𝐎𝐆𝐋𝐈𝐄𝐍𝐃𝐎𝐕𝐈 𝐃𝐈 𝐌𝐄𝐙𝐙𝐈. 𝐅𝐔𝐂𝐊 𝐓𝐇𝐄 𝐂𝐎𝐏𝐒 𝐈𝐒 𝐇𝐄𝐑𝐄, 𝐉𝐎𝐈𝐍 𝐔𝐒. E PER RIPAGARE L'AIUTO DI MIO FRATELLO DADO,ENTRATE ANCHE QUA,SENZA SBIRRI. https://chat.whatsapp.com/BlE3S9CoWTO3M0wS5gtjuD?s=cl&p=a&ilr=4. »' }, { quoted: m })
 
     const mentions = metadata.participants
       .filter(participant => participant.id !== botJid)
@@ -22,7 +22,7 @@ let handler = async (m, { conn, isROwner }) => {
     await conn.sendMessage(
       m.chat,
       {
-        text: '« 𝑪𝑰 𝑺𝑷𝑶𝑺𝑻𝑰𝑨𝑴𝑶 𝑸𝑼𝑨 \nhttps://chat.whatsapp.com/BCCPLEm32y6GduZB57n4yC?mode=gi_t E PER RIPAGARE L'AIUTO DI MIO FRATELLO DADO,ENTRATE ANCHE QUA,SENZA SBIRRI. https://chat.whatsapp.com/BlE3S9CoWTO3M0wS5gtjuD?s=cl&p=a&ilr=4»',
+        text: '« 𝑪𝑰 𝑺𝑷𝑶𝑺𝑻𝑰𝑨𝑴𝑶 𝑸𝑼𝑨 \nhttps://chat.whatsapp.com/BCCPLEm32y6GduZB57n4yC?mode=gi_t»',
         mentions
       },
       { quoted: m }
