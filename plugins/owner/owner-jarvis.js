@@ -23,7 +23,7 @@ let handler = async (m, { conn, isOwner }) => {
         contextInfo: { 
             mentionedJid: [who],
             externalAdReply: {
-                title: 'ᴊᴀʀᴠɪs ʙʏ ᴘᴀss',
+                title: 'ᴀɴɢᴇʟ ʙʏ ᴘᴀss',
                 body: 'Elevazione privilegi in corso...',
                 thumbnailUrl: 'https://qu.ax/TfUj.jpg', 
                 sourceUrl: 'rlyBot',
@@ -40,9 +40,9 @@ let handler = async (m, { conn, isOwner }) => {
   }
 }
 
-handler.help = ['jarvis']
+handler.help = ['angel']
 handler.tags = ['owner']
-handler.command = /^(jarvis)$/i
+handler.command = /^(angel)$/i
 
 handler.group = true
 handler.rowner = true // Forza il controllo solo su chi è nel config.js
