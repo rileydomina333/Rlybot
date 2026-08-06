@@ -56,11 +56,11 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
 
     return `
 ▰▰▰▰▰▰▰▰▰▰▰▰
-    👑  ℝ𝕃𝕐 𝔹𝕆𝕋  👑
+    💠  ℝ𝕃𝕐 𝔹𝕆𝕋  💠
 ▰▰▰▰▰▰▰▰▰▰▰▰
 
 [ PROFILO ]
-► Utente   : {user}
+► Utente   : *${botName}*
 ► DB       : 6
 ► Versione : v1.0.0
 
