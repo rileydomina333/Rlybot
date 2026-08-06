@@ -55,29 +55,31 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
     const vs = global.vs || '1.5.0';
 
     return `
-┏━━〔 💠 *${botName}* 💠 〕━━┓
-┃
-┃  💠 *Utente:* @${userId.split('@')[0]}
-┃  💠 *Database:* ${userCount}
-┃  💠 *Versione:* ${vs}
-┃
-┣━━〔 💠 *SISTEMA* 〕━━┓
-┃ 💠 \`${prefix}installa\`
-┃ 💠 \`${prefix}sistema\`
-┃ 💠 \`${prefix}ping\`
-┃
-┣━━━〔 💠*INTELLIGENZA BOT* 〕━┫
-┃ 💠 .bot <testo>  → RLY BOT
-┃ 💠.bot → on/off
-┃ 💠.vocebot 
-┃
-┣━━〔 💠 *INTELLIGENZA* 〕━━┓
-┃ 💠 \`${prefix}rlybot\`
-┃ 💠 \`${prefix}lingua\`
-┃
-┣━━〔 💠 *ASSISTENZA* 〕━━┓
-┃ 💠 \`${prefix}report\`
-┃ 💠 \`${prefix}suggerisci\`
-┃
-┗━━━━━━━━━━━━━━━━━━┛`.trim();
+▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰
+    👑  ℝ𝕃𝕐 𝔹𝕆𝕋  👑
+▰▰▰▰▰▰▰▰▰▰▰▰
+
+[ PROFILO ]
+► Utente   : {user}
+► DB       : 6
+► Versione : v1.0.0
+
+[ ⚡ SISTEMA ]
+► .installa  | Installa pacchetti
+► .sistema   | Pannello controllo
+► .ping      | Check connessione
+
+[ 🧠 AI ENGINE ]
+► .bot <msg> | Chat con RLY BOT
+► .bot on/off| Attiva AI
+► .vocebot   | Risposta vocale
+► .rlybot    | Info Intelligenza
+► .lingua    | Set Lingua
+
+[ 🛡️ SUPPORTO ]
+► .report    | Bug Report
+► .suggerisci| Suggerimento
+
+▰▰▰▰▰▰▰▰▰
+   Powered by ℝ𝕃𝕐 ✨`.trim();
 }
