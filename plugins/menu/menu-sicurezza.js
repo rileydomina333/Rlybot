@@ -11,7 +11,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     const imagePath = path.join(__dirname, '../../media/WA_1782994913707.jpeg');
 
     const botName = "ℝ𝕃𝕐 𝔹𝕆𝕋";
-    const menuText = generateMenuText(chat, userId, groupId, botName, usedPrefix);
+    const menuText = generateMenuText(m, chat, userId, groupId, botName, usedPrefix); // <- AGGIUNTO m
     
     const footerText = `𝕊𝕖𝕝𝕖𝕫𝕚𝕠𝕟𝕒 𝕦𝕟𝕒 𝕔𝕒𝕥𝕖𝕘𝕠𝕣𝕚𝕒 💠`;
 
@@ -35,7 +35,8 @@ handler.command = /^(menusicurezza|securitymenu|menusecurity|safety)$/i;
 
 export default handler;
 
-function generateMenuText(chat, userId, groupId, botName, usedPrefix) {
+// AGGIUNTO m come primo parametro
+function generateMenuText(m, chat, userId, groupId, botName, usedPrefix) { 
     const vs = global.vs || '1.0.0';
     
     const functions = {
@@ -62,12 +63,12 @@ function generateMenuText(chat, userId, groupId, botName, usedPrefix) {
         .join('\n');
 
     return `
-▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰
+▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰
     👑  ${botName}  👑
 ▰▰▰▰▰
 
 [ PROFILO ]
-► Utente   : ${m.pushName}
+► Utente   : ${m.pushName} // <- ORA FUNZIONA
 ► ID       : @${userId.split('@')[0]}
 ► Versione : v${vs}
 
@@ -81,7 +82,7 @@ ${statusList}
 [ ℹ️ INFO ]
 ► Versione : v${vs}
 
-▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰
+▰▰▰▰▰▰▰▰▰▰▰▰▰
    Powered by ℝ𝕃𝕐 ✨
 `.trim();
 }
