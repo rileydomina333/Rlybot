@@ -8,20 +8,28 @@ let handler = m => m
 handler.all = async function(m, {conn}) {
     let chat = m.chat
     let text = m.text
+    if (!text) return
 
-    if (!botAttivo[chat]) return
+    // REGOLA 1: se è.bot on/off lo gestisce il file bot-toggle.js
+    if (text.startsWith('.')) return
     if (m.fromMe) return
-    if (!text || text.startsWith('.')) return
+
+    // REGOLA 2: RISPONDE SOLO SE: bot è ON O se gli stai rispondendo
+    let isReplyToBot = m.quoted && m.quoted.sender == conn.user.jid
+    if (!botAttivo[chat] &&!isReplyToBot) return
+
+    // Se gli rispondi ma bot era OFF, lo riattiva solo per quella chat
+    if (isReplyToBot &&!botAttivo[chat]) botAttivo[chat] = true
 
     await conn.sendPresenceUpdate('composing', chat)
 
     try {
-        if(!chatHistory[chat]) chatHistory[chat] = [{role: "system", content: "Sei ℝ𝕃𝕐 𝔹𝕆𝕋. Italiano, diretto, amichevole, max 3 righe. Usa emoji max 1."}]
+        if(!chatHistory[chat]) chatHistory[chat] = [{role: "system", content: "Sei ℝ𝕃𝕐 𝔹𝕆𝕋. Italiano, diretto, amichevole, max 3 righe. Non essere robot."}]
 
-        // SE RISPONDI AL BOT
+        // SE RISPONDI AL BOT GLI DAI IL CONTESTO
         let userMsg = text
-        if (m.quoted && m.quoted.sender == conn.user.jid) {
-            userMsg = `Contesto: stavi rispondendo a questo: "${m.quoted.text}"\nDomanda: "${text}"`
+        if (isReplyToBot) {
+            userMsg = `L'utente sta rispondendo a questo messaggio: "${m.quoted.text}"\nRisposta: "${text}"`
         }
 
         chatHistory[chat].push({role: "user", content: userMsg})
@@ -29,8 +37,7 @@ handler.all = async function(m, {conn}) {
 
         const response = await g4f.chatCompletion(chatHistory[chat], {
             model: "gpt-4o-mini",
-            provider: "Liaobots",
-            timeout: 15000
+            provider: "Liaobots"
         });
 
         chatHistory[chat].push({role: "assistant", content: response})
@@ -38,7 +45,6 @@ handler.all = async function(m, {conn}) {
 
     } catch (e) {
         console.log("AI ERROR:", e)
-        m.reply("⚠️ Errore AI. Riprova tra 3s")
     }
 }
 export default handler
