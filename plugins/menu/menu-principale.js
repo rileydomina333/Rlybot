@@ -55,7 +55,7 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
     const vs = global.vs || '1.5.0';
 
     return `
-▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰
+▰▰▰▰▰▰▰▰▰▰▰▰
     👑  ℝ𝕃𝕐 𝔹𝕆𝕋  👑
 ▰▰▰▰▰▰▰▰▰▰▰▰
 
