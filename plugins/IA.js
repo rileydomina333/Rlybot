@@ -3,90 +3,100 @@ let modalitaIncazzata = {}
 let botAttivo = {}
 let livelloAffetto = {}
 
-// Database di risposte per sembrare "intelligente"
-const risposteNormali = [
-    "Interessante quello che dici. Dimmi di più 👀",
-    "Ci ho pensato e secondo me hai ragione. Cosa ne pensi di...?",
-    "Ok, ti spiego: {text} dipende da tanti fattori. Vuoi che approfondisca?",
-    "Mmm bella domanda. Da quello che so {text} è così. Ti serve altro?",
-    "Capito! Allora ti consiglio di provare con {text}. Funziona sempre."
+// Database risposte per keyword
+const DB_RISPOSTE = {
+    saluti: ["Ciao! 👋", "Ehilà! Come va?", "Salve capo!"],
+    come_stai: ["Bene grazie! E tu?", "Tutto a posto. Tu come stai?", "Sto alla grande!"],
+    aiuto: ["Dimmi pure, con cosa ti aiuto?", "Sono qui per te. Cosa ti serve?", "Chiedi pure!"],
+    battuta: [
+        "Cosa fa una mucca in discoteca? Il moooove 😂",
+        "Perché i programmatori odiano la natura? Troppe bug.",
+        "Cosa dice un tetto a un altro? Ti copro!"
+    ],
+    meteo: ["Non ho i dati meteo ora, ma qui a Palermo oggi fa caldo 🌞"],
+    riley: ["Riley è il capo! Rispetto massimo 👑"],
+    grazie: ["Di nulla! ❤️", "Figurati!", "Per questo e altro ci sono."]
+}
+
+const RISPOSTE_GENERALI = [
+    "Interessante... spiegami meglio",
+    "Ci sto pensando... secondo me {text}",
+    "Ok ho capito. Vuoi che ti aiuti con {text}?",
+    "Mmm bella domanda su {text}",
+    "Allora, per quanto riguarda {text} ti dico che..."
 ]
 
-const risposteIncazzate = [
-    "Ma che cavolo vuoi?! Spiegati meglio dannazione!",
-    "Uffa... non ho voglia. Riformula.",
-    "Senti, {text} non è così difficile da capire, merda!",
-    "Oh ma la smetti? Chiedi qualcosa di sensato!",
-    "Maledizione, sto cercando di aiutarti e tu fai {text}"
+const RISPOSTE_INCAZZATE = [
+    "Che palle! Riformula meglio!",
+    "Ma non vedi che sono occupato?! {text}",
+    "DANNATAMENTE parla chiaro!",
+    "Uffa... e mo che vuoi con {text}?",
+    "Smettila o mi incazzo davvero!"
 ]
 
-const risposteDolci = [
-    "Aww 🥺 Grazie, mi fai commuovere!",
-    "Anche io ti voglio bene ❤️ Cosa posso fare per te?",
-    "Sei un tesoro! Dimmi pure, sono qui per te.",
-    "Mi hai fatto sorridere! Raccontami altro."
-]
+function trovaRisposta(testo, incazzato) {
+    testo = testo.toLowerCase()
+
+    // Controlla keyword
+    if(/ciao|salve|hey|yo/.test(testo)) return random(DB_RISPOSTE.saluti)
+    if(/come stai|tutto bene/.test(testo)) return random(DB_RISPOSTE.come_stai)
+    if(/aiuto|help|aiutami/.test(testo)) return random(DB_RISPOSTE.aiuto)
+    if(/battuta|ridere|ridi/.test(testo)) return random(DB_RISPOSTE.battuta)
+    if(/meteo|piove|sole/.test(testo)) return random(DB_RISPOSTE.meteo)
+    if(/riley|capo/.test(testo)) return random(DB_RISPOSTE.riley)
+    if(/grazie|ty/.test(testo)) return random(DB_RISPOSTE.grazie)
+
+    // Risposta generica
+    let base = incazzato? RISPOSTE_INCAZZATE : RISPOSTE_GENERALI
+    return random(base).replace('{text}', testo.slice(0,20))
+}
+
+function random(arr){ return arr[Math.floor(Math.random() * arr.length)] }
 
 let rispostaIA = async (m, { conn, text, fullText }) => {
     const comandoCompleto = fullText.toLowerCase().trim()
     const domanda = text.toLowerCase().trim()
     const chatId = m.chat
 
-    // 0. Default
     if (botAttivo[chatId] === undefined) botAttivo[chatId] = true
     if (livelloAffetto[chatId] === undefined) livelloAffetto[chatId] = 0
 
-    // Comandi on/off
+    // Comandi
     if (comandoCompleto === '.bot on') {
         botAttivo[chatId] = true
-        return m.reply('RLY BOT attivato ✅ Ora rispondo a tutto!')
+        return m.reply('RLY BOT attivato ✅')
     }
     if (comandoCompleto === '.bot off') {
         botAttivo[chatId] = false
         return m.reply('RLY BOT disattivato ❌')
     }
     if (!botAttivo[chatId]) return
-    if (!text) return m.reply('Dimmi pure, sono qui per aiutarti!')
+    if (!text) return m.reply('Dimmi pure!')
 
-    // 1. AFFETTO
-    const triggerAffetto = ['ti voglio bene', 'ti amo', 'sei il migliore', 'sei un tesoro', 'ti adoro', 'grazie', 'sei carino', 'mi piaci', 'sei dolce']
-    if (triggerAffetto.some(frase => domanda.includes(frase))) {
+    // AFFETTO
+    if (['ti voglio bene','ti amo','sei il migliore','grazie'].some(f => domanda.includes(f))) {
         livelloAffetto[chatId] = Math.min(livelloAffetto[chatId] + 1, 5)
-        const risp = modalitaIncazzata[chatId]
-           ? ['Tsk... smettila... mi fai arrossire, dannazione.', 'Oh. Ehm. Grazie.']
-            : risposteDolci
-        return m.reply(risp[Math.floor(Math.random() * risp.length)])
+        if(modalitaIncazzata[chatId]) return m.reply('Tsk... smettila... mi fai arrossire.')
+        return m.reply(random(["Aww 🥺 Ti voglio bene anch'io!", "Grazie di cuore ❤️", "Sei un amore!"]))
     }
 
-    // 2. Modalità
-    if (domanda === 'incazzati' || domanda === 'modalità incazzata') {
+    // MODALITA
+    if (domanda === 'incazzati') {
         modalitaIncazzata[chatId] = true
-        return m.reply('Va bene... ora sono incazzato. Che diavolo vuoi?!')
+        return m.reply('Va bene... ora sono incazzato. Che vuoi?!')
     }
-    if (domanda === 'calmati' || domanda === 'modalità gentile') {
+    if (domanda === 'calmati') {
         modalitaIncazzata[chatId] = false
-        return m.reply('Ok, mi calmo. Come posso aiutarti?')
+        return m.reply('Ok mi calmo. Dimmi.')
     }
 
-    // 3. Chi sei
-    if (['chi sei', 'chi sei?'].includes(domanda)) {
-        return m.reply('Sono RLY BOT, il bot di Riley. Sono qui per aiutarti!')
-    }
-    if (domanda === 'sono riley') {
-        return m.reply('Riley! Capo, bentornato! Dimmi tutto.')
-    }
+    // CHI SEI
+    if (domanda.includes('chi sei')) return m.reply('Sono RLY BOT di Riley!')
+    if (domanda === 'sono riley') return m.reply('Capo! Bentornato!')
 
-    // 4. RISPOSTA "IA" OFFLINE
-    let base = modalitaIncazzata[chatId]? risposteIncazzate : risposteNormali
-    let risposta = base[Math.floor(Math.random() * base.length)]
-
-    // Inserisce la domanda nella risposta per sembrare più reale
-    risposta = risposta.replace('{text}', text.substring(0, 30))
-
-    // Se ha ricevuto affetto, aggiunge tono dolce
-    if(livelloAffetto[chatId] > 2 &&!modalitaIncazzata[chatId]){
-        risposta += " ❤️"
-    }
+    // RISPOSTA
+    let risposta = trovaRisposta(text, modalitaIncazzata[chatId])
+    if(livelloAffetto[chatId] > 2 &&!modalitaIncazzata[chatId]) risposta += " ❤️"
 
     await m.reply(risposta)
 }
@@ -99,8 +109,7 @@ handler.tags = ['tools']
 handler.help = ['bot <domanda>', 'bot on', 'bot off']
 
 handler.before = async function (m, { conn }) {
-    if (m.isBaileys) return
-    if (m.fromMe) return
+    if (m.isBaileys || m.fromMe) return
     const chatId = m.chat
     if (botAttivo[chatId] === false) return
     if (m.quoted && m.quoted.fromMe && m.text &&!m.text.startsWith('.')) {
