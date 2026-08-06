@@ -1,50 +1,42 @@
-import { G4F } from "g4f";
-
 let botAttivo = {}
 let chatHistory = {}
-const g4f = new G4F();
 
 let handler = m => m
 handler.all = async function(m, {conn}) {
     let chat = m.chat
     let text = m.text
-    if (!text) return
+    if (!text || text.startsWith('.') || m.fromMe) return
 
-    // REGOLA 1: se è.bot on/off lo gestisce il file bot-toggle.js
-    if (text.startsWith('.')) return
-    if (m.fromMe) return
-
-    // REGOLA 2: RISPONDE SOLO SE: bot è ON O se gli stai rispondendo
     let isReplyToBot = m.quoted && m.quoted.sender == conn.user.jid
     if (!botAttivo[chat] &&!isReplyToBot) return
-
-    // Se gli rispondi ma bot era OFF, lo riattiva solo per quella chat
     if (isReplyToBot &&!botAttivo[chat]) botAttivo[chat] = true
 
     await conn.sendPresenceUpdate('composing', chat)
 
-    try {
-        if(!chatHistory[chat]) chatHistory[chat] = [{role: "system", content: "Sei ℝ𝕃𝕐 𝔹𝕆𝕋. Italiano, diretto, amichevole, max 3 righe. Non essere robot."}]
+    let userMsg = text
+    if (isReplyToBot) userMsg = `Contesto: "${m.quoted.text}"\nRisposta: "${text}"`
 
-        // SE RISPONDI AL BOT GLI DAI IL CONTESTO
-        let userMsg = text
-        if (isReplyToBot) {
-            userMsg = `L'utente sta rispondendo a questo messaggio: "${m.quoted.text}"\nRisposta: "${text}"`
-        }
-
-        chatHistory[chat].push({role: "user", content: userMsg})
-        if(chatHistory[chat].length > 10) chatHistory[chat].splice(1,2)
-
-        const response = await g4f.chatCompletion(chatHistory[chat], {
-            model: "gpt-4o-mini",
-            provider: "Liaobots"
-        });
-
-        chatHistory[chat].push({role: "assistant", content: response})
-        conn.reply(chat, response, m)
-
-    } catch (e) {
-        console.log("AI ERROR:", e)
-    }
+    let risposta = await chiediAI(userMsg, chat)
+    conn.reply(chat, risposta, m)
 }
 export default handler
+
+async function chiediAI(prompt, chat){
+    if(!chatHistory[chat]) chatHistory[chat] = [{role: "system", content: "Sei RLY BOT. Italiano, diretto, max 3 righe."}]
+    chatHistory[chat].push({role: "user", content: prompt})
+    if(chatHistory[chat].length > 10) chatHistory[chat].splice(1,2)
+
+    try{
+        let r = await fetch('https://api.gptgo.ai/v1/chat/completions', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({model: "gpt-3.5-turbo", messages: chatHistory[chat]})
+        })
+        let json = await r.json()
+        let risposta = json.choices[0].message.content
+        chatHistory[chat].push({role: "assistant", content: risposta})
+        return risposta
+    }catch(e){
+        return "⚠️ Errore connessione. Riprova tra 3s"
+    }
+}
