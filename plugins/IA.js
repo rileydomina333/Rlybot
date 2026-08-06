@@ -1,63 +1,11 @@
+import fetch from 'node-fetch'
+
 // Memoria per modalità aggressiva per ogni chat
 let modalitaIncazzata = {}
 // Memoria per stato ON/OFF per ogni chat - default: attivo
 let botAttivo = {}
 // Memoria per affetto ricevuto - rende il bot più dolce
 let livelloAffetto = {}
-// Memoria conversazione per sembrare più umano
-let memoriaChat = {}
-
-// Database cervello offline
-const CERVELLO = {
-    saluti: ["ciao", "salve", "hey", "yo", "buongiorno", "buonasera"],
-    domande: ["come stai", "che fai", "dove sei", "che ore sono"],
-    aiuto: ["aiuto", "help", "aiutami", "non so"],
-    battute: ["battuta", "ridi", "fammi ridere", "scherzo"],
-    info: ["chi sei", "cosa sei", "che bot sei"]
-}
-
-const RISPOSTE = {
-    normali: {
-        saluti: ["Ciao! 👋 Come va?", "Ehilà! Tutto bene?", "Salve! Dimmi pure"],
-        come_stai: ["Sto benissimo! E tu?", "Tutto apposto, grazie. E tu come stai?", "Vivo e vegeto 😎"],
-        aiuto: ["Dimmi pure, con cosa ti aiuto?", "Sono qui per te. Cosa ti serve?", "Chiedi pure!"],
-        battute: [
-            "Cosa fa una mucca in discoteca? Il moooove 😂",
-            "Perché i programmatori odiano la natura? Troppi bug.",
-            "Cosa dice 0 a 8? Bella cintura!"
-        ],
-        info: ["Sono RLY BOT, il bot di Riley. Sono qui per aiutarti con tutto!", "Sono un'IA creata per Riley. Posso chiacchierare e aiutarti."],
-        default: ["Interessante... parlami di {text}", "Ok, quindi {text}. Cosa ne pensi?", "Mmm capisco. Vuoi approfondire {text}?"]
-    },
-    incazzati: {
-        saluti: ["Che vuoi?!", "Oh, ciao. Contento?", "Che palle..."],
-        come_stai: ["Male, a causa tua. E tu?", "Incazzato! Vedi un po' tu.", "Sto di merda."],
-        aiuto: ["Arrangiati!", "Non ho voglia. Cerca su Google.", "Che diavolo vuoi adesso?!"],
-        battute: ["Non ho voglia di ridere.", "Fai ridere tu.", "Smettila."],
-        info: ["Sono RLY BOT. E allora? Che vuoi?", "Sono il bot di Riley. Problemi?"],
-        default: ["Ma che cavolo dici?! {text}", "Spiegati meglio dannazione!", "Uffa... non ho capito {text}"]
-    },
-    dolci: [
-        "Aww 🥺 Ti voglio bene anch'io!",
-        "Grazie di cuore ❤️ Mi fai arrossire",
-        "Sei un amore! Cosa posso fare per te?",
-        "E io voglio bene a te!"
-    ],
-    dolciIncazzati: [
-        "Tsk... smettila... mi fai arrossire, dannazione.",
-        "Oh. Ehm. Grazie. Non fare che ci prendi gusto.",
-        "Maledizione, sei carino anche tu. Contento?"
-    ]
-}
-
-function trovaCategoria(testo) {
-    for(let cat in CERVELLO){
-        if(CERVELLO[cat].some(parola => testo.includes(parola))) return cat
-    }
-    return "default"
-}
-
-function random(arr){ return arr[Math.floor(Math.random() * arr.length)] }
 
 let rispostaIA = async (m, { conn, text, fullText }) => {
     const comandoCompleto = fullText.toLowerCase().trim()
@@ -67,7 +15,6 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
     // 0. Default attivo se non impostato
     if (botAttivo[chatId] === undefined) botAttivo[chatId] = true
     if (livelloAffetto[chatId] === undefined) livelloAffetto[chatId] = 0
-    if (!memoriaChat[chatId]) memoriaChat[chatId] = []
 
     // Comandi.bot on /.bot off
     if (comandoCompleto === '.bot on') {
@@ -90,8 +37,23 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
 
     if (triggerAffetto.some(frase => domanda.includes(frase))) {
         livelloAffetto[chatId] = Math.min(livelloAffetto[chatId] + 1, 5)
-        const risposte = modalitaIncazzata[chatId]? RISPOSTE.dolciIncazzati : RISPOSTE.dolci
-        return m.reply(random(risposte))
+
+        if (modalitaIncazzata[chatId]) {
+            const risposteIncazzateDolci = [
+                'Tsk... smettila... mi fai arrossire, dannazione.',
+                'Oh. Ehm. Grazie. Non fare che ci prendi gusto.',
+                'Mal... maledizione, sei carino anche tu. Contento?'
+            ]
+            return m.reply(risposteIncazzateDolci[Math.floor(Math.random() * risposteIncazzateDolci.length)])
+        } else {
+            const risposteDolci = [
+                'Aww 🥺 Ti voglio bene anch\'io! Mi hai fatto sorridere.',
+                'Grazie di cuore ❤️ Significa tanto per me.',
+                'Sei un amore! Conto su di te anche io.',
+                'E io voglio bene a te! Cosa posso fare per te ora?'
+            ]
+            return m.reply(risposteDolci[Math.floor(Math.random() * risposteDolci.length)])
+        }
     }
 
     // 2. Attiva/disattiva modalità aggressiva
@@ -116,21 +78,84 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
 
     await conn.sendPresenceUpdate('composing', m.chat)
 
-    // 5. GENERA RISPOSTA OFFLINE
-    let categoria = trovaCategoria(domanda)
-    let tipoRisposte = modalitaIncazzata[chatId]? RISPOSTE.incazzati : RISPOSTE.normali
+    try {
+        // Se ha ricevuto affetto, diventa più caldo
+        let extraTono = ''
+        if (livelloAffetto[chatId] > 0 &&!modalitaIncazzata[chatId]) {
+            extraTono = ' L\'utente è stato gentile con te prima, sii più caloroso e amichevole.'
+        }
 
-    let risposta = random(tipoRisposte[categoria] || tipoRisposte.default)
-    risposta = risposta.replace('{text}', text.slice(0, 30))
+        let systemPrompt = modalitaIncazzata[chatId]
+       ? `Sei RLY BOT in modalità incazzata. Tono aggressivo e sarcastico. Sii breve, max 3 righe. Rispondi in italiano.`
+            : `Sei RLY BOT, il bot di Riley. Sei gentile, educato e disponibile. Rispondi in italiano, max 4 righe.` + extraTono
 
-    // Bonus affetto
-    if(livelloAffetto[chatId] > 2 &&!modalitaIncazzata[chatId]) risposta += " ❤️"
+        const prompt = `${systemPrompt}\nUtente: ${text}\nRLY BOT:`
 
-    // Salva in memoria
-    memoriaChat[chatId].push({user: text, bot: risposta})
-    if(memoriaChat[chatId].length > 5) memoriaChat[chatId].shift() // tieni solo ultime 5
+        // API ONLINE GRATIS SENZA KEY - Aggiornate Agosto 2026
+        const apis = [
+            // 1. DuckDuckGo AI - gratis, veloce
+            async () => {
+                let res = await fetch(`https://api.duck.ai/chat`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({messages: [{role: "user", content: prompt}], model: "claude-3-haiku"})
+                })
+                let data = await res.json()
+                return data.message
+            },
+            // 2. HuggingFace Free Inference
+            async () => {
+                let res = await fetch(`https://api-inference.huggingface.co/models/meta-llama/Llama-3.1-8B-Instruct`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({inputs: prompt, parameters: {max_new_tokens: 150}})
+                })
+                let data = await res.json()
+                return data[0]?.generated_text?.split('RLY BOT:')[1]
+            },
+            // 3. Gemini via proxy pubblico
+            async () => {
+                let res = await fetch(`https://gemini-proxy-1.tiiny.site/chat`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({prompt: prompt})
+                })
+                let data = await res.json()
+                return data.response
+            }
+        ]
 
-    await m.reply(risposta)
+        let risposta = null
+        for (let fn of apis) {
+            try {
+                risposta = await Promise.race([
+                    fn(),
+                    new Promise((_, reject) => setTimeout(() => reject('timeout'), 15000))
+                ])
+                if (risposta && risposta.length > 5) break
+            } catch { continue }
+        }
+
+        if (!risposta) throw 'Nessuna API ha risposto'
+
+        risposta = risposta.replace(/RLY BOT:|Assistant:/gi, '').trim()
+        if(risposta.length > 600) risposta = risposta.substring(0, 600) + '...'
+
+        if (risposta.includes('I cannot') || risposta.includes("I don't know")) {
+            risposta = modalitaIncazzata[chatId]
+           ? 'MA CHE NE SO, DANNATAMENTE?! Chiedi altro!'
+                : 'Mi dispiace, su questo non ho info. Riformula?'
+        }
+
+        await m.reply(risposta)
+
+    } catch (e) {
+        console.log(e)
+        let msgErrore = modalitaIncazzata[chatId]
+       ? 'È ANDATO TUTTO A MERDA! I server sono morti! Riprova!'
+            : 'Mi spiace, i server sono lenti. Riprova tra 10 secondi?'
+        m.reply(msgErrore)
+    }
 }
 
 // Handler comandi
