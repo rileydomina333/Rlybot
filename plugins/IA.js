@@ -3,7 +3,30 @@ import fetch from 'node-fetch'
 let modalitaIncazzata = {}
 let botAttivo = {}
 let livelloAffetto = {}
-let cacheRisposte = {} // cache per risposte veloci
+
+// Cervello OFFLINE per risposte immediate
+const CERVELLO_OFFLINE = {
+    "ciao|salve|hey": ["Ciao! 👋", "Ehilà!", "Salve!"],
+    "come stai|tutto bene": ["Sto benissimo! E tu?", "Alla grande ⚡", "Tutto ok"],
+    "battuta|ridi": ["Perché il programmatore ha annegato? Aveva troppi bug 😂", "Cosa dice 0 a 8? Bella cintura!"],
+    "chi sei": ["Sono RLY BOT di Riley ⚡"],
+    "aiuto|help": ["Dimmi pure, cosa ti serve?", "Sono qui per aiutarti!"],
+    "grazie|ty": ["Di nulla! ❤️", "Figurati!"],
+    "riley": ["Riley è il capo! 👑"],
+    "che ore|ora": [new Date().toLocaleTimeString('it-IT')],
+    "meteo": ["Non ho i dati ora, ma spero ci sia sole ☀️"]
+}
+
+function cercaOffline(testo) {
+    testo = testo.toLowerCase()
+    for(let key in CERVELLO_OFFLINE){
+        if(key.split('|').some(k => testo.includes(k))){
+            const arr = CERVELLO_OFFLINE[key]
+            return arr[Math.floor(Math.random() * arr.length)]
+        }
+    }
+    return null
+}
 
 let rispostaIA = async (m, { conn, text, fullText }) => {
     const comandoCompleto = fullText.toLowerCase().trim()
@@ -14,62 +37,38 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
     if (livelloAffetto[chatId] === undefined) livelloAffetto[chatId] = 0
 
     // Comandi
-    if (comandoCompleto === '.bot on') {
-        botAttivo[chatId] = true
-        return m.reply('RLY BOT VELOCE attivato ⚡')
-    }
-    if (comandoCompleto === '.bot off') {
-        botAttivo[chatId] = false
-        return m.reply('RLY BOT disattivato ❌')
-    }
+    if (comandoCompleto === '.bot on') return m.reply('RLY BOT VELOCE attivato ⚡')
+    if (comandoCompleto === '.bot off') { botAttivo[chatId] = false; return m.reply('RLY BOT disattivato ❌') }
     if (!botAttivo[chatId]) return
     if (!text) return m.reply('Dimmi pure!')
 
-    // AFFETTO - risposta istantanea
-    const triggerAffetto = ['ti voglio bene', 'ti amo', 'sei il migliore', 'grazie', 'sei dolce']
-    if (triggerAffetto.some(frase => domanda.includes(frase))) {
-        livelloAffetto[chatId] = Math.min(livelloAffetto[chatId] + 1, 5)
-        const risp = modalitaIncazzata[chatId]
-          ? ['Tsk... grazie. Contento ora?', 'Smettila di farmi arrossire...']
-            : ['Aww 🥺 Ti voglio bene anch\'io!', 'Grazie ❤️ Sei un amore!']
-        return m.reply(risp[Math.floor(Math.random() * risp.length)])
+    // AFFETTO - istantaneo
+    if (['ti voglio bene','ti amo','grazie'].some(f => domanda.includes(f))) {
+        livelloAffetto[chatId]++
+        return m.reply(modalitaIncazzata[chatId]? 'Tsk... grazie.' : 'Aww 🥺 Ti voglio bene anch\'io!')
     }
 
     // MODALITA
-    if (domanda === 'incazzati') {
-        modalitaIncazzata[chatId] = true
-        return m.reply('Ok sono incazzato. Sbrigati.')
-    }
-    if (domanda === 'calmati') {
-        modalitaIncazzata[chatId] = false
-        return m.reply('Ok calmo. Dimmi.')
-    }
+    if (domanda === 'incazzati') { modalitaIncazzata[chatId] = true; return m.reply('Ok incazzato. Sbrigati.') }
+    if (domanda === 'calmati') { modalitaIncazzata[chatId] = false; return m.reply('Ok calmo.') }
 
-    // CHI SEI - risposta istantanea
-    if (['chi sei', 'chi sei?'].includes(domanda)) {
-        return m.reply('Sono RLY BOT di Riley. Bot veloce ⚡')
-    }
-    if (domanda === 'sono riley') {
-        return m.reply('Capo Riley! Bentornato!')
-    }
+    // 1. PROVA OFFLINE PRIMA - 0.1s
+    let rispostaOffline = cercaOffline(domanda)
+    if(rispostaOffline) return m.reply(rispostaOffline)
 
-    // CACHE: se abbiamo già risposto a questa domanda, la rispediamo subito
-    if(cacheRisposte[domanda]){
-        return m.reply(cacheRisposte[domanda] + ' ⚡')
-    }
-
+    // 2. SE NON LO SA, VA ONLINE - max 5s
     await conn.sendPresenceUpdate('composing', m.chat)
 
     try {
         let tono = modalitaIncazzata[chatId]
-      ? `Rispondi in italiano, tono incazzato, sarcastico, max 2 righe.`
-            : `Rispondi in italiano, gentile e diretto, max 3 righe.` + (livelloAffetto[chatId] > 0? ' Sii caloroso.' : '')
+     ? `Rispondi in italiano, tono incazzato, max 2 righe.`
+            : `Rispondi in italiano, gentile, max 3 righe.`
 
         const prompt = `${tono}\nDomanda: ${text}`
 
-        // SOLO 1 API VELOCE: DuckDuckGo AI - è la più veloce e non cade mai
+        // Usiamo solo 1 API ma con timeout cortissimo
         const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 8000) // 8s max
+        setTimeout(() => controller.abort(), 5000) // 5s e basta
 
         let res = await fetch(`https://api.duck.ai/chat`, {
             method: 'POST',
@@ -77,32 +76,22 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 messages: [{role: "user", content: prompt}],
-                model: "gpt-4o-mini" // il più veloce
+                model: "claude-3-haiku" // il più veloce
             })
         })
-        clearTimeout(timeout)
 
         let data = await res.json()
-        let risposta = data.message || data.response
-
-        if (!risposta) throw 'vuota'
-
-        risposta = risposta.trim()
-        if(risposta.length > 400) risposta = risposta.substring(0, 400) + '...'
-
-        // Salva in cache
-        cacheRisposte[domanda] = risposta
-        // pulisci cache se diventa troppo grande
-        if(Object.keys(cacheRisposte).length > 100) delete cacheRisposte[Object.keys(cacheRisposte)[0]]
+        let risposta = data.message || "Non ho capito"
+        risposta = risposta.substring(0, 300)
 
         await m.reply(risposta)
 
     } catch (e) {
         console.log(e)
-        // Fallback istantaneo se l'API è lenta
+        // FALLBACK Istantaneo se online fallisce
         const fallback = modalitaIncazzata[chatId]
-      ? 'Non ho tempo ora! Riprova!'
-            : 'Server lento. Riprova tra 2s.'
+     ? 'Non ho internet ora. Chiedi qualcosa di semplice.'
+            : 'Sono un po\' lento ora. Riprova con "ciao" o "battuta"'
         m.reply(fallback)
     }
 }
@@ -112,7 +101,7 @@ let handler = async (m, { conn, text }) => {
 }
 handler.command = /^bot(?:\s+(.+))?$/i
 handler.tags = ['tools']
-handler.help = ['bot <domanda>', 'bot on', 'bot off']
+handler.help = ['bot <domanda>']
 
 handler.before = async function (m, { conn }) {
     if (m.isBaileys || m.fromMe) return
