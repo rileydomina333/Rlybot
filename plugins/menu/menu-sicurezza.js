@@ -66,7 +66,7 @@ function generateMenuText(m, chat, userId, groupId, botName, usedPrefix) {
     return `
 ▰▰▰▰▰▰▰▰▰▰▰▰▰▰
     👑  ${botName}  👑
-▰▰
+▰▰▰▰▰▰▰▰▰▰▰▰▰▰
 
 [ PROFILO ]
 ► Utente   : ${m.pushName}
