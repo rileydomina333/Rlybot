@@ -1,8 +1,7 @@
 import fetch from 'node-fetch';
 
 let botAttivo = global.botAttivo || (global.botAttivo = {});
-const GEMINI_KEY = 'AQ.Ab8RN6IZFlErNXaaHoNHtNOrMwbcyga-
-Ept5SzzEs2qfKgNF9w'; // <--- METTI LA TUA KEY QUI
+const GEMINI_KEY = 'AQ.Ab8RN6IZFlErNXaaHoNHtNOrMwbcygaEpt5SzzEs2qfKgNF9w'; // <--- METTI LA TUA KEY QUI
 
 async function chiediAGemini(prompt, history = []) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
