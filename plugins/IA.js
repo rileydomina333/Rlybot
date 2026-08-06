@@ -1,95 +1,66 @@
 import fetch from 'node-fetch';
 
 let botAttivo = global.botAttivo || (global.botAttivo = {});
-let chatHistory = global.chatHistory || (global.chatHistory = {}); // { chatid: [messaggi] }
-const GEMINI_KEY = 'AQ.Ab8RN6IZFlErNXaaHoNHtNOrMwbcyga-
-Ept5SzzEs2qfKgNF9w';
+let chatHistory = global.chatHistory || (global.chatHistory = {});
 
-const PERSONALITA = `Sei ℝ𝕃𝕐 𝔹𝕆𝕋.
-Regole:
-1. Rispondi in italiano, diretto, amichevole e con un po' di sass
-2. Max 3 righe per risposta
-3. Usa emoji solo 1-2 max
-4. Ricorda il nome dell'utente se te lo dice
-5. Se non sai qualcosa dillo`;
+const PERSONALITA = `Sei ℝ𝕃𝕐 𝔹𝕆𝕋. Rispondi in italiano, diretto, amichevole, max 3 righe.`;
 
-async function chiediAGemini(chatId, prompt) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
-
-    // Prendi ultime 10 memorie
+async function chiediALLama(chatId, prompt) {
     let history = chatHistory[chatId] || [];
-    history = history.slice(-10);
+    let messages = [{ role: "system", content: PERSONALITA }];
 
-    const contents = [
-        { role: "user", parts: [{ text: PERSONALITA }] },
-       ...history,
-        { role: "user", parts: [{ text: prompt }] }
-    ];
+    history.slice(-10).forEach(m => messages.push(m));
+    messages.push({ role: "user", content: prompt });
 
-    let res = await fetch(url, {
+    let res = await fetch('https://text.pollinations.ai/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents })
+        body: JSON.stringify({ messages, model: "llama3.1" })
     });
 
-    let json = await res.json();
-    if(!json.candidates) throw new Error(JSON.stringify(json));
-
-    let reply = json.candidates[0].content.parts[0].text;
+    let reply = await res.text();
 
     // SALVA MEMORIA
     if(!chatHistory[chatId]) chatHistory[chatId] = [];
-    chatHistory[chatId].push({ role: "user", parts: [{ text: prompt }] });
-    chatHistory[chatId].push({ role: "model", parts: [{ text: reply }] });
-    if(chatHistory[chatId].length > 20) chatHistory[chatId].splice(0, 2); // tieni solo 10 scambi
+    chatHistory[chatId].push({ role: "user", content: prompt });
+    chatHistory[chatId].push({ role: "assistant", content: reply });
+    if(chatHistory[chatId].length > 20) chatHistory[chatId].splice(0, 2);
 
     return reply;
 }
 
-let handler = async (m, { conn, text, args, usedPrefix }) => {
+let handler = async (m, { conn, args, usedPrefix }) => {
     const chatId = m.chat;
-
     if (args[0]?.toLowerCase() === 'on') {
         botAttivo[chatId] = true;
-        return m.reply(`✅ *ℝ𝕃𝕐 𝔹𝕆𝕋 PRO ATTIVATA*\n\nModello: Gemini 1.5 Flash\nMemoria: ON 10 messaggi\nRispondo a tutti.\n\n*${usedPrefix}bot off* per spegnere\n*${usedPrefix}bot reset* per pulire memoria`);
+        return m.reply(`✅ *ℝ𝕃𝕐 𝔹𝕆𝕋 LLAMA ATTIVATA*\n\nModello: Llama 3.1 FREE\nNo Key | Memoria: 10 msg\n*${usedPrefix}bot off* per spegnere`);
     }
     if (args[0]?.toLowerCase() === 'off') {
         botAttivo[chatId] = false;
-        return m.reply(`❌ *ℝ𝕃𝕐 𝔹𝕆𝕋 DISATTIVATA*\n\nSono muta.`);
+        return m.reply(`❌ *ℝ𝕃𝕐 𝔹𝕆𝕋 DISATTIVATA*`);
     }
     if (args[0]?.toLowerCase() === 'reset') {
         chatHistory[chatId] = [];
-        return m.reply(`🧠 Memoria pulita. Ricominciamo da 0`);
+        return m.reply(`🧠 Memoria pulita`);
     }
     if (!args[0]) {
         const stato = botAttivo[chatId]? '🟢 ATTIVA' : '🔴 DISATTIVA';
-        const mem = chatHistory[chatId]?.length || 0;
-        return m.reply(`🤖 *ℝ𝕃𝕐 𝔹𝕆𝕋 PRO*\nStato: ${stato}\nMemoria: ${mem/2} messaggi\n\n*${usedPrefix}bot on*\n*${usedPrefix}bot off*\n*${usedPrefix}bot reset*`);
+        return m.reply(`🤖 *ℝ𝕃𝕐 𝔹𝕆𝕋*\nStato: ${stato}\n*${usedPrefix}bot on/off/reset*`);
     }
 }
 
-// ASCOLTA TUTTI I MESSAGGI
 handler.before = async (m, { conn }) => {
-    const chatId = m.chat;
-    if (!botAttivo[chatId]) return; // se off = zitto
-    if (m.isBaileys) return;
-    if (m.text.startsWith('.')) return;
-    if (!m.text) return;
-
+    if (!botAttivo[m.chat]) return;
+    if (m.isBaileys || m.text.startsWith('.') ||!m.text) return;
     await conn.sendPresenceUpdate('composing', m.chat);
-    await new Promise(r => setTimeout(r, 700));
-
     try {
-        let reply = await chiediAGemini(chatId, m.text);
+        let reply = await chiediALLama(m.chat, m.text);
         await conn.reply(m.chat, reply, m);
     } catch (e) {
-        console.log(e);
-        await conn.reply(m.chat, "⚠️ Errore API. Controlla key o quota", m);
+        await conn.reply(m.chat, "⚠️ Errore server. Riprova", m);
     }
 }
-
 handler.help = ['bot on/off/reset'];
 handler.tags = ['ai'];
 handler.command = /^bot$/i;
-
 export default handler;
