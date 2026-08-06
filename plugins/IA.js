@@ -1,77 +1,94 @@
 import fetch from 'node-fetch';
 
 let botAttivo = global.botAttivo || (global.botAttivo = {});
-const GEMINI_KEY = 'AQ.Ab8RN6IZFlErNXaaHoNHtNOrMwbcygaEpt5SzzEs2qfKgNF9w'; // <--- METTI LA TUA KEY QUI
+let chatHistory = global.chatHistory || (global.chatHistory = {}); // { chatid: [messaggi] }
+const GEMINI_KEY = 'AQ.Ab8RN6IZFlErNXaaHoNHtNOrMwbcyga-
+Ept5SzzEs2qfKgNF9w';
 
-async function chiediAGemini(prompt, history = []) {
+const PERSONALITA = `Sei ℝ𝕃𝕐 𝔹𝕆𝕋.
+Regole:
+1. Rispondi in italiano, diretto, amichevole e con un po' di sass
+2. Max 3 righe per risposta
+3. Usa emoji solo 1-2 max
+4. Ricorda il nome dell'utente se te lo dice
+5. Se non sai qualcosa dillo`;
+
+async function chiediAGemini(chatId, prompt) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
 
-    const body = {
-        contents: [
-            { role: "user", parts: [{ text: "Sei ℝ𝕃𝕐 𝔹𝕆𝕋. Rispondi in italiano, amichevole e diretto. Max 3 righe." }] },
-          ...history,
-            { role: "user", parts: [{ text: prompt }] }
-        ]
-    };
+    // Prendi ultime 10 memorie
+    let history = chatHistory[chatId] || [];
+    history = history.slice(-10);
+
+    const contents = [
+        { role: "user", parts: [{ text: PERSONALITA }] },
+       ...history,
+        { role: "user", parts: [{ text: prompt }] }
+    ];
 
     let res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        body: JSON.stringify({ contents })
     });
 
     let json = await res.json();
-    return json.candidates[0].content.parts[0].text;
+    if(!json.candidates) throw new Error(JSON.stringify(json));
+
+    let reply = json.candidates[0].content.parts[0].text;
+
+    // SALVA MEMORIA
+    if(!chatHistory[chatId]) chatHistory[chatId] = [];
+    chatHistory[chatId].push({ role: "user", parts: [{ text: prompt }] });
+    chatHistory[chatId].push({ role: "model", parts: [{ text: reply }] });
+    if(chatHistory[chatId].length > 20) chatHistory[chatId].splice(0, 2); // tieni solo 10 scambi
+
+    return reply;
 }
 
 let handler = async (m, { conn, text, args, usedPrefix }) => {
     const chatId = m.chat;
 
-    // COMANDI ON/OFF
     if (args[0]?.toLowerCase() === 'on') {
         botAttivo[chatId] = true;
-        return m.reply(`✅ *ℝ𝕃𝕐 𝔹𝕆𝕋 AI GEMINI ATTIVATA*\n\nOra rispondo a tutti i messaggi.\n*${usedPrefix}bot off* per spegnere`);
+        return m.reply(`✅ *ℝ𝕃𝕐 𝔹𝕆𝕋 PRO ATTIVATA*\n\nModello: Gemini 1.5 Flash\nMemoria: ON 10 messaggi\nRispondo a tutti.\n\n*${usedPrefix}bot off* per spegnere\n*${usedPrefix}bot reset* per pulire memoria`);
     }
     if (args[0]?.toLowerCase() === 'off') {
         botAttivo[chatId] = false;
-        return m.reply(`❌ *ℝ𝕃𝕐 𝔹𝕆𝕋 AI DISATTIVATA*\n\nNon risponderò più.`);
+        return m.reply(`❌ *ℝ𝕃𝕐 𝔹𝕆𝕋 DISATTIVATA*\n\nSono muta.`);
+    }
+    if (args[0]?.toLowerCase() === 'reset') {
+        chatHistory[chatId] = [];
+        return m.reply(`🧠 Memoria pulita. Ricominciamo da 0`);
     }
     if (!args[0]) {
         const stato = botAttivo[chatId]? '🟢 ATTIVA' : '🔴 DISATTIVA';
-        return m.reply(`🤖 *ℝ𝕃𝕐 𝔹𝕆𝕋 AI*\nStato: ${stato}\n*${usedPrefix}bot on* | Attiva\n*${usedPrefix}bot off* | Disattiva`);
+        const mem = chatHistory[chatId]?.length || 0;
+        return m.reply(`🤖 *ℝ𝕃𝕐 𝔹𝕆𝕋 PRO*\nStato: ${stato}\nMemoria: ${mem/2} messaggi\n\n*${usedPrefix}bot on*\n*${usedPrefix}bot off*\n*${usedPrefix}bot reset*`);
     }
 }
 
 // ASCOLTA TUTTI I MESSAGGI
 handler.before = async (m, { conn }) => {
     const chatId = m.chat;
-    let text = m.text;
-    if (!text) return;
-
-    // REGOLA NUOVA: RISPONDE SOLO SE bot ON
-    if (!botAttivo[chatId]) return;
-
+    if (!botAttivo[chatId]) return; // se off = zitto
     if (m.isBaileys) return;
-    if (text.startsWith('.')) return;
+    if (m.text.startsWith('.')) return;
+    if (!m.text) return;
 
     await conn.sendPresenceUpdate('composing', m.chat);
+    await new Promise(r => setTimeout(r, 700));
 
     try {
-        let history = [];
-        // Se rispondi al bot gli passo anche il contesto di cosa ha detto lui
-        if (m.quoted && m.quoted.sender === conn.user.jid) {
-            history.push({ role: "assistant", parts: [{ text: m.quoted.text }] });
-        }
-
-        let reply = await chiediAGemini(text, history);
+        let reply = await chiediAGemini(chatId, m.text);
         await conn.reply(m.chat, reply, m);
     } catch (e) {
         console.log(e);
-        await conn.reply(m.chat, "⚠️ Errore Gemini. Controlla la key", m);
+        await conn.reply(m.chat, "⚠️ Errore API. Controlla key o quota", m);
     }
 }
 
-handler.help = ['bot on/off'];
+handler.help = ['bot on/off/reset'];
 handler.tags = ['ai'];
 handler.command = /^bot$/i;
 
