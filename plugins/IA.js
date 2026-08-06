@@ -1,9 +1,31 @@
-import fetch from 'node-fetch' // questo ce l'hai già in Baileys
-
 // Memorie per chat
 let modalitaIncazzata = {}
 let botAttivo = {}
 let livelloAffetto = {}
+
+// Database di risposte per sembrare "intelligente"
+const risposteNormali = [
+    "Interessante quello che dici. Dimmi di più 👀",
+    "Ci ho pensato e secondo me hai ragione. Cosa ne pensi di...?",
+    "Ok, ti spiego: {text} dipende da tanti fattori. Vuoi che approfondisca?",
+    "Mmm bella domanda. Da quello che so {text} è così. Ti serve altro?",
+    "Capito! Allora ti consiglio di provare con {text}. Funziona sempre."
+]
+
+const risposteIncazzate = [
+    "Ma che cavolo vuoi?! Spiegati meglio dannazione!",
+    "Uffa... non ho voglia. Riformula.",
+    "Senti, {text} non è così difficile da capire, merda!",
+    "Oh ma la smetti? Chiedi qualcosa di sensato!",
+    "Maledizione, sto cercando di aiutarti e tu fai {text}"
+]
+
+const risposteDolci = [
+    "Aww 🥺 Grazie, mi fai commuovere!",
+    "Anche io ti voglio bene ❤️ Cosa posso fare per te?",
+    "Sei un tesoro! Dimmi pure, sono qui per te.",
+    "Mi hai fatto sorridere! Raccontami altro."
+]
 
 let rispostaIA = async (m, { conn, text, fullText }) => {
     const comandoCompleto = fullText.toLowerCase().trim()
@@ -30,13 +52,10 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
     const triggerAffetto = ['ti voglio bene', 'ti amo', 'sei il migliore', 'sei un tesoro', 'ti adoro', 'grazie', 'sei carino', 'mi piaci', 'sei dolce']
     if (triggerAffetto.some(frase => domanda.includes(frase))) {
         livelloAffetto[chatId] = Math.min(livelloAffetto[chatId] + 1, 5)
-        if (modalitaIncazzata[chatId]) {
-            const risp = ['Tsk... smettila... mi fai arrossire, dannazione.', 'Oh. Ehm. Grazie. Non fare che ci prendi gusto.']
-            return m.reply(risp[Math.floor(Math.random() * risp.length)])
-        } else {
-            const risp = ['Aww 🥺 Ti voglio bene anch\'io!', 'Grazie di cuore ❤️ Significa tanto per me.', 'Sei un amore!']
-            return m.reply(risp[Math.floor(Math.random() * risp.length)])
-        }
+        const risp = modalitaIncazzata[chatId]
+           ? ['Tsk... smettila... mi fai arrossire, dannazione.', 'Oh. Ehm. Grazie.']
+            : risposteDolci
+        return m.reply(risp[Math.floor(Math.random() * risp.length)])
     }
 
     // 2. Modalità
@@ -54,65 +73,22 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
         return m.reply('Sono RLY BOT, il bot di Riley. Sono qui per aiutarti!')
     }
     if (domanda === 'sono riley') {
-        return m.reply('Riley! Capo, bentornato!')
+        return m.reply('Riley! Capo, bentornato! Dimmi tutto.')
     }
 
-    try {
-        let extraTono = ''
-        if (livelloAffetto[chatId] > 0 &&!modalitaIncazzata[chatId]) {
-            extraTono = ' L\'utente è stato gentile, sii più caloroso.'
-        }
+    // 4. RISPOSTA "IA" OFFLINE
+    let base = modalitaIncazzata[chatId]? risposteIncazzate : risposteNormali
+    let risposta = base[Math.floor(Math.random() * base.length)]
 
-        let systemPrompt = modalitaIncazzata[chatId]
-        ? `Sei RLY BOT in modalità incazzata. Tono aggressivo, sarcastico, risposte corte max 3 righe. Rispondi in italiano.`
-            : `Sei RLY BOT, il bot di Riley. Sei gentile, utile e disponibile. Rispondi in italiano, max 4 righe.` + extraTono
+    // Inserisce la domanda nella risposta per sembrare più reale
+    risposta = risposta.replace('{text}', text.substring(0, 30))
 
-        const prompt = `${systemPrompt}\nUtente: ${text}\nRLY BOT:`
-
-        // API che non danno timeout - giro in cascata
-        const apis = [
-            async () => {
-                // DuckDuckGo AI - gratis, veloce
-                let res = await fetch(`https://api.duckgo.com/?q=${encodeURIComponent(text)}&format=json&no_redirect=1&no_html=1`)
-                let data = await res.json()
-                return data.AbstractText || data.Answer
-            },
-            async () => {
-                // HuggingFace free inference
-                let res = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({inputs: prompt, parameters: {max_new_tokens: 200}})
-                })
-                let data = await res.json()
-                return data[0]?.generated_text?.split('RLY BOT:')[1]
-            },
-            async () => {
-                // Fallback finale
-                return `Non ho internet per rispondere ora. Riprova tra 1 min.`
-            }
-        ]
-
-        let risposta = null
-        for(let fn of apis){
-            try{
-                risposta = await fn()
-                if(risposta && risposta.length > 5) break
-            }catch{}
-        }
-
-        if(!risposta) risposta = "Mi spiace, tutti i server sono occupati. Riprova."
-
-        // Pulisci
-        risposta = risposta.replace(/RLY BOT:|Assistant:/gi, '').trim()
-        if(risposta.length > 700) risposta = risposta.substring(0, 700) + '...'
-
-        await m.reply(risposta)
-
-    } catch (e) {
-        console.log(e)
-        m.reply('Errore. Riprova.')
+    // Se ha ricevuto affetto, aggiunge tono dolce
+    if(livelloAffetto[chatId] > 2 &&!modalitaIncazzata[chatId]){
+        risposta += " ❤️"
     }
+
+    await m.reply(risposta)
 }
 
 let handler = async (m, { conn, text }) => {
