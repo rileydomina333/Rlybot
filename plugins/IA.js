@@ -1,20 +1,9 @@
-import { pipeline } from '@xenova/transformers'
+import fetch from 'node-fetch' // questo ce l'hai già in Baileys
 
 // Memorie per chat
 let modalitaIncazzata = {}
 let botAttivo = {}
 let livelloAffetto = {}
-let generatore = null // lo carichiamo 1 volta sola
-
-// Carica il modello al primo avvio - ci mette 30s la prima volta
-const caricaModello = async () => {
-    if(!generatore){
-        console.log('[RLY BOT] Carico modello IA... attendi 30s la prima volta')
-        generatore = await pipeline('text-generation', 'Xenova/Qwen2-0.5B-Instruct')
-        console.log('[RLY BOT] Modello pronto ✅')
-    }
-}
-caricaModello()
 
 let rispostaIA = async (m, { conn, text, fullText }) => {
     const comandoCompleto = fullText.toLowerCase().trim()
@@ -45,7 +34,7 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
             const risp = ['Tsk... smettila... mi fai arrossire, dannazione.', 'Oh. Ehm. Grazie. Non fare che ci prendi gusto.']
             return m.reply(risp[Math.floor(Math.random() * risp.length)])
         } else {
-            const risp = ['Aww 🥺 Ti voglio bene anch\'io!', 'Grazie di cuore ❤️ Significa tanto per me.']
+            const risp = ['Aww 🥺 Ti voglio bene anch\'io!', 'Grazie di cuore ❤️ Significa tanto per me.', 'Sei un amore!']
             return m.reply(risp[Math.floor(Math.random() * risp.length)])
         }
     }
@@ -68,9 +57,6 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
         return m.reply('Riley! Capo, bentornato!')
     }
 
-    await conn.sendPresenceUpdate('composing', m.chat)
-    await caricaModello() // assicurati sia caricato
-
     try {
         let extraTono = ''
         if (livelloAffetto[chatId] > 0 &&!modalitaIncazzata[chatId]) {
@@ -78,25 +64,54 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
         }
 
         let systemPrompt = modalitaIncazzata[chatId]
-         ? `Sei RLY BOT in modalità incazzata. Tono aggressivo, sarcastico, breve. Rispondi in italiano.`
-            : `Sei RLY BOT, il bot di Riley. Sei gentile, utile e disponibile. Rispondi in italiano, max 4 frasi.` + extraTono
+        ? `Sei RLY BOT in modalità incazzata. Tono aggressivo, sarcastico, risposte corte max 3 righe. Rispondi in italiano.`
+            : `Sei RLY BOT, il bot di Riley. Sei gentile, utile e disponibile. Rispondi in italiano, max 4 righe.` + extraTono
 
-        const prompt = `<|system|>${systemPrompt}<|user|>${text}<|assistant|>`
+        const prompt = `${systemPrompt}\nUtente: ${text}\nRLY BOT:`
 
-        const output = await generatore(prompt, {
-            max_new_tokens: 150,
-            temperature: 0.9,
-            top_p: 0.95,
-        })
+        // API che non danno timeout - giro in cascata
+        const apis = [
+            async () => {
+                // DuckDuckGo AI - gratis, veloce
+                let res = await fetch(`https://api.duckgo.com/?q=${encodeURIComponent(text)}&format=json&no_redirect=1&no_html=1`)
+                let data = await res.json()
+                return data.AbstractText || data.Answer
+            },
+            async () => {
+                // HuggingFace free inference
+                let res = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({inputs: prompt, parameters: {max_new_tokens: 200}})
+                })
+                let data = await res.json()
+                return data[0]?.generated_text?.split('RLY BOT:')[1]
+            },
+            async () => {
+                // Fallback finale
+                return `Non ho internet per rispondere ora. Riprova tra 1 min.`
+            }
+        ]
 
-        let risposta = output[0].generated_text.split("<|assistant|>")[1].trim()
-        if(!risposta || risposta.length < 3) risposta = "Non ho capito. Puoi ripetere?"
+        let risposta = null
+        for(let fn of apis){
+            try{
+                risposta = await fn()
+                if(risposta && risposta.length > 5) break
+            }catch{}
+        }
+
+        if(!risposta) risposta = "Mi spiace, tutti i server sono occupati. Riprova."
+
+        // Pulisci
+        risposta = risposta.replace(/RLY BOT:|Assistant:/gi, '').trim()
+        if(risposta.length > 700) risposta = risposta.substring(0, 700) + '...'
 
         await m.reply(risposta)
 
     } catch (e) {
         console.log(e)
-        m.reply('Errore IA. Riavvia il bot.')
+        m.reply('Errore. Riprova.')
     }
 }
 
