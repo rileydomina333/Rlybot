@@ -20,11 +20,9 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         caption: menuText,
         footer: footerText,
         buttons: [
+            { buttonId: `${usedPrefix}attiva`, buttonText: { displayText: '✅ Attiva' }, type: 1 },
+            { buttonId: `${usedPrefix}disabilita`, buttonText: { displayText: '❌ Disattiva' }, type: 1 },
             { buttonId: `${usedPrefix}menu`, buttonText: { displayText: '💠 Menu Principale' }, type: 1 },
-            { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '💠 Menu Admin' }, type: 1 },
-            { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '💠 Menu Owner' }, type: 1 },
-            { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '💠 Menu Gruppo' }, type: 1 },
-            { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '💠 Menu Mod' }, type: 1 },
         ],
         viewOnce: true,
         headerType: 4,
@@ -38,7 +36,7 @@ handler.command = /^(menusicurezza|securitymenu|menusecurity|safety)$/i;
 export default handler;
 
 function generateMenuText(chat, userId, groupId, botName, usedPrefix) {
-    const vs = global.vs || '1.5.0';
+    const vs = global.vs || '1.0.0';
     
     const functions = {
         "Anti Link": !!chat?.antiLink,
@@ -55,30 +53,35 @@ function generateMenuText(chat, userId, groupId, botName, usedPrefix) {
         "Anti Bot": !!chat?.antibot,
         "Anti Media": !!chat?.antimedia,
         "Anti TikTok": !!chat?.antitiktok,
-        "Anti Bot": !!chat?.antibot,
-        "Anti gore": !!chat?.antigore,       
-        "Anti nuke": !!chat?.antinuke
+        "Anti Gore": !!chat?.antigore,       
+        "Anti Nuke": !!chat?.antinuke
     };
 
     const statusList = Object.entries(functions)
-        .map(([name, state]) => `┃ ${state ? '🟢' : '🔴'} *${name}*`)
+        .map(([name, state]) => `► ${name.padEnd(14)} | ${state ? '🟢' : '🔴'}`)
         .join('\n');
 
     return `
-┏━━〔 💠 *${botName}* 💠 〕━━┓
-┃
-┃ 💠 *SICUREZZA & FUNZIONI*
-┃
-┣━━〔 💠 *GUIDA* 〕━━┓
-┃ 🟢 .attiva <funzione>
-┃ 🔴 .disabilita <funzione>
-┃
-┣━━〔 💠 *STATO* 〕━━┓
+▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰
+    👑  ${botName}  👑
+▰▰▰▰▰
+
+[ PROFILO ]
+► Utente   : ${m.pushName}
+► ID       : @${userId.split('@')[0]}
+► Versione : v${vs}
+
+[ 💠 SICUREZZA & FUNZIONI ]
+► .attiva <funzione>    | Attiva funzione
+► .disabilita <funzione>| Disattiva funzione
+
+[ 🛡️ STATO ANTICHEAT ]
 ${statusList}
-┃
-┣━━〔 💠 *INFO* 〕━━┓
-┃ 💠 *Versione:* ${vs}
-┃ 💠 *ID:* @${userId.split('@')[0]}
-┃
-┗━━━━━━━━━━━━━━━━━━┛`.trim();
+
+[ ℹ️ INFO ]
+► Versione : v${vs}
+
+▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰
+   Powered by ℝ𝕃𝕐 ✨
+`.trim();
 }
