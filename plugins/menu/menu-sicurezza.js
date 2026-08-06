@@ -11,7 +11,7 @@ let handler = async (m, { conn, usedPrefix, command }) => {
     const imagePath = path.join(__dirname, '../../media/WA_1782994913707.jpeg');
 
     const botName = "ℝ𝕃𝕐 𝔹𝕆𝕋";
-    const menuText = generateMenuText(m, chat, userId, groupId, botName, usedPrefix); // <- AGGIUNTO m
+    const menuText = generateMenuText(m, chat, userId, groupId, botName, usedPrefix);
     
     const footerText = `𝕊𝕖𝕝𝕖𝕫𝕚𝕠𝕟𝕒 𝕦𝕟𝕒 𝕔𝕒𝕥𝕖𝕘𝕠𝕣𝕚𝕒 💠`;
 
@@ -20,9 +20,11 @@ let handler = async (m, { conn, usedPrefix, command }) => {
         caption: menuText,
         footer: footerText,
         buttons: [
-            { buttonId: `${usedPrefix}attiva`, buttonText: { displayText: '✅ Attiva' }, type: 1 },
-            { buttonId: `${usedPrefix}disabilita`, buttonText: { displayText: '❌ Disattiva' }, type: 1 },
             { buttonId: `${usedPrefix}menu`, buttonText: { displayText: '💠 Menu Principale' }, type: 1 },
+            { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '💠 Menu Admin' }, type: 1 },
+            { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: '💠 Menu Owner' }, type: 1 },
+            { buttonId: `${usedPrefix}menugruppo`, buttonText: { displayText: '💠 Menu Gruppo' }, type: 1 },
+            { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '💠 Menu Mod' }, type: 1 },
         ],
         viewOnce: true,
         headerType: 4,
@@ -35,7 +37,6 @@ handler.command = /^(menusicurezza|securitymenu|menusecurity|safety)$/i;
 
 export default handler;
 
-// AGGIUNTO m come primo parametro
 function generateMenuText(m, chat, userId, groupId, botName, usedPrefix) { 
     const vs = global.vs || '1.0.0';
     
@@ -63,12 +64,12 @@ function generateMenuText(m, chat, userId, groupId, botName, usedPrefix) {
         .join('\n');
 
     return `
-▰▰▰▰▰▰▰▰▰▰▰▰▰▰▰
+▰▰▰▰▰▰▰▰▰▰▰▰▰▰
     👑  ${botName}  👑
-▰▰▰▰▰
+▰▰
 
 [ PROFILO ]
-► Utente   : ${m.pushName} // <- ORA FUNZIONA
+► Utente   : ${m.pushName}
 ► ID       : @${userId.split('@')[0]}
 ► Versione : v${vs}
 
@@ -82,7 +83,7 @@ ${statusList}
 [ ℹ️ INFO ]
 ► Versione : v${vs}
 
-▰▰▰▰▰▰▰▰▰▰▰▰▰
+▰▰▰▰▰▰▰▰▰▰
    Powered by ℝ𝕃𝕐 ✨
 `.trim();
 }
