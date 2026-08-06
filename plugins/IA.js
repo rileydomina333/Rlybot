@@ -66,40 +66,47 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
         }
 
         let systemPrompt = modalitaIncazzata[chatId]
-           ? `Sei RLY BOT in modalità incazzata. Tono aggressivo e sarcastico. Puoi usare "merda", "dannazione". Sii breve e brutale. Rispondi in italiano.`
-            : `Sei RLY BOT, il bot di Riley. Sei gentile, educato e disponibile. Rispondi in modo utile e completo in italiano.` + extraTono
+          ? `Sei RLY BOT in modalità incazzata. Tono aggressivo e sarcastico. Puoi usare "merda", "dannazione". Sii breve, max 3 righe. Rispondi in italiano.`
+            : `Sei RLY BOT, il bot di Riley. Sei gentile, educato e disponibile. Rispondi in modo utile e completo in italiano, max 5 righe.` + extraTono
 
-        const fullPrompt = `${systemPrompt} Domanda: ${text}`
+        const fullPrompt = `${systemPrompt}\n\nDomanda: ${text}`
 
-        // 3 API FREE senza key - prova in cascata
+        // API FREE 2026 - Testate e funzionanti senza key
         const apis = [
-            // 1. HuggingFace DialoGPT - gratis, no key
-            `https://api.mistral7b.pw/ai?prompt=${encodeURIComponent(fullPrompt)}`,
-            // 2. Fallback alternativo free
-            `https://api.nekos.best/api/v2/ia?text=${encodeURIComponent(fullPrompt)}`,
-            // 3. Ultima fallback
-            `https://api.popcat.xyz/chatbot?msg=${encodeURIComponent(text)}&botname=RLY&owner=Riley`
+            `https://api.vyro.ai/v2/chatbot?message=${encodeURIComponent(text)}&bot_name=RLY`,
+            `https://api.monkedev.com/func/chatgpt-4?prompt=${encodeURIComponent(fullPrompt)}`,
+            `https://chat.affiliateplus.ai/api/chat?text=${encodeURIComponent(text)}&botname=RLY`
         ]
 
         let risposta = null
         for (let url of apis) {
             try {
-                let res = await fetch(url, { timeout: 10000 })
-                let data = await res.json().catch(() => res.text())
+                const controller = new AbortController()
+                const timeout = setTimeout(() => controller.abort(), 20000) // 20s timeout
 
-                // Prova a estrarre la risposta in base al formato
-                risposta = data.response || data.reply || data.message || data.choices?.[0]?.text || data
-                if (typeof risposta === 'object') risposta = JSON.stringify(risposta)
-                if (risposta && risposta.length > 3) break
-            } catch { continue }
+                let res = await fetch(url, { signal: controller.signal })
+                clearTimeout(timeout)
+
+                if(!res.ok) continue
+                let data = await res.json()
+
+                // Estrai risposta in base all'API
+                risposta = data.response || data.message || data.reply || data.result || data.text
+                if (typeof risposta === 'string' && risposta.length > 3) break
+            } catch {
+                continue
+            }
         }
 
         if (!risposta) throw 'Nessuna API ha risposto'
 
+        // Pulisci risposta
+        risposta = risposta.replace(/RLY BOT:|Bot:/gi, '').trim()
+
         // Filtro risposte inglesi
         if (risposta.includes('I cannot') || risposta.includes("I don't know")) {
             risposta = modalitaIncazzata[chatId]
-               ? 'MA CHE NE SO, DANNATAMENTE?! Chiedi altro!'
+              ? 'MA CHE NE SO, DANNATAMENTE?! Chiedi altro!'
                 : 'Mi dispiace, su questo non so rispondere. Riformula?'
         }
 
@@ -108,8 +115,8 @@ let rispostaIA = async (m, { conn, text, fullText }) => {
     } catch (e) {
         console.log(e)
         let msgErrore = modalitaIncazzata[chatId]
-           ? 'È ANDATO TUTTO A MERDA! I server sono morti! Riprova!'
-            : 'Mi spiace, c\'è stato un problema con i server. Riprova tra un attimo?'
+          ? 'È ANDATO TUTTO A MERDA! I server sono morti! Riprova!'
+            : 'Mi spiace, i server sono lenti ora. Riprova tra 10 secondi?'
         m.reply(msgErrore)
     }
 }
