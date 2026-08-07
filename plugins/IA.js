@@ -1,26 +1,28 @@
-let attivo = false // unico stato per tutto il bot
+import axios from 'axios'
 
-let handler = async (m, {conn, text}) => {
-    let msg = text.toLowerCase()
+let ON = false
 
-    if (msg === '.bot on') {
-        attivo = true
+let handler = async (m, {conn}) => {
+    let text = m.text
+
+    if (text === '.bot on') {
+        ON = true
         return m.reply('✅ AI ATTIVA')
     }
-    if (msg === '.bot off') {
-        attivo = false
+    if (text === '.bot off') {
+        ON = false
         return m.reply('❌ AI DISATTIVATA')
     }
-    if (msg.startsWith('.bot ')) {
-        if (!attivo) return // se off non risponde
-        let domanda = text.slice(5)
+    if (text.startsWith('.bot ') && text!== '.bot on' && text!== '.bot off') {
+        if (!ON) return // SE OFF NON RISPONDE
+        let domanda = text.replace('.bot ', '')
         let risposta = await ia(domanda)
         return m.reply(risposta)
     }
 }
 
 handler.all = async (m) => {
-    if (!attivo) return // se off esce subito
+    if (!ON) return // SE OFF NON RISPONDE
     if (m.fromMe) return
     if (m.text.startsWith('.')) return
 
@@ -32,23 +34,26 @@ handler.all = async (m) => {
 handler.command = /^bot$/i
 export default handler
 
-// Funzione AI super semplice senza key
+// IA DUCKDUCKGO SENZA KEY
 async function ia(prompt) {
     try {
-        let res = await fetch('https://api.gptgo.ai/v1/chat/completions', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                model: "gpt-3.5-turbo",
-                messages: [
-                    {role: "system", content: "Sei RLY BOT. Rispondi corto, max 2 righe."},
-                    {role: "user", content: prompt}
-                ]
-            })
+        let {data} = await axios.post('https://duckduckgo.com/duckchat/v1/chat', 
+        {
+            model: "gpt-4o-mini", // modello gratis di DDG
+            messages: [
+                {role: "system", content: "Sei RLY BOT. Rispondi in italiano, corto, max 3 righe."},
+                {role: "user", content: prompt}
+            ]
+        },
+        {
+            headers: {
+                "User-Agent": "Mozilla/5.0",
+                "Content-Type": "application/json"
+            }
         })
-        let json = await res.json()
-        return json.choices[0].message.content
-    } catch {
-        return "Errore AI"
+        return data.message
+    } catch (e) {
+        console.log("DDG ERROR:", e.response?.data || e.message)
+        return "Errore AI. Riprova"
     }
 }
