@@ -14,7 +14,7 @@ let handler = async (m, {conn}) => {
         return m.reply('❌ AI DISATTIVATA')
     }
     if (text.startsWith('.bot ') && text!== '.bot on' && text!== '.bot off') {
-        if (!ON) return // SE OFF NON RISPONDE
+        if (!ON) return 
         let domanda = text.replace('.bot ', '')
         let risposta = await ia(domanda)
         return m.reply(risposta)
@@ -22,7 +22,7 @@ let handler = async (m, {conn}) => {
 }
 
 handler.all = async (m) => {
-    if (!ON) return // SE OFF NON RISPONDE
+    if (!ON) return 
     if (m.fromMe) return
     if (m.text.startsWith('.')) return
 
@@ -34,26 +34,14 @@ handler.all = async (m) => {
 handler.command = /^bot$/i
 export default handler
 
-// IA DUCKDUCKGO SENZA KEY
+// IA POLLINATIONS - LA PIU STABILE
 async function ia(prompt) {
     try {
-        let {data} = await axios.post('https://duckduckgo.com/duckchat/v1/chat', 
-        {
-            model: "gpt-4o-mini", // modello gratis di DDG
-            messages: [
-                {role: "system", content: "Sei RLY BOT. Rispondi in italiano, corto, max 3 righe."},
-                {role: "user", content: prompt}
-            ]
-        },
-        {
-            headers: {
-                "User-Agent": "Mozilla/5.0",
-                "Content-Type": "application/json"
-            }
-        })
-        return data.message
+        let url = `https://text.pollinations.ai/${encodeURIComponent("Sei RLY BOT. Rispondi in italiano, corto max 3 righe. Domanda: " + prompt)}`
+        let {data} = await axios.get(url, {timeout: 15000})
+        return data
     } catch (e) {
-        console.log("DDG ERROR:", e.response?.data || e.message)
-        return "Errore AI. Riprova"
+        console.log("POLLINATIONS ERROR:", e.message)
+        return "Errore AI. Riprova tra 5s"
     }
 }
