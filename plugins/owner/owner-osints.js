@@ -1,7 +1,7 @@
 import axios from 'axios'
 let handler = async (m) => {
     let user = m.text.split(' ')[1]
-    if(!user) return m.reply('Esempio:.user marco')
+    if(!user) return m.reply('Esempio:.osint marco')
     let siti = {
         'Instagram': `https://instagram.com/${user}`,
         'GitHub': `https://github.com/${user}`,
