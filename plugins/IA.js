@@ -13,8 +13,8 @@ let handler = async (m, {conn}) => {
         ON = false
         return m.reply('❌ AI DISATTIVATA')
     }
-    if (text.startsWith('.bot ') && text!== '.bot on' && text!== '.bot off') {
-        if (!ON) return 
+    if (text.startsWith('.bot ')) {
+        if (!ON) return
         let domanda = text.replace('.bot ', '')
         let risposta = await ia(domanda)
         return m.reply(risposta)
@@ -22,7 +22,7 @@ let handler = async (m, {conn}) => {
 }
 
 handler.all = async (m) => {
-    if (!ON) return 
+    if (!ON) return
     if (m.fromMe) return
     if (m.text.startsWith('.')) return
 
@@ -34,14 +34,21 @@ handler.all = async (m) => {
 handler.command = /^bot$/i
 export default handler
 
-// IA POLLINATIONS - LA PIU STABILE
 async function ia(prompt) {
     try {
-        let url = `https://text.pollinations.ai/${encodeURIComponent("Sei RLY BOT. Rispondi in italiano, corto max 3 righe. Domanda: " + prompt)}`
-        let {data} = await axios.get(url, {timeout: 15000})
-        return data
+        let {data} = await axios.get(`https://api.adviceslip.com/advice`) // TEST CONNESSIONE
+        console.log("Connessione OK")
+
+        let res = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+            model: "meta-llama/llama-3.2-3b-instruct:free",
+            messages: [{role: "user", content: prompt}]
+        }, {
+            headers: {'Authorization': 'Bearer '},
+            timeout: 20000
+        })
+        return res.data.choices[0].message.content
     } catch (e) {
-        console.log("POLLINATIONS ERROR:", e.message)
-        return "Errore AI. Riprova tra 5s"
+        console.log("ERRORE DETTAGLIO:", e.message)
+        return "Errore. Controlla internet"
     }
 }
