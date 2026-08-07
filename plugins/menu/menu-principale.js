@@ -70,9 +70,6 @@ function generateMenuText(prefix, botName, userCount, userId, groupId) {
 ► .ping      | Check connessione
 
 [ 🧠 AI ENGINE ]
-► .bot <msg> | Chat con RLY BOT
-► .bot on/off| Attiva AI
-► .vocebot   | Risposta vocale
 ► .rlybot    | Info Intelligenza
 ► .lingua    | Set Lingua
 
