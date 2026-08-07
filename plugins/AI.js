@@ -1,22 +1,33 @@
+import 'dotenv/config' // <--- deve stare per primo
 import axios from 'axios'
+
+const GROQ_KEY = process.env.GROQ_KEY
 
 let handler = async (m) => {
     let domanda = m.text.slice(5).trim()
-    if(!domanda) return m.reply('Esempio:.ask come si fa la pasta alla norma\n.ask spiegami cos’è il doxxing')
+    if(!domanda) return m.reply('Esempio:.ask scrivimi una ricetta')
+    if(!GROQ_KEY) return m.reply('❌ Key non trovata. Controlla il file .env')
 
-    m.reply('_RLY AI sta pensando alla risposta..._')
+    await conn.sendMessage(m.chat, {text: '_RLY AI sta pensando..._'}, {quoted: m})
 
     try {
-        // API free senza key
-        let url = `https://text.pollinations.ai/${encodeURIComponent(domanda)}?model=llamav3`
-        let {data} = await axios.get(url, {timeout: 15000})
+        let {data} = await axios.post('https://api.groq.com/openai/v1/chat/completions', {
+            model: "llama-3.1-8b-instant",
+            messages: [
+                {role: "system", content: "Sei RLY AI, un assistente italiano utile e diretto."},
+                {role: "user", content: domanda}
+            ],
+            max_tokens: 600
+        }, {
+            headers: {'Authorization': `Bearer ${GROQ_KEY}`}
+        })
         
-        if(!data) throw new Error()
-        
-        m.reply(`🤖 *RLY ASK*\n\n${data}\n\n_Domanda: ${domanda}_`)
+        let risposta = data.choices[0].message.content
+        m.reply(`🤖 *RLY ASK - Groq*\n\n${risposta}`)
         
     } catch(e) {
-        m.reply('Errore, riprova tra 10s. Le API free a volte sono lente.')
+        console.log(e)
+        m.reply('Errore API. Key sbagliata o crediti finiti.')
     }
 }
 
