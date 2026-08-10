@@ -1,18 +1,21 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
- const __filename = fileURLToPath(import.meta.url);
+
+const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const handler = async (message, { conn, usedPrefix, command }) => {
     const userId = message.sender;
     const groupId = message.isGroup ? message.chat : null;
     const menuText = generateMenuText(usedPrefix, userId, groupId);
     const imagePath = path.join(__dirname, '../../media/WA_1782994956052.jpeg');
-    const footerText = global.t('chooseMenu', userId, groupId) || 'Scegli un menu:';
-    const mainMenuText = global.t('mainMenuButton', userId, groupId) || '💠 Menu Principale';
-    const adminMenuText = global.t('menuAdmin', userId, groupId) || '💠 Menu Admin';
-    const securityMenuText = global.t('menuSecurity', userId, groupId) || '💠 Menu Sicurezza';
-    const groupMenuText = global.t('menuGroup', userId, groupId) || '💠 Menu Gruppo';
+    const footerText = 'Scegli un menu:';
+    const mainMenuText = '💠 Menu Principale';
+    const adminMenuText = '💠 Menu Admin';
+    const securityMenuText = '💠 Menu Sicurezza';
+    const groupMenuText = '💠 Menu Gruppo';
+    
     await conn.sendMessage(message.chat, {
         image: fs.existsSync(imagePath) ? { url: imagePath } : { url: 'https://telegra.ph/file/710185c7e0247662d8ca6.png' },
         caption: menuText,
@@ -28,74 +31,70 @@ const handler = async (message, { conn, usedPrefix, command }) => {
         headerType: 4,
     }, { quoted: message });
 };
-handler.help = [
-  'menuowner',
-  'menupadrone',
-  'menúpropietario',
-  'menupropietario',
-  'menu_dono',
-  'menupainelowner',
-  'besitzermenü',
-  'eigentümermenü',
-  '所有者菜单',
-  '主人菜单',
-  'менювладельца',
-  'менюсоздателя',
-  'قائمةالمالك',
-  'قائمةالمؤسس',
-  'मालिकमेनू',
-  'स्वामीमेनू',
-  'menuowner_fr',
-  'menucréateur',
-  'menuowner_id',
-  'menuowner_tr'
-];
+
+handler.help = ['menuowner'];
 handler.tags = ['menu'];
-handler.command = /^(menuowner|menupadrone|menúpropietario|menupropietario|menu_dono|menupainelowner|besitzermenü|eigentümermenü|所有者菜单|主人菜单|менювладельца|менюсоздателя|قائمةالمالك|قائمةالمؤسس|मालिकमेनू|स्वामीमेनू|menuowner_fr|menucréateur|menuowner_id|menuowner_tr)$/i;
+handler.command = /^(menuowner|menupadrone|menupropietario)$/i;
 
 export default handler;
+
 function generateMenuText(prefix, userId, groupId) {
-    const vs = global.vs || '8.0';
-    const collab = global.collab || 'ONE PIECE';
-    const menuTitle = global.t('menuownerTitle', userId, groupId);
-    const versionText = global.t('menuownerVersionLabel', userId, groupId);
-    const supportText = global.t('menuownerSupportLabel', userId, groupId);
-    const commandList = `
-• 💠 *${prefix}${global.t('menuownerManageCommand', userId, groupId)}* @
-• 💠 *${prefix}${global.t('menuownerSetGroupsCommand', userId, groupId)}*
-• 💠 *${prefix}${global.t('menuownerAddGroupsCommand', userId, groupId)}* @
-• 💠 *${prefix}${global.t('menuownerResetGroupsCommand', userId, groupId)}* @
-• 💠 *${prefix}${global.t('menuownerBanUserCommand', userId, groupId)}* @
-• 💠 *${prefix}${global.t('menuownerUnbanUserCommand', userId, groupId)}* @
-• 💠 *${prefix}${global.t('menuownerCleanupCommand', userId, groupId)}* (+)
-• 💠 *${prefix}${global.t('menuownerGetFileCommand', userId, groupId)}*
-• 💠 *${prefix}${global.t('menuownerSaveCommand', userId, groupId)}* (${global.t('menuownerPluginParam', userId, groupId)})
-• 💠 *${prefix}${global.t('menuownerDpCommand', userId, groupId)}* (${global.t('menuownerPluginParam', userId, groupId)})
-• 💠 *${prefix}${global.t('menuownerGetPluginCommand', userId, groupId)}*
-• 💠 *${prefix}${global.t('menuownerJoinCommand', userId, groupId)}* + ${global.t('menuownerLinkParam', userId, groupId)}
-• 💠 *${prefix}${global.t('menuownerOutCommand', userId, groupId)}*
-• 💠 *${prefix}${global.t('menuownerPrefixCommand', userId, groupId)}* (?)
-• 💠 *${prefix}${global.t('menuownerResetPrefixCommand', userId, groupId)}*
-• 💠 *${prefix}${global.t('menuownerGodModeCommand', userId, groupId)}* {${global.t('menuownerAutoAdminParam', userId, groupId)}}
-• 💠 *${prefix}${global.t('menuownerResetCommand', userId, groupId)}* @
-• 💠 *${prefix}${global.t('menuownerAddCommand', userId, groupId)}* (${global.t('menuownerNumMessagesParam', userId, groupId)}) @
-• 💠 *${prefix}${global.t('menuownerRemoveCommand', userId, groupId)}* (${global.t('menuownerNumMessagesParam', userId, groupId)}) @
-• 💠 *${prefix}${global.t('menuownerEveryGroupCommand', userId, groupId)}* (${global.t('menuownerCommandParam', userId, groupId)})
-• 💠 *${prefix}${global.t('menuownerBanChatCommand', userId, groupId)}* (${global.t('menuownerGroupParam', userId, groupId)})
-• 💠 *${prefix}${global.t('menuownerUnbanChatCommand', userId, groupId)}* (${global.t('menuownerGroupParam', userId, groupId)})
-• 💠 *${prefix}${global.t('menuownerRestartCommand', userId, groupId)}*
-• 💠 *${prefix}${global.t('menuownerShutdownBotCommand', userId, groupId)}*
-• 💠 *${prefix}${global.t('menuownerUpdateBotCommand', userId, groupId)}*
-    `.trim();
-    return `
-⋆ ︵ 💠 ${menuTitle} 💠 ︵ ⋆
+    const vs = global.vs || '1.0.0';
+    
+    const createSection = (title, commands) => {
+        const commandLines = commands.trim().split('\n').filter(c => c.trim()).map(c => `► ${c.trim()}`).join('\n');
+        return `[ ${title} ]\n${commandLines}`;
+    };
+    
+    const sections = [
+        createSection('👑 GESTIONE UTENTI GLOBALI', `
+*${prefix}manage* @ | Gestisci utente
+*${prefix}ban* @ | Ban utente globale
+*${prefix}unban* @ | Unban utente
+*${prefix}reset* @ | Reset dati utente
+*${prefix}add* (num) @ | Aggiungi messaggi
+*${prefix}remove* (num) @ | Rimuovi messaggi`),
 
+        createSection('🏢 GESTIONE GRUPPI', `
+*${prefix}setgroups* | Imposta gruppi
+*${prefix}addgroups* @ | Aggiungi gruppo
+*${prefix}resetgroups* @ | Reset gruppo
+*${prefix}join* link | Entra in gruppo
+*${prefix}out* | Esci dal gruppo
+*${prefix}banchat* (gruppo) | Ban chat
+*${prefix}unbanchat* (gruppo) | Unban chat
+*${prefix}everygroup* comando | Esegui in tutti i gruppi`),
 
-*${global.t('menuownerReservedCommands', userId, groupId)}*
+        createSection('⚙️ BOT & SISTEMA', `
+*${prefix}cleanup* | Pulisci database
+*${prefix}restart* | Riavvia bot
+*${prefix}shutdown* | Spegni bot
+*${prefix}update* | Aggiorna bot
+*${prefix}prefix* ? | Cambia prefisso
+*${prefix}resetprefix* | Reset prefisso
+*${prefix}godmode* {auto} | Modalità dio`),
 
+        createSection('📁 FILE & PLUGIN', `
+*${prefix}getfile* | Prendi file
+*${prefix}save* plugin | Salva plugin
+*${prefix}dp* plugin | Cancella plugin
+*${prefix}getplugin* | Scarica plugin`),
 
+        createSection('📊 INFO OWNER', `
+*${prefix}stats* | Statistiche bot
+*${prefix}ping* | Ping bot
+*${prefix}listban* | Lista ban`)
+    ];
 
-${commandList.split('\n').map(line => line.trim() ? `୧ ${line.trim()}` : '').filter(Boolean).join('\n')}
+    return `▰▰▰▰▰▰▰▰
+    💠  𝑴𝑬𝑵𝑼 𝑶𝑾𝑵𝑬𝑹  💠
+▰▰▰▰▰▰▰▰
 
-`.trim();
+*Comandi riservati all'Owner*
+
+${sections.join('\n\n')}
+
+▰
+   Powered by ℝ𝕃𝕐 𝔹𝕆𝕋 ✨
+Versione: v${vs}`.trim();
 }
