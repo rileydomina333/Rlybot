@@ -1,159 +1,74 @@
-import yts from 'yt-search'
-import { exec } from 'child_process'
-import fs from 'fs'
-import os from 'os'
-import path from 'path'
+const yts = require('yt-search'); // npm i yt-search
+const ytdl = require('@distube/ytdl-core'); // npm i @distube/ytdl-core
+const fs = require('fs');
+const path = require('path');
 
-let pendingLyrics = {}
-global.playChoice = global.playChoice || {}
+module.exports = {
+    name: "play",
+    command: [".play"],
+    desc: "Cerca su YouTube e invia la canzone in mp3",
 
-const execPromise = (cmd) => new Promise((resolve, reject) => {
-  exec(cmd, { maxBuffer: 1024 * 1024 * 10 }, (err, stdout, stderr) => {
-    if (err) reject(new Error(stderr || err.message))
-    else resolve(stdout)
-  })
-})
+    async execute(sock, msg, args) {
+        const chatId = msg.key.remoteJid;
+        const query = args.join(" ");
 
-let handler = async (m, { conn, text, usedPrefix, command }) => {
+        if (!query) {
+            return await sock.sendMessage(chatId, {
+                text: "❌ Uso:.play nome canzone\nEsempio:.play headshot DR4GM4SHRO0M"
+            });
+        }
 
-  if (command === "play") {
+        try {
+            await sock.sendMessage(chatId, { text: `🔍 Cerco: *${query}*` });
 
-    if (!text) return m.reply("🎧 𝐒𝐜𝐫𝐢𝐯𝐢 𝐢𝐥 𝐭𝐢𝐭𝐨𝐥𝐨!")
+            // 1. Cerca su YouTube
+            const search = await yts(query);
+            const video = search.videos[0];
+            
+            if (!video) {
+                return await sock.sendMessage(chatId, { text: "❌ Nessun risultato trovato" });
+            }
 
-    let search = await yts(text)
-    let video = search.videos[0]
+            await sock.sendMessage(chatId, { 
+                text: `✅ Trovato: *${video.title}*\n⏱️ ${video.timestamp}\n⬇️ Scarico mp3...` 
+            });
 
-    if (!video) return m.reply("❌ Nessun risultato")
+            // 2. Scarica audio in mp3
+            const stream = ytdl(video.url, {
+                filter: 'audioonly',
+                quality: 'highestaudio'
+            });
 
-    global.playChoice[m.sender] = video
+            const filePath = path.join(__dirname, `../temp/${video.videoId}.mp3`);
+            
+            // crea cartella temp se non esiste
+            if (!fs.existsSync(path.join(__dirname, '../temp'))) {
+                fs.mkdirSync(path.join(__dirname, '../temp'));
+            }
 
-    return conn.sendMessage(m.chat, {
-      text:
-`🎶 *${video.title}*
+            const writer = fs.createWriteStream(filePath);
+            
+            await new Promise((resolve, reject) => {
+                stream.pipe(writer);
+                writer.on('finish', resolve);
+                writer.on('error', reject);
+            });
 
-╭─────────╮
-┃📺 𝐂𝚲𝐍𝚲𝐋𝚵: *${video.author.name}*
-┃⏱️ 𝐃𝐔𝐑𝚲𝐓𝚲: *${video.timestamp}*
-┃👁️ 𝐕𝕀𝐒𝐔𝚲𝐋: *${video.views.toLocaleString()}*
-╰─────────╯
+            // 3. Invia l'mp3
+            await sock.sendMessage(chatId, {
+                audio: fs.readFileSync(filePath),
+                mimetype: 'audio/mpeg',
+                fileName: `${video.title}.mp3`
+            });
 
-𝐕𝐮𝐨𝐢 𝐚𝐮𝐝𝐢𝐨 𝐨  𝐯𝐢𝐝𝐞𝐨🎥?`,
-      buttons: [
-        { buttonId: ".play_audio", buttonText: { displayText: "🎧 𝐀𝐮𝐝𝐢𝐨" }, type: 1 },
-        { buttonId: ".play_video", buttonText: { displayText: "🎥 𝐕𝐢𝐝𝐞𝐨" }, type: 1 }
-      ],
-      headerType: 1
-    }, { quoted: m })
-  }
+            // cancella il file dopo l'invio
+            fs.unlinkSync(filePath);
 
-  let video = global.playChoice[m.sender]
-  if (!video) return m.reply("❌ Nessuna richiesta attiva")
-
-  if (command === "play_audio") {
-
-    let infoMsg = `
-ℹ️ 𝐑𝐢𝐬𝐮𝐥𝐭𝐚𝐭𝐨:
-
-*${video.title}*
-
-⌛️ 𝐒𝐜𝐚𝐫𝐢𝐜𝐨 𝐥’𝐚𝐮𝐝𝐢𝐨...
-
-> 𝐑𝐋𝐘 𝐁𝐎𝐓 𝐝𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐫
-`
-    await m.reply(infoMsg)
-
-    let file = `./tmp_${Date.now()}.mp3`
-
-    exec(`yt-dlp -x --audio-format mp3 -o "${file}" ${video.url}`, async (err) => {
-
-      if (err) return m.reply("❌ Errore audio")
-
-      await conn.sendMessage(m.chat, {
-        audio: fs.readFileSync(file),
-        mimetype: 'audio/mpeg'
-      }, { quoted: m })
-
-      fs.unlinkSync(file)
-
-      global.lyricsRequest = global.lyricsRequest || {}
-      global.lyricsRequest[m.sender] = video.title
-
-      if (pendingLyrics[m.sender]) clearTimeout(pendingLyrics[m.sender])
-      pendingLyrics[m.sender] = setTimeout(() => {
-        delete pendingLyrics[m.sender]
-        delete global.lyricsRequest[m.sender]
-      }, 15000)
-
-      const pulsanti = [
-        ['✅ 𝐒𝐢', `${usedPrefix}lyrics_yes`]
-      ];
-
-      await conn.sendButton(
-        m.chat,
-        `📜 Vuoi il testo?\n\n*${video.title}*`,
-        `Hai 15 secondi`,
-        null,
-        pulsanti,
-        m
-      );
-
-      delete global.playChoice[m.sender]
-    })
-  }
-
-  if (command === "play_video") {
-    if (video.seconds > 480)
-      return m.reply("❌ Max 8 minuti")
-
-    await m.reply("🎬 𝐒𝐜𝐚𝐫𝐢𝐜𝐨 𝐯𝐢𝐝𝐞𝐨...\n> 𝐑𝐋𝐘 𝐁𝐎𝐓 𝐝𝐨𝐰𝐧𝐥𝐨𝐚𝐝𝐞𝐫")
-
-    const ts  = Date.now()
-    const raw = path.join(os.tmpdir(), `vid_raw_${ts}.mp4`)
-    const out = path.join(os.tmpdir(), `vid_out_${ts}.mp4`)
-
-    try {
-
-      await execPromise(
-        `yt-dlp --no-playlist ` +
-        `-f "bestvideo[vcodec^=avc1][height<=480]+bestaudio[acodec^=mp4a]/best[vcodec^=avc1][height<=480]/best[height<=480]" ` +
-        `--merge-output-format mp4 --ffmpeg-location /usr/bin/ffmpeg ` +
-        `--no-part --retries 3 ` +
-        `-o "${raw}" "${video.url}"`
-      )
-
-      await execPromise(
-        `/usr/bin/ffmpeg -y -i "${raw}" ` +
-        `-c:v libx264 -preset ultrafast -crf 30 ` +
-        `-vf "scale=trunc(iw/2)*2:trunc(ih/2)*2" ` +
-        `-c:a aac -b:a 96k -movflags +faststart "${out}"`
-      )
-
-      fs.unlinkSync(raw)
-
-      const sizeMB = fs.statSync(out).size / (1024 * 1024)
-      if (sizeMB > 64) {
-        fs.unlinkSync(out)
-        return m.reply("❌ Video troppo pesante")
-      }
-
-      await conn.sendMessage(m.chat, {
-        video: fs.readFileSync(out),
-        mimetype: 'video/mp4',
-        caption: `🎬 ${video.title}`
-      }, { quoted: m })
-
-      fs.unlinkSync(out)
-      delete global.playChoice[m.sender]
-
-    } catch (e) {
-      console.log(e)
-      m.reply("❌ Errore video")
+        } catch (err) {
+            console.error(err);
+            await sock.sendMessage(chatId, {
+                text: `❌ Errore: ${err.message}`
+            });
+        }
     }
-  }
 }
-
-handler.command = /^(play|play_audio|play_video)$/i
-handler.help = ['play']
-handler.tags = ['fun']
-
-export default handler
