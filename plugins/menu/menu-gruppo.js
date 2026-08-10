@@ -197,7 +197,7 @@ function generateMenuText(prefix, userId, groupId) {
 *.clascrimine*`)
     ];
     
-    return `▰▰▰
+    return `▰▰▰▰▰▰▰▰▰▰▰
     💠  𝑴𝑬𝑵𝑼 𝑮𝑹𝑼𝑷𝑷𝑶  💠
 ▰▰▰▰▰▰▰▰▰▰▰
 
