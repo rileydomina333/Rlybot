@@ -1,4 +1,4 @@
- import path from 'path';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -9,220 +9,201 @@ const handler = async (message, { conn, usedPrefix, command }) => {
     const groupId = message.isGroup ? message.chat : null;
     
     const menuText = generateMenuText(usedPrefix, userId, groupId);
-        const imagePath = path.join(__dirname, '../../media/WA_1782994972105.jpeg');
-        const footerText = global.t('chooseMenu', userId, groupId) || 'Scegli un menu:';
-        const mainMenuText = global.t('mainMenuButton', userId, groupId) || '💠 Menu Principale';
-        const adminMenuText = global.t('menuAdmin', userId, groupId) || '💠 Menu Admin';
-        const ownerMenuText = global.t('menuOwner', userId, groupId) || '💠 Menu Owner';
-        const securityMenuText = global.t('menuSecurity', userId, groupId) || '💠 Menu Sicurezza';
+    const imagePath = path.join(__dirname, '../../media/WA_1782994972105.jpeg');
+    const footerText = 'Scegli una categoria dal menu:';
+    const mainMenuText = '💠 Menu Principale';
+    const adminMenuText = '💠 Menu Admin';
+    const ownerMenuText = '💠 Menu Owner';
+    const securityMenuText = '💠 Menu Sicurezza';
     
     await conn.sendMessage(message.chat, {
         image: { url: imagePath },
         caption: menuText,
-                footer: footerText,
-                buttons: [
-                        { buttonId: `${usedPrefix}menu`, buttonText: { displayText: mainMenuText }, type: 1 },
-                        { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: adminMenuText }, type: 1 },
-                        { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: ownerMenuText }, type: 1 },
-                        { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: securityMenuText }, type: 1 },
-                        { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '💠 Menu Mod' }, type: 1 },
-                ],
-                viewOnce: true,
-                headerType: 4,
+        footer: footerText,
+        buttons: [
+            { buttonId: `${usedPrefix}menu`, buttonText: { displayText: mainMenuText }, type: 1 },
+            { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: adminMenuText }, type: 1 },
+            { buttonId: `${usedPrefix}menuowner`, buttonText: { displayText: ownerMenuText }, type: 1 },
+            { buttonId: `${usedPrefix}menusicurezza`, buttonText: { displayText: securityMenuText }, type: 1 },
+            { buttonId: `${usedPrefix}menumod`, buttonText: { displayText: '💠 Menu Mod' }, type: 1 },
+        ],
+        viewOnce: true,
+        headerType: 4,
     }, { quoted: message });
 };
 
-handler.help = [
-  'menugruppo',
-  'gruppo',
-  'groupmenu',
-  'group',
-  'menúgrupo',
-  'grupo',
-  'menugrupo',
-  'grupo_pt',
-  'gruppenmenü',
-  'gruppe',
-  '群组菜单',
-  '群组',
-  'менюгруппы',
-  'группа',
-  'قائمةالمجموعة',
-  'مجموعة',
-  'समूहमेनू',
-  'समूह',
-  'menu_groupe',
-  'groupe',
-  'menugrup',
-  'grup',
-  'grupmenü'
-];
+handler.help = ['menugruppo', 'gruppo', 'groupmenu'];
 handler.tags = ['menu'];
-handler.command = /^(gruppo|menugruppo|groupmenu|group|menúgrupo|grupo|menugrupo|grupo_pt|gruppenmenü|gruppe|群组菜单|群组|менюгруппы|группа|قائمةالمجموعة|مجموعة|समूहमेनू|समूह|menu_groupe|groupe|menugrup|grup|grupmenü)$/i;
-
+handler.command = /^(gruppo|menugruppo|groupmenu|group)$/i;
 
 export default handler;
 
 function generateMenuText(prefix, userId, groupId) {
-    const vs = global.vs || '8.0';
-    const collab = global.collab || 'ChatUnity x 333';
-    const menuTitle = global.t('groupMenuTitle', userId, groupId);
+    const vs = global.vs || '1.0.0';
     
     const createSection = (title, commands) => {
-        const commandLines = commands.trim().split('\n').map(c => `│ ${c.trim()}`).join('\n');
-        return `╭★ ${title} ★╮\n${commandLines}\n╰★────────────★╯`;
+        const commandLines = commands.trim().split('\n').filter(c => c.trim()).map(c => `► ${c.trim()}`).join('\n');
+        return `[ ${title} ]\n${commandLines}`;
     };
     
     const sections = [
-        createSection(global.t('musicAudioSection', userId, groupId), `
-💠 *.play* (${global.t('songCommand', userId, groupId)})
-💠 *.playlist*
-💠 *.ytsearch*
-💠 *.tomp3* (${global.t('videoCommand', userId, groupId)})`),
-        createSection(global.t('infoUtilitySection', userId, groupId), `
-💠 *.meteo* (${global.t('cityCommand', userId, groupId)})
-💠 *.traduci* (${global.t('textCommand', userId, groupId)})
-💠 *.info* [@${global.t('userCommand', userId, groupId)}]
-💠 *.regole*
-💠 *.dashboard*
-💠 *.offusca*`),
-        createSection(global.t('imageEditSection', userId, groupId), `
-💠 *.sticker* (${global.t('photoToStickerCommand', userId, groupId)})
-💠 *.hd* (${global.t('improveQualityCommand', userId, groupId)})
-💠 *.bonk* (${global.t('memeCommand', userId, groupId)})
-💠 *.toimg* (${global.t('fromStickerCommand', userId, groupId)})
-💠 *.hornycard* [@${global.t('userCommand', userId, groupId)}]
-💠 *.stupido/a* @
-💠 *.emojimix*
-💠 *.wanted* @
-💠 *.scherzo* @
-💠 *.nokia* @
-💠 *.carcere* @
-💠 *.ads* @`),
-        createSection(global.t('pokemonSection', userId, groupId), `
-💠 *.apripokemon*
-💠 *.buypokemon* 
-💠 *.classificapokemon*
-💠 *.pacchetti*
-💠 *.combatti*
-💠 *.evolvi*
-💠 *.darknessinfo*
-💠 *.inventario*
-💠 *.pity*
-💠 *.scambia*`),
-        createSection(global.t('gamesCasinoSection', userId, groupId), `
-💠 *.tris*
-💠 *.dado*
-💠 *.slot*
-💠 *.casinò*
-💠 *.annuale*
-💠 *.poker*
-💠 *.blockblast*
-💠 *.scacchi*
-💠 *.scommessa* (${global.t('quantityCommand', userId, groupId)})
-💠 *.blackjack*
-💠 *.wordle*
-💠 *.roulette*
-💠 *.moneta* (${global.t('headsOrTailsCommand', userId, groupId)})
-💠 *.mate* (${global.t('mathProblemCommand', userId, groupId)})
-💠 *.scf* (${global.t('rockPaperScissorsCommand', userId, groupId)})
-💠 *.pokedex* (${global.t('pokemonInfoCommand', userId, groupId)})
-💠 *.bandiera*
-💠 *.obbligo/verità*
-💠 *.indovinacanzone*
-💠 *.auto*
-💠 *.missioni*`),
-        createSection(global.t('economyRankingSection', userId, groupId), `
-💠 *.portafoglio* (${global.t('balanceCommand', userId, groupId)})
-💠 *.banca*
-💠 *.daily*
-💠 *.topuser* (${global.t('topUsersCommand', userId, groupId)})
-💠 *.topgruppi*
-💠 *.donauc*
-💠 *.ruba* @${global.t('userCommand', userId, groupId)}
-💠 *.ritira* (${global.t('withdrawUCCommand', userId, groupId)})
-💠 *.mina* (${global.t('earnXPCommand', userId, groupId)})
-💠 *.xp*
-💠 *.donaxp* @${global.t('userCommand', userId, groupId)}
-💠 *.rubaxp* @${global.t('userCommand', userId, groupId)}`),
-        createSection(global.t('socialInteractionSection', userId, groupId), `
-💠 *.divorzia* (${global.t('endRelationshipCommand', userId, groupId)})
-💠 *.amore* @${global.t('userCommand', userId, groupId)} (${global.t('affinityCommand', userId, groupId)})
-💠 *.bacia* @${global.t('userCommand', userId, groupId)}
-💠 *.picchia* @${global.t('userCommand', userId, groupId)}
-💠 *.limona* @${global.t('userCommand', userId, groupId)}
-💠 *.threesome* @${global.t('userCommand', userId, groupId)}
-💠 *.palpa* @${global.t('userCommand', userId, groupId)}
-💠 *.odio* @${global.t('userCommand', userId, groupId)}
-💠 *.rizz* @${global.t('userCommand', userId, groupId)} (${global.t('charmCommand', userId, groupId)})
-💠 *.minaccia* @${global.t('userCommand', userId, groupId)}
-💠 *.zizzania* @${global.t('userCommand', userId, groupId)} (${global.t('createFightCommand', userId, groupId)})
-💠 *.ditalino* @
-💠 *.sega* @
-💠 *.sputa* @${global.t('userCommand', userId, groupId)}
-💠 *.cazzo* @${global.t('userCommand', userId, groupId)}
-💠 *.figa* @${global.t('userCommand', userId, groupId)}
-💠 *.twerk* @${global.t('userCommand', userId, groupId)}
-💠 *.tette* @${global.t('userCommand', userId, groupId)}
-💠 *.insulta* @
-💠 *.amicizia/listamici* @`),
-        createSection(global.t('howMuchSection', userId, groupId), `
-💠 *.lesbica* @
-💠 *.negro* @
-💠 *.cornuto* @`),
-        createSection(global.t('personalityTestSection', userId, groupId), `
-💠 *.alcolizzato*
-💠 *.drogato*`),
-        createSection('Famiglia & Adozione', `
-💠 *.adotta* @utente (500 UC)
-💠 *.abbandona* @utente
-💠 *.orfanotrofio*
-💠 *.famiglia*
-💠 *.diseredita* @utente
-💠 *.scappa*`),
-        createSection('RPG & Avventura', `
-💠 *.duello* @utente <UC>
-💠 *.mostro*
-💠 *.esplora*
-💠 *.zaino*
-💠 *.vendizaino*
-💠 *.pesca*
-💠 *.inventariopesca*
-💠 *.vendipesce*`),
-        createSection('Lavoro & Crimine', `
-💠 *.lavora*
-💠 *.crimini*
-💠 *.proiettile*
-💠 *.crimine* <num>
-💠 *.rapina* @utente
-💠 *.clan* @4/5utenti
-💠 *.fedinapenale*`),
-        createSection('Pet', `
-💠 *.cercapet*
-💠 *.pet*
-💠 *.sfamapet* <num>
-💠 *.coccolapet* <num>
-💠 *.rilasciapet* <num>
-💠 *.arenapet* @utente`),
-        createSection('Profilo & Classifiche', `
-💠 *.profilo* [@utente]
-💠 *.classifica*
-💠 *.clasxp*
-💠 *.clascrimine*`)
+        createSection('🎵 MUSICA & AUDIO', `
+*.play* (canzone) | Cerca e invia mp3
+*.playlist* | Crea playlist
+*.ytsearch* | Cerca video YouTube
+*.tomp3* (video) | Converti in mp3`),
+
+        createSection('ℹ️ INFORMAZIONI & UTILITÀ', `
+*.meteo* (città) | Meteo città
+*.traduci* (testo) | Traduci testo
+*.info* [@utente] | Info utente
+*.regole* | Regole gruppo
+*.dashboard* | Dashboard bot
+*.offusca* | Offusca immagine`),
+
+        createSection('🎨 IMMAGINI & MODIFICA', `
+*.sticker* | Foto → sticker
+*.hd* | Migliora qualità foto
+*.bonk* | Meme bonk
+*.toimg* | Sticker → immagine
+*.hornycard* [@utente]
+*.stupido/a* @ | Carta stupido
+*.emojimix* | Mix emoji
+*.wanted* @ | Manifesti wanted
+*.scherzo* @ | Meme scherzo
+*.nokia* @ | Telefono nokia
+*.carcere* @ | Foto carcere
+*.ads* @ | Pubblicità`),
+
+        createSection('⚡ POKEMON', `
+*.apripokemon* | Apri pacchetto
+*.buypokemon* | Compra pokemon
+*.classificapokemon* | Classifica
+*.pacchetti* | I tuoi pacchetti
+*.combatti* | Combatti
+*.evolvi* | Evolvi pokemon
+*.darknessinfo* | Info darkness
+*.inventario* | Inventario
+*.pity* | Contatore pity
+*.scambia* | Scambia pokemon`),
+
+        createSection('🎰 GIOCHI & CASINÒ', `
+*.tris* | Gioca a tris
+*.dado* | Tira dado
+*.slot* | Slot machine
+*.casinò* | Entra casinò
+*.annuale* | Premio annuale
+*.poker* | Poker
+*.blockblast* | Block blast
+*.scacchi* | Scacchi
+*.scommessa* (q) | Scommetti
+*.blackjack* | Blackjack
+*.wordle* | Wordle
+*.roulette* | Roulette
+*.moneta* | Testa o croce
+*.mate* | Problema mate
+*.scf* | Sasso carta forbici
+*.pokedex* | Info pokemon
+*.bandiera* | Indovina bandiera
+*.obbligo/verità* | Obbligo o verità
+*.indovinacanzone* | Indovina canzone
+*.auto* | Gioco auto
+*.missioni* | Missioni giornaliere`),
+
+        createSection('💰 ECONOMIA & CLASSIFICHE', `
+*.portafoglio* | Saldo UC
+*.banca* | Banca
+*.daily* | Bonus giornaliero
+*.topuser* | Top utenti
+*.topgruppi* | Top gruppi
+*.donauc* | Dona UC
+*.ruba* @utente | Ruba UC
+*.ritira* | Ritira UC
+*.mina* | Mina XP
+*.xp* | Vedi XP
+*.donaxp* @ | Dona XP
+*.rubaxp* @ | Ruba XP`),
+
+        createSection('💞 INTERAZIONI SOCIALI', `
+*.divorzia* | Fine relazione
+*.amore* @ | Affinità
+*.bacia* @ | Bacia
+*.picchia* @ | Picchia
+*.limona* @ | Limona
+*.threesome* @ | Threesome
+*.palpa* @ | Palpa
+*.odio* @ | Odia
+*.rizz* @ | Rizz
+*.minaccia* @ | Minaccia
+*.zizzania* @ | Crea litigi
+*.ditalino* @ | Ditalino
+*.sega* @ | Sega
+*.sputa* @ | Sputa
+*.cazzo* @ | Cazzo
+*.figa* @ | Figa
+*.twerk* @ | Twerk
+*.tette* @ | Tette
+*.insulta* @ | Insulta
+*.amicizia/listamici* @`),
+
+        createSection('📊 QUANTO È?', `
+*.lesbica* @ | % lesbica
+*.negro* @ | % negro
+*.cornuto* @ | % cornuto`),
+
+        createSection('🧪 TEST PERSONALITÀ', `
+*.alcolizzato* | Test alcol
+*.drogato* | Test droga`),
+
+        createSection('👨‍👩‍👧 FAMIGLIA & ADOZIONE', `
+*.adotta* @utente (500 UC)
+*.abbandona* @utente
+*.orfanotrofio*
+*.famiglia*
+*.diseredita* @utente
+*.scappa*`),
+
+        createSection('🗡️ RPG & AVVENTURA', `
+*.duello* @utente <UC>
+*.mostro*
+*.esplora*
+*.zaino*
+*.vendizaino*
+*.pesca*
+*.inventariopesca*
+*.vendipesce*`),
+
+        createSection('💼 LAVORO & CRIMINE', `
+*.lavora*
+*.crimini*
+*.proiettile*
+*.crimine* <num>
+*.rapina* @utente
+*.clan* @4/5utenti
+*.fedinapenale*`),
+
+        createSection('🐾 PET', `
+*.cercapet*
+*.pet*
+*.sfamapet* <num>
+*.coccolapet* <num>
+*.rilasciapet* <num>
+*.arenapet* @utente`),
+
+        createSection('👑 PROFILO & CLASSIFICHE', `
+*.profilo* [@utente]
+*.classifica*
+*.clasxp*
+*.clascrimine*`)
     ];
     
-    return `
-╭┈ ─ ─ ✦ ─ ─ ┈╮
-   ୧ 💠 ୭ *${menuTitle}*
-╰┈ ─ ─ ✦ ─ ─ ┈╯
-
-꒷꒦ ✦ ${global.t('memberCommands', userId, groupId)} ✦ ꒷꒦
+    return `▰▰▰
+    💠  𝑴𝑬𝑵𝑼 𝑮𝑹𝑼𝑷𝑷𝑶  💠
+▰▰▰▰▰▰▰▰▰▰▰
 
 ${sections.join('\n\n')}
 
-╭★────★────★╮
-│ ୭ ˚. ᵎᵎ 💠
-│ ${global.t('versionLabel', userId, groupId)}: ${vs}
-╰★────★────★╯`.trim();
+▰▰▰
+   Powered by ℝ𝕃𝕐 𝔹𝕆𝕋 ✨
+Versione: v${vs}`.trim();
 }
-
