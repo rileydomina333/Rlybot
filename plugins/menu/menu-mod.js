@@ -10,11 +10,12 @@ const handler = async (message, { conn, usedPrefix, command }) => {
 
     const menuText = generateMenuText(usedPrefix, userId, groupId);
     const imagePath = path.join(__dirname, '../../media/WA_1782994929859.jpeg');
+    const footerText = 'Scegli un menu:';
 
     await conn.sendMessage(message.chat, {
         image: { url: imagePath },
         caption: menuText,
-        footer: '💠 Menu Moderatore',
+        footer: footerText,
         buttons: [
             { buttonId: `${usedPrefix}menu`, buttonText: { displayText: '💠 Menu Principale' }, type: 1 },
             { buttonId: `${usedPrefix}menuadmin`, buttonText: { displayText: '💠 Menu Admin' }, type: 1 },
@@ -27,49 +28,53 @@ const handler = async (message, { conn, usedPrefix, command }) => {
     }, { quoted: message });
 };
 
-handler.help = [
-  'menumod',
-  'menumoderator',
-  'menumoderatore',
-  'modmenu'
-];
+handler.help = ['menumod', 'modmenu'];
 handler.tags = ['menu'];
-handler.command = /^(menumod|menumoderator|menumoderatore|modmenu|menúmod|menúmoderador|moderatormenü|菜单管理|менюмод|قائمةالمشرف|मॉडमेनू|menumodérateur|menumod_id|menumod_tr)$/i;
+handler.command = /^(menumod|modmenu|menumoderatore)$/i;
 
 export default handler;
 
 function generateMenuText(prefix, userId, groupId) {
-    return `
-╭┈ ─ ─ ✦ ─ ─ ┈╮
-   ୧ 💠 ୭ *Menu Moderatore*
-╰┈ ─ ─ ✦ ─ ─ ┈╯
+    
+    const createSection = (title, commands) => {
+        const commandLines = commands.trim().split('\n').filter(c => c.trim()).map(c => `► ${c.trim()}`).join('\n');
+        return `[ ${title} ]\n${commandLines}`;
+    };
+    
+    const sections = [
+        createSection('🛡️ GESTIONE UTENTI', `
+*${prefix}kick* @user | Rimuovi utente
+*${prefix}muta* @user | Silenzia utente
+*${prefix}smuta* @user | Ripristina utente
+*${prefix}warn* @user | Ammonisci utente
+*${prefix}unwarn* @user | Rimuovi warn
+*${prefix}listawarn* | Lista avvertimenti`),
 
-╭★ Gestione Utenti ★╮
-│ 💠 *${prefix}kick* @user — Rimuovi utente
-│ 💠 *${prefix}muta* @user — Silenzia utente
-│ 💠 *${prefix}smuta* @user — Ripristina utente
-│ 💠 *${prefix}warn* @user — Avverti utente
-│ 💠 *${prefix}unwarn* @user — Rimuovi warn
-│ 💠 *${prefix}listawarn* — Lista avvertimenti
-╰★───────────★╯
+        createSection('⚙️ GESTIONE GRUPPO', `
+*${prefix}del* | Elimina un messaggio
+*${prefix}hidetag* testo | Menziona tutti nascosto
+*${prefix}tagall* | Tagga tutti
+*${prefix}aperto* / *${prefix}chiuso* | Apri/Chiudi gruppo
+*${prefix}inattivi* | Gestisci inattivi`),
 
-╭★ Gestione Gruppo ★╮
-│ 💠 *${prefix}del* — Elimina un messaggio
-│ 💠 *${prefix}hidetag* testo — Menziona tutti
-│ 💠 *${prefix}tagall* — Tagga tutti
-│ 💠 *${prefix}aperto* / *${prefix}chiuso* — Apri/Chiudi gruppo
-│ 💠 *${prefix}inattivi* — Gestisci inattivi
-╰★───────────★╯
+        createSection('ℹ️ INFO', `
+*${prefix}listmod* | Lista moderatori
+*${prefix}groupinfo* | Info gruppo`),
 
-╭★ Info ★╮
-│ 💠 *${prefix}listmod* — Lista moderatori
-╰★───────────★╯
+        createSection('🚫 NON DISPONIBILI PER MOD', `
+*promuovi* | Solo Admin
+*retrocedi* | Solo Admin
+*setname* | Solo Admin
+*setdesc* | Solo Admin`)
+    ];
 
-╭★ Non disponibili per mod
-│ 💠 *promuovi* — Solo admin
-│ 💠 *retrocedi* — Solo admin
-╰★───────────★╯
+    return `▰▰▰▰▰▰▰▰▰▰▰▰
+    💠  𝑴𝑬𝑵𝑼 𝑴𝑶𝑫𝑬𝑹𝑨𝑻𝑶𝑹𝑬  💠
+▰▰▰▰▰▰▰▰▰▰▰▰
 
-> © Powered by 𝐑𝐋𝐘 𝐁𝐎𝐓
-`.trim();
+${sections.join('\n\n')}
+
+▰
+   Powered by ℝ𝕃𝕐 𝔹𝕆𝕋 ✨
+Versione: v1.0.0`.trim();
 }
