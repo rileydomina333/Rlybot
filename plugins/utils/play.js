@@ -1,5 +1,5 @@
 const yts = require('yt-search'); // npm i yt-search
-const ytdl = require('@distube/ytdl-core'); // npm i @distube/ytdl-core
+const { exec } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
@@ -33,35 +33,29 @@ module.exports = {
                 text: `✅ Trovato: *${video.title}*\n⏱️ ${video.timestamp}\n⬇️ Scarico mp3...` 
             });
 
-            // 2. Scarica audio in mp3
-            const stream = ytdl(video.url, {
-                filter: 'audioonly',
-                quality: 'highestaudio'
-            });
-
-            const filePath = path.join(__dirname, `../temp/${video.videoId}.mp3`);
+            // 2. Scarica con yt-dlp
+            const tempDir = path.join(__dirname, '../temp');
+            if (!fs.existsSync(tempDir)) fs.mkdirSync(tempDir);
             
-            // crea cartella temp se non esiste
-            if (!fs.existsSync(path.join(__dirname, '../temp'))) {
-                fs.mkdirSync(path.join(__dirname, '../temp'));
-            }
+            const filePath = path.join(tempDir, `${video.videoId}.mp3`);
+            const cmd = `yt-dlp -x --audio-format mp3 -o "${filePath}" "${video.url}"`;
 
-            const writer = fs.createWriteStream(filePath);
-            
             await new Promise((resolve, reject) => {
-                stream.pipe(writer);
-                writer.on('finish', resolve);
-                writer.on('error', reject);
+                exec(cmd, (error) => {
+                    if (error) reject(error);
+                    else resolve();
+                });
             });
 
             // 3. Invia l'mp3
             await sock.sendMessage(chatId, {
                 audio: fs.readFileSync(filePath),
                 mimetype: 'audio/mpeg',
-                fileName: `${video.title}.mp3`
+                fileName: `${video.title}.mp3`,
+                ptt: false
             });
 
-            // cancella il file dopo l'invio
+            // cancella
             fs.unlinkSync(filePath);
 
         } catch (err) {
