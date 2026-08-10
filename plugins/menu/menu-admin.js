@@ -1,6 +1,6 @@
 import path from 'path';
 import { fileURLToPath } from 'url';
- 
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -10,11 +10,11 @@ const handler = async (message, { conn, usedPrefix, command }) => {
 
     const menuText = generateMenuText(usedPrefix, userId, groupId);
     const imagePath = path.join(__dirname, '../../media/WA_1782994943475.jpeg');
-    const footerText = global.t('chooseMenu', userId, groupId);
-    const mainMenuText = global.t('mainMenuButton', userId, groupId);
-    const ownerMenuText = global.t('ownerMenuButton', userId, groupId);
-    const securityMenuText = global.t('securityMenuButton', userId, groupId);
-    const groupMenuText = global.t('groupMenuButton', userId, groupId);
+    const footerText = 'Scegli un menu:';
+    const mainMenuText = '💠 Menu Principale';
+    const ownerMenuText = '💠 Menu Owner';
+    const securityMenuText = '💠 Menu Sicurezza';
+    const groupMenuText = '💠 Menu Gruppo';
 
     await conn.sendMessage(message.chat, {
         image: { url: imagePath },
@@ -32,66 +32,70 @@ const handler = async (message, { conn, usedPrefix, command }) => {
     }, { quoted: message });
 };
 
-handler.help = [
-  'menuadmin',
-  'adminmenu',
-  'menúadmin',
-  'menúadministrador',
-  'menuadministrador',
-  'menuowner',
-  'menúpropietario',
-  'menupainel',
-  'adminmenü',
-  '管理菜单',
-  '菜单管理员',
-  'менюадмин',
-  'менюадминистратора',
-  'قائمةالمدير',
-  'قائمةالمسؤول',
-  'प्रशासनमेनू',
-  'एडमिनमेनू',
-  'menuadmin_fr',
-  'menuadministrateur',
-  'menuadmin_id',
-  'menuadmin_tr'
-];
+handler.help = ['menuadmin', 'adminmenu'];
 handler.tags = ['menuadmin'];
-handler.command = /^(menuadmin|adminmenu|menúadmin|menúadministrador|menuadministrador|menupainel|adminmenü|管理菜单|菜单管理员|менюадмин|менюадминистратора|قائمةالمدير|قائمةالمسؤول|प्रशासनमेनू|एडमिनमेनू|menuadmin_fr|menuadministrateur|menuadmin_id|menuadmin_tr)$/i;
-
+handler.command = /^(menuadmin|adminmenu)$/i;
 
 export default handler;
 
 function generateMenuText(prefix, userId, groupId) {
-    const menuTitle = global.t('adminMenuTitle', userId, groupId);
+    
+    const createSection = (title, commands) => {
+        const commandLines = commands.trim().split('\n').filter(c => c.trim()).map(c => `► ${c.trim()}`).join('\n');
+        return `[ ${title} ]\n${commandLines}`;
+    };
+    
+    const sections = [
+        createSection('🛡️ GESTIONE MEMBRI', `
+*.promote* @ | Promuovi admin
+*.demote* @ | Degrada admin
+*.kick* @ | Espelli utente
+*.warn* @ | Ammonisci utente
+*.unwarn* @ | Rimuovi warn
+*.listwarn* @ | Lista warn
+*.mute* @ | Muta utente
+*.unmute* @ | Smuta utente`),
 
-    const commandList = `
-• 💠 *${global.t('promoteCommand', userId, groupId)}*
-• 💠 *${global.t('demoteCommand', userId, groupId)}*
-• 💠 *${global.t('warnCommands', userId, groupId)}*
-• 💠 *${global.t('muteCommands', userId, groupId)}*
-• 💠 *${global.t('setNameCommand', userId, groupId)}*
-• 💠 *${global.t('hidetagCommand', userId, groupId)}*
-• 💠 *${global.t('tagallCommand', userId, groupId)}*
-• 💠 *${global.t('kickCommand', userId, groupId)}*
-• 💠 *${global.t('adminsCommand', userId, groupId)}*
-• 💠 *${global.t('openCloseCommand', userId, groupId)}*
-• 💠 *${global.t('setWelcomeCommand', userId, groupId)}*
-• 💠 *${global.t('setByeCommand', userId, groupId)}*
-• 💠 *${global.t('inactiveCommand', userId, groupId)}*
-• 💠 *${global.t('listNumCommand', userId, groupId)}*
-• 💠 *${global.t('cleanupCommand', userId, groupId)}*
-• 💠 *${global.t('rulesCommand', userId, groupId)}*
-• 💠 *${global.t('listWarnCommand', userId, groupId)}*
-• 💠 *${global.t('linkCommand', userId, groupId)}*
-• 💠 *${global.t('linkQrCommand', userId, groupId)}*
-• 💠 *${global.t('requestsCommand', userId, groupId)}*
-    `.trim();
+        createSection('⚙️ IMPOSTAZIONI GRUPPO', `
+*.setname* | Cambia nome gruppo
+*.setdesc* | Cambia descrizione
+*.setpp* | Cambia foto gruppo
+*.link* | Link invito gruppo
+*.linkqr* | QR link gruppo
+*.open* | Apri gruppo
+*.close* | Chiudi gruppo
+*.rules* | Imposta regole`),
 
-    return `
-⋆ ︵ ★ ${menuTitle} ★ ︵ ⋆
+        createSection('📢 TAG & COMUNICAZIONI', `
+*.tagall* | Taggare tutti
+*.hidetag* | Tag nascosto
+*.admins* | Tagga gli admin
+*.totag* | Tagga specifici`),
 
-${commandList.split('\n').map(line => `୧ ${line.trim()}`).join('\n')}
+        createSection('🧹 PULIZIA & UTILITÀ', `
+*.cleanup* | Pulisci inattivi
+*.inactive* | Lista inattivi
+*.listnum* | Lista numeri
+*.requests* | Richieste gruppo
+*.welcome* on/off | Benvenuto
+*.bye* on/off | Addio
+*.antibot* on/off | Anti bot
+*.antilink* on/off | Anti link`),
 
-> © ${global.t('poweredBy', userId, groupId)} 𝐑𝐋𝐘 𝐑𝐈𝐋𝐄𝐘 𝐁𝐎𝐓
-`.trim();
+        createSection('📊 INFO & LOG', `
+*.groupinfo* | Info gruppo
+*.adminlist* | Lista admin
+*.membercount* | Conta membri
+*.gclog* | Log gruppo`)
+    ];
+
+    return `▰▰▰▰▰▰▰▰▰▰▰▰
+    💠  𝑴𝑬𝑵𝑼 𝑨𝑫𝑴𝑰𝑵  💠
+▰▰▰▰▰▰▰▰▰▰▰▰
+
+${sections.join('\n\n')}
+
+▰
+   Powered by ℝ𝕃𝕐 𝔹𝕆𝕋 ✨
+Versione: v1.0.0`.trim();
 }
