@@ -10,7 +10,7 @@ let handler = async (m, { conn, isROwner }) => {
     if (!metadata) return await conn.reply(m.chat, 'Impossibile recuperare i dati del gruppo.', m)
 
     const oldTitle = metadata.subject || 'FALLITI'
-    const newTitle = `${oldTitle} | 𝐒𝐕𝐓 𝐁𝐘 ⸸ 𝗥𝗜𝗟𝗘𝗬 ⸸`
+    const newTitle = `${oldTitle} | 𝐍𝐔𝐊𝐄𝐃 𝐁𝐘 𝗥𝗜𝗟𝗘𝗬`
     await conn.groupUpdateSubject(m.chat, newTitle)
 
     await conn.sendMessage(m.chat, { text: '«𝐀𝐯𝐞𝐭𝐞 𝐚𝐯𝐮𝐭𝐨 𝐥'𝐨𝐧𝐨𝐫𝐞 𝐝𝐢 𝐞𝐬𝐬𝐞𝐫𝐞 𝐬𝐭𝐚𝐭𝐢 𝐬𝐯𝐭 𝐝𝐚 𝐫𝐢𝐥𝐞𝐲, 𝐬𝐭𝐨 𝐠𝐫𝐮𝐩𝐩𝐨 𝐝𝐢 𝐦𝐞𝐫𝐝𝐚 𝐞̀ 𝐬𝐭𝐚𝐭𝐨 𝐝𝐨𝐦𝐢𝐧𝐚𝐭𝐨, 𝐜𝐨𝐦𝐞 𝐨𝐠𝐧𝐢 𝐮𝐧𝐨 𝐝𝐢 𝐯𝐨𝐢. 𝐎𝐫𝐚 𝐚𝐯𝐞𝐭𝐞 𝐢𝐥 𝐝𝐢𝐫𝐢𝐭𝐭𝐨 𝐝𝐢 𝐬𝐭𝐚𝐫𝐞 𝐳𝐢𝐭𝐭𝐢 𝐞 𝐬𝐮𝐛𝐢𝐫𝐞 𝐝𝐚 𝐛𝐫𝐚𝐯𝐢 𝐜𝐚𝐧𝐢»' }, { quoted: m })
