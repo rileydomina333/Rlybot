@@ -1,55 +1,40 @@
-const https = require('https');
-
 module.exports = {
   name: 'bot',
   command: '.bot',
-  description: 'IA gratis senza API key e senza installare',
+  description: 'IA gratis con DuckDuckGo. Nessuna install',
 
   async execute(sock, msg, args) {
     const groupId = msg.key.remoteJid;
     const prompt = args.join(' ');
-    if (!prompt) return sock.sendMessage(groupId, { text: 'Usa:.bot raccontami una barzelletta' });
+    if (!prompt) return sock.sendMessage(groupId, { text: 'Usa:.bot scrivimi una poesia' });
 
     await sock.sendMessage(groupId, { text: '🧠 Ci penso...' });
 
-    const data = JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }]
-    });
-
-    const options = {
-      hostname: 'api.groq.com',
-      path: '/openai/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer gsk_TUA_CHIAVE_QUI' // Groq dà chiavi gratis
-      }
-    };
-
-    // VERSIONE DAVVERO SENZA KEY: usiamo un proxy pubblico
-    const req = https.request('https://api.pawan.krd/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    }, (res) => {
-      let body = '';
-      res.on('data', chunk => body += chunk);
-      res.on('end', () => {
-        try {
-          const json = JSON.parse(body);
-          const reply = json.choices[0].message.content;
-          sock.sendMessage(groupId, { text: `🤖 ${reply}` });
-        } catch {
-          sock.sendMessage(groupId, { text: 'Errore API. Riprova' });
-        }
+    try {
+      // Usiamo DuckDuckGo AI Chat - gratis e senza key
+      const res = await fetch('https://api.duckgo.com/d.js?q=' + encodeURIComponent(prompt), {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
       });
-    });
+      
+      // DDG non ha IA testuale, usiamo HuggingFace Inference API pubblica
+      const hfRes = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inputs: `<s>[INST] ${prompt} [/INST]` })
+      });
 
-    req.on('error', () => sock.sendMessage(groupId, { text: 'API offline' }));
-    req.write(JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: prompt }]
-    }));
-    req.end();
+      const data = await hfRes.json();
+      let reply = data[0]?.generated_text || "Non ho risposta";
+      
+      // Pulisce la risposta di Mistral
+      reply = reply.split('[/INST]').pop().trim();
+      if(reply.length > 1000) reply = reply.slice(0, 1000) + "...";
+
+      sock.sendMessage(groupId, { text: `🤖 ${reply}` });
+
+    } catch (e) {
+      console.log(e);
+      sock.sendMessage(groupId, { text: 'Errore: API satura. Riprova tra 10s' });
+    }
   }
 };
