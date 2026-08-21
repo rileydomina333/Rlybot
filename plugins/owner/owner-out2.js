@@ -13,7 +13,7 @@ let handler = async (m, { conn, text, command }) => {
 
   // Design Estetico Aggressivo
   let leaveMessage = `
-💀 *〔 THE PUNISHER-BOT : EXTERMINATUS 〕* 💀
+💀 *〔 RLY RILEY BOT : EXTERMINATUS 〕* 💀
 
 ┏──────────────────────────────┓
 │ ⚠️  *PROTOCOLLO DI EPURAZIONE ATTIVO*
