@@ -1,23 +1,31 @@
+let fetch = (await import('node-fetch')).default
+
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return conn.reply(m.chat, `Esempio: ${usedPrefix + command} spiegami le black hole 🤖`, m)
+    if (!text) return conn.reply(m.chat, `Esempio: ${usedPrefix + command} raccontami una storia 🤖`, m)
     
     await conn.sendMessage(m.chat, {react: { text: '🧠', key: m.key }})
     
     try {
-        // Pollinations API legacy - funziona senza key e senza model
+        // FORZIAMO LA VERSIONE ANONIMA GRATIS
         let prompt = encodeURIComponent(text)
         let url = `https://text.pollinations.ai/${prompt}`
         
-        let res = await fetch(url)
+        let res = await fetch(url, {
+            headers: {
+                'User-Agent': 'Rlybot' // a volte serve
+            }
+        })
+        
+        if(!res.ok) throw new Error('Pollinations: ' + res.status)
+        
         let risposta = await res.text()
         
-        // Taglia se è troppo lungo per WA
         if(risposta.length > 4000) risposta = risposta.slice(0, 4000) + '...\n\n[Testo tagliato]'
         
         await conn.reply(m.chat, risposta, m)
         
     } catch (e) {
-        await conn.reply(m.chat, 'Pollinations è down. Riprova tra 10 sec', m)
+        await conn.reply(m.chat, 'Pollinations bloccata. Errore: ' + e.message, m)
         console.log(e)
     }
 }
@@ -25,6 +33,6 @@ let handler = async (m, { conn, text, usedPrefix, command }) => {
 handler.help = ['bot <domanda>']
 handler.tags = ['ai']
 handler.command = ['bot', 'ai', 'ask']
-handler.register = false // pubblico per tutti
+handler.register = false
 
 export default handler
