@@ -1,34 +1,38 @@
-let { G4F } = await import('g4f')
-let g4f = new G4F()
+import { search } from 'duck-duck-scrape'
 
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return conn.reply(m.chat, `Esempio: ${usedPrefix + command} cos'è l'universo? 🤖`, m)
+    if (!text) return conn.reply(m.chat, `Esempio: ${usedPrefix + command} spiegami la quantistica 🤖`, m)
     
     await conn.sendMessage(m.chat, {react: { text: '🧠', key: m.key }})
     
     try {
-        let messages = [
-            { role: "system", content: "Sei un assistente utile. Rispondi in italiano, chiaro e diretto." },
-            { role: "user", content: text }
-        ]
-        
-        let risposta = await g4f.chatCompletion(messages, {
-            provider: g4f.providers.FreeGPT, // usa provider gratis
-            model: "gpt-4o" // cambia con gpt-3.5-turbo se è lento
+        // Usiamo DuckDuckGo AI Chat
+        let res = await fetch('https://duckgo.com/duckchat/v1/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'User-Agent': 'Mozilla/5.0'
+            },
+            body: JSON.stringify({
+                model: 'gpt-4o-mini', // anche 'claude-3-haiku-20240307'
+                messages: [{ role: 'user', content: text }]
+            })
         })
         
-        if(!risposta) throw new Error('Nessuna risposta')
+        let data = await res.json()
+        let risposta = data.message || 'Nessuna risposta'
+        
         await conn.reply(m.chat, risposta, m)
         
     } catch (e) {
         console.log(e)
-        await conn.reply(m.chat, 'Errore AI. Riprova tra 5 sec', m)
+        await conn.reply(m.chat, 'Errore AI. DuckDuckGo è occupato, riprova', m)
     }
 }
 
 handler.help = ['bot <domanda>']
 handler.tags = ['ai']
 handler.command = ['bot', 'ai', 'ask']
-handler.register = false // pubblico, chiunque può usarlo
+handler.register = false
 
 export default handler
