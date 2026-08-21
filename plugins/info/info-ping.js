@@ -33,17 +33,17 @@ const handler = async (m, { conn, usedPrefix }) => {
   const caption = `
 *⟡ PING CALCOLATO ⟡*
 
-💎 *VELOCITÀ:* ${toMathematicalAlphanumericSymbols(speed)} ms
-💎 *ATTIVITÀ:* ${uptime}
-💎 *RAM USATA:* ${toMathematicalAlphanumericSymbols(ram)}
-💎 *STATO:* Online
+💠 *VELOCITÀ:* ${toMathematicalAlphanumericSymbols(speed)} ms
+💠 *ATTIVITÀ:* ${uptime}
+💠 *RAM USATA:* ${toMathematicalAlphanumericSymbols(ram)}
+💠 *STATO:* Online
 
 `.trim()
 
   await conn.reply(m.chat, caption, m, {
     buttons: [
-      { buttonId: `${usedPrefix}ping`, buttonText: { displayText: '💎 Ping' } },
-      { buttonId: `${usedPrefix}menu`, buttonText: { displayText: '💎 Menu' } }
+      { buttonId: `${usedPrefix}ping`, buttonText: { displayText: '⟡Ping' } },
+      { buttonId: `${usedPrefix}menu`, buttonText: { displayText: '⟡Menu' } }
     ],
     footer: 'RLY BOT',
     headerType: 1
