@@ -40,13 +40,14 @@ const handler = async (message, { conn }) => {
 💠 *Le sessioni sono già vuote*
       `.trim()
       : `
-*⟡ SVUOTAMENTO COMPLETATO ⟡*
+*⟡ SESSIONI ELIMINATE ⟡*
 
 💠 *Sono stati eliminati ${deletedCount} archivi dalle sessioni*
+
 💠 *Grazie per avermi svuotato!*
 
 *━━━━━━━━━━━━━━*
-> RLY BOT*
+> RLY BOT
 *━━━━━━━━━━━━━━*
       `.trim()
 
