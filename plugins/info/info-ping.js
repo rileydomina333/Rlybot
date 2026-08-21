@@ -1,69 +1,60 @@
-// by 𝕯𝖊ⱥ𝖉𝖑𝐲 × Bonzino
-
 import { performance } from 'perf_hooks'
+import os from 'os'
 
 const toMathematicalAlphanumericSymbols = number => {
   const map = {
     '0': '𝟎', '1': '𝟏', '2': '𝟐', '3': '𝟑', '4': '𝟒',
     '5': '𝟓', '6': '𝟔', '7': '𝟕', '8': '𝟖', '9': '𝟗', '.': '.'
   }
-
-  return number
-    .toString()
-    .split('')
-    .map(d => map[d] || d)
-    .join('')
+  return number.toString().split('').map(d => map[d] || d).join('')
 }
 
 const clockString = ms => {
   const days = Math.floor(ms / 86400000)
   const hours = Math.floor((ms % 86400000) / 3600000)
   const minutes = Math.floor((ms % 3600000) / 60000)
+  const seconds = Math.floor((ms % 60000) / 1000)
 
-  return `${toMathematicalAlphanumericSymbols(days.toString().padStart(2, '0'))}d ${toMathematicalAlphanumericSymbols(hours.toString().padStart(2, '0'))}h ${toMathematicalAlphanumericSymbols(minutes.toString().padStart(2, '0'))}m`
+  return `${toMathematicalAlphanumericSymbols(String(days).padStart(2, '0'))}d ` +
+         `${toMathematicalAlphanumericSymbols(String(hours).padStart(2, '0'))}h ` +
+         `${toMathematicalAlphanumericSymbols(String(minutes).padStart(2, '0'))}m ` +
+         `${toMathematicalAlphanumericSymbols(String(seconds).padStart(2, '0'))}s`
 }
 
 const handler = async (m, { conn, usedPrefix }) => {
   const start = performance.now()
+  await Promise.resolve() // micro tick per avere un ping reale
   const end = performance.now()
 
   const speed = (end - start).toFixed(4)
-  const speedWithFont = toMathematicalAlphanumericSymbols(speed)
-
   const uptime = clockString(process.uptime() * 1000)
+  const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`
 
-  const info = `
-*𝐏𝐈𝐍𝐆 𝐂𝐀𝐋𝐂𝐎𝐋𝐀𝐓𝐎 𝐂𝐎𝐍 𝐒𝐔𝐂𝐂𝐄𝐒𝐒𝐎*
+  const caption = `
+*⟡ PING CALCOLATO CON SUCCESSO ⟡*
 
-*💠 𝐕𝐄𝐋𝐎𝐂𝐈𝐓𝐀̀:* ${speedWithFont} ms
-*💠 𝐓𝐄𝐌𝐏𝐎:* ${uptime}
-*💠 𝐒𝐓𝐀𝐓𝐎:* Online
+💎 *VELOCITÀ:* ${toMathematicalAlphanumericSymbols(speed)} ms
+💎 *TEMPO ATTIVO:* ${uptime}
+💎 *RAM USATA:* ${toMathematicalAlphanumericSymbols(ram)}
+💎 *STATO:* Online
 
-> *𝐑𝐋𝐘 𝐁𝐎𝐓*
+*━━━━━━━━━━━━━━*
+*│ RLY BOT*
+*━━━━━━━━━━━━━━*
 `.trim()
 
-  const buttons = [
-    {
-      buttonId: `${usedPrefix}ping`,
-      buttonText: { displayText: '💠 Ping' },
-      type: 1
-    },
-    {
-      buttonId: `${usedPrefix}menu`,
-      buttonText: { displayText: '💠 Menu' },
-      type: 1
-    }
-  ]
-
-  await conn.sendMessage(m.chat, {
-    text: info,
-    buttons,
+  await conn.reply(m.chat, caption, m, {
+    buttons: [
+      { buttonId: `${usedPrefix}ping`, buttonText: { displayText: '💎 Ping' } },
+      { buttonId: `${usedPrefix}menu`, buttonText: { displayText: '💎 Menu' } }
+    ],
+    footer: 'RLY BOT',
     headerType: 1
-  }, { quoted: m })
+  })
 }
 
 handler.help = ['ping']
 handler.tags = ['info']
-handler.command = /^(ping)$/i
+handler.command = ['ping', 'p']
 
 export default handler
