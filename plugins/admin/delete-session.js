@@ -26,8 +26,8 @@ let handler = async (m, { conn }) => {
 
   let text = deletedCount === 0
    ? `*⟡ SVUOTAMENTO COMPLETATO ⟡*\n\n💠 *Le sessioni sono già vuote*`
-    : `*⟡ SESSIONI ELIMINATE ⟡*\n\n💠 > Sono stati eliminati ${deletedCount} archivi dalle sessioni\n
-💠 > Grazie per avermi svuotato!\n\n`
+    : `*⟡ SESSIONI ELIMINATE ⟡*\n\n💠 *Sono stati eliminati ${deletedCount} archivi dalle sessioni*\n
+💠 *Grazie per avermi svuotato!*\n\n`
 
   await conn.sendMessage(m.chat, {
     text,
