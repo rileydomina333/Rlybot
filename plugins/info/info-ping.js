@@ -38,9 +38,6 @@ const handler = async (m, { conn, usedPrefix }) => {
 💎 *RAM USATA:* ${toMathematicalAlphanumericSymbols(ram)}
 💎 *STATO:* Online
 
-*━━━━━━━━━━━━━━*
-> RLY BOT
-*━━━━━━━━━━━━━━*
 `.trim()
 
   await conn.reply(m.chat, caption, m, {
