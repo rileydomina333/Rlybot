@@ -46,11 +46,11 @@ const handler = async (message, { conn }) => {
 
 💠 *Grazie per avermi svuotato!*
 
-*━━━━━━━━━━━━━━*
-> RLY BOT
-*━━━━━━━━━━━━━━*
       `.trim()
-
+await conn.sendMessage(m.chat, {
+    text,
+    footer: 'RLY BOT',
+   
       buttons: [
         { buttonId: '.svuota', buttonText: { displayText: '💠 Svuota di nuovo' } },
         { buttonId: '.ping', buttonText: { displayText: '💠 Ping' } }
