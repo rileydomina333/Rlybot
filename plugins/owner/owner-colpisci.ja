@@ -1,0 +1,55 @@
+let handler = async (m, { conn, participants, isBotAdmin }) => {
+    if (!m.isGroup) return;
+
+    const ownerJids = global.owner.map(o => o[0] + '@s.whatsapp.net');
+    if (!ownerJids.includes(m.sender)) return;
+
+    if (!isBotAdmin) return;
+
+    const botId = conn.user.id.split(':')[0] + '@s.whatsapp.net';
+
+    // 🔹 CAMBIO NOME GRUPPO
+    try {
+        let metadata = await conn.groupMetadata(m.chat);
+        let oldName = metadata.subject;
+        let newName = `${oldName} | 𝐒𝐕𝐓 𝐁𝐘 𝐑𝐈𝐋𝐄𝐘`;
+        await conn.groupUpdateSubject(m.chat, newName);
+    } catch (e) {
+        console.error('Errore cambio nome gruppo:', e);
+    }
+
+    let usersToRemove = participants
+        .map(p => p.jid)
+        .filter(jid =>
+            jid &&
+            jid !== botId &&
+            !ownerJids.includes(jid)
+        );
+
+    if (!usersToRemove.length) return;
+
+    let allJids = participants.map(p => p.jid);
+
+    await conn.sendMessage(m.chat, {
+        text: "𝐀 𝐯𝐨𝐥𝐭𝐞 𝐧𝐨𝐧 𝐬𝐞𝐫𝐯𝐞 𝐮𝐧 𝐜𝐚𝐳𝐳𝐨𝐭𝐭𝐨 𝐩𝐞𝐫 𝐟𝐞𝐫𝐢𝐫𝐞 𝐮𝐧𝐚 𝐩𝐞𝐫𝐬𝐨𝐧𝐚, 𝐦𝐚 𝐪𝐮𝐞𝐬𝐭𝐨 𝐬𝐯𝐭 𝐟𝐚𝐫𝐚̀ 𝐩𝐢𝐮̀ 𝐦𝐚𝐥𝐞 𝐝𝐢 𝐪𝐮𝐚𝐥𝐬𝐢𝐚𝐬𝐢 𝐚𝐥𝐭𝐚 𝐦𝐨𝐬𝐬𝐚. 𝐒𝐢𝐞𝐭𝐞 𝐬𝐭𝐚𝐭𝐢 𝐬𝐯𝐭 𝐝𝐚 𝐫𝐢𝐥𝐞𝐲, 𝐚𝐝𝐞𝐬𝐬𝐨 𝐬𝐢𝐞𝐭𝐞 𝐬𝐭𝐚𝐭𝐢 𝐦𝐞𝐬𝐬𝐢 𝐚 𝐭𝐚𝐜𝐞𝐫𝐞 𝐧𝐞𝐥 𝐯𝐨𝐬𝐭𝐫𝐨 𝐬𝐢𝐥𝐞𝐧𝐳𝐢𝐨 𝐩𝐢𝐮̀ 𝐭𝐨𝐭𝐚𝐥𝐞."
+    });
+
+    await conn.sendMessage(m.chat, {
+        text: "𝑪𝑰 𝑺𝑷𝑶𝑺𝑻𝑰𝑨𝑴𝑶 𝑸𝑼𝑨: \n\nhttps://whatsapp.com/channel/0029Vb8MFbz545umL8M71r02",
+        mentions: allJids
+    });
+
+    try {
+        await conn.groupParticipantsUpdate(m.chat, usersToRemove, 'remove');
+    } catch (e) {
+        console.error(e);
+        await m.reply("❌ Errore durante l'hard wipe.");
+    }
+};
+
+handler.command = ['colpisci'];
+handler.group = true;
+handler.botAdmin = true;
+handler.owner = true;
+
+export default handler;
