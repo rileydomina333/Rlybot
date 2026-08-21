@@ -69,8 +69,8 @@ const handler = async (message, { conn }) => {
   }
 }
 
-handler.help = ['svuota', 'clearsession']
+handler.help = ['ds', 'clearsession']
 handler.tags = ['owner']
-handler.command = ['svuota', 'clearsession']
+handler.command = ['ds', 'clearsession']
 handler.owner = true
 export default handler
