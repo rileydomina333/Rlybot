@@ -1,30 +1,38 @@
+let fetch = (await import('node-fetch')).default
+
 let handler = async (m, { conn, text, usedPrefix, command }) => {
-    if (!text) return conn.reply(m.chat, `Esempio: ${usedPrefix + command} spiegami i buchi neri 🤖`, m)
+    if (!text) return conn.reply(m.chat, `Esempio: ${usedPrefix + command} raccontami una storia 🤖`, m)
     
     await conn.sendMessage(m.chat, {react: { text: '🧠', key: m.key }})
     
     try {
-        const { G4F } = await import('g4f')
-        const g4f = new G4F()
+        // FORZIAMO LA VERSIONE ANONIMA GRATIS
+        let prompt = encodeURIComponent(text)
+        let url = `https://text.pollinations.ai/${prompt}`
         
-        const messages = [
-            { role: "system", content: "Sei un assistente utile. Rispondi in italiano e sii breve." },
-            { role: "user", content: text }
-        ]
+        let res = await fetch(url, {
+            headers: {
+                'User-Agent': 'Rlybot' // a volte serve
+            }
+        })
         
-        const risposta = await g4f.chatCompletion(messages)
+        if(!res.ok) throw new Error('Pollinations: ' + res.status)
+        
+        let risposta = await res.text()
+        
+        if(risposta.length > 4000) risposta = risposta.slice(0, 4000) + '...\n\n[Testo tagliato]'
         
         await conn.reply(m.chat, risposta, m)
         
     } catch (e) {
-        await conn.reply(m.chat, 'Errore AI. Riprova tra 5 sec', m)
+        await conn.reply(m.chat, 'Pollinations bloccata. Errore: ' + e.message, m)
         console.log(e)
     }
 }
 
 handler.help = ['bot <domanda>']
-handler.tags = ['ai'] 
+handler.tags = ['ai']
 handler.command = ['bot', 'ai', 'ask']
-handler.register = false // pubblico per tutti
+handler.register = false
 
 export default handler
