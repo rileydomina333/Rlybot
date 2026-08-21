@@ -51,9 +51,6 @@ const handler = async (message, { conn }) => {
 *━━━━━━━━━━━━━━*
       `.trim()
 
-    await conn.sendMessage(message.chat, {
-      text: caption,
-      footer: 'RLY BOT',
       buttons: [
         { buttonId: '.svuota', buttonText: { displayText: '💠 Svuota di nuovo' } },
         { buttonId: '.ping', buttonText: { displayText: '💠 Ping' } }
