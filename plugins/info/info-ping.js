@@ -39,7 +39,7 @@ const handler = async (m, { conn, usedPrefix }) => {
 💎 *STATO:* Online
 
 *━━━━━━━━━━━━━━*
-*> RLY BOT*
+> RLY BOT
 *━━━━━━━━━━━━━━*
 `.trim()
 
