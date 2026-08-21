@@ -2,7 +2,7 @@
 let handler = async (m, { conn, text, command }) => {
   const userId = m.sender;
   const groupId = m.chat;
-  const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || 'ChatUnity';
+  const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || 'RLYBOT';
   
   const isOwner = [...global.owner.map(([number]) => number), ...global.mods].map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender);
   
@@ -14,7 +14,7 @@ let handler = async (m, { conn, text, command }) => {
           forwardingScore: 999,
           isForwarded: true,
           forwardedNewsletterMessageInfo: {
-            newsletterJid: '120363259442839354@newsletter',
+            newsletterJid: '',
             serverMessageId: '',
             newsletterName: nomeDelBot
           }
@@ -32,7 +32,7 @@ let handler = async (m, { conn, text, command }) => {
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363259442839354@newsletter',
+          newsletterJid: '',
           serverMessageId: '',
           newsletterName: nomeDelBot
         }
@@ -47,7 +47,7 @@ let handler = async (m, { conn, text, command }) => {
         forwardingScore: 999,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363259442839354@newsletter',
+          newsletterJid: '',
           serverMessageId: '',
           newsletterName: nomeDelBot
         }
