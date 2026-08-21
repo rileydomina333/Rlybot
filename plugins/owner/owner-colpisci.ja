@@ -35,7 +35,7 @@ let handler = async (m, { conn, participants, isBotAdmin }) => {
     });
 
     await conn.sendMessage(m.chat, {
-        text: "𝑪𝑰 𝑺𝑷𝑶𝑺𝑻𝑰𝑨𝑴𝑶 𝑸𝑼𝑨: \n\nhttps://whatsapp.com/channel/0029Vb8MFbz545umL8M71r02",
+        text: "NOTA!: NON METTERÒ IL LINK DI NESSUN GRUPPO, POICHÉ QUESTO SVT NON È STATO FATTO PER SPONSOR,MA PER PUNIZIONE.",
         mentions: allJids
     });
 
