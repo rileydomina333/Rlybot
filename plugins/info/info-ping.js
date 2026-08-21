@@ -31,15 +31,15 @@ const handler = async (m, { conn, usedPrefix }) => {
   const ram = `${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB`
 
   const caption = `
-*⟡ PING CALCOLATO CON SUCCESSO ⟡*
+*⟡ PING CALCOLATO ⟡*
 
 💎 *VELOCITÀ:* ${toMathematicalAlphanumericSymbols(speed)} ms
-💎 *TEMPO ATTIVO:* ${uptime}
+💎 *ATTIVITÀ:* ${uptime}
 💎 *RAM USATA:* ${toMathematicalAlphanumericSymbols(ram)}
 💎 *STATO:* Online
 
 *━━━━━━━━━━━━━━*
-*│ RLY BOT*
+*> RLY BOT*
 *━━━━━━━━━━━━━━*
 `.trim()
 
