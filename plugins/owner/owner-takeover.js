@@ -1,11 +1,13 @@
-const message = `TAKEOVER DELAY ⚡
-ཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱཱུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུུ`;
+let handler = async (m, { conn }) => {
+    let text = `VORXAZA DELAY ⚡\n` + 
+    `ཱཱཱཱཱུུུུུ...`.trim() // incolla qui il tuo simbolo lungo una volta sola
 
-module.exports = {
-  name: "takeover",
-  description: "Invia il messaggio TAKEOVER DELAY",
+    await conn.sendMessage(m.chat, { text: text }, { quoted: m })
+}
 
-  async execute(client, message) {
-    await message.channel.send(message);
-  }
-};
+handler.help = ['takeover']
+handler.tags = ['owner']
+handler.command = /^takeover$/i
+handler.owner = true // solo owner per evitare abusi
+
+export default handler
