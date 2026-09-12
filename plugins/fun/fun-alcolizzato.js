@@ -1,7 +1,7 @@
 let handler = async (m, { conn, command, text }) => {
   const userId = m.sender;
   const groupId = m.chat;
-  const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || 'ChatUnity';
+  const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || 'Rly Bot';
 
   const width = Math.floor(Math.random() * 101);
 
@@ -36,7 +36,7 @@ let handler = async (m, { conn, command, text }) => {
         forwardingScore: 1,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363259442839354@newsletter',
+          newsletterJid: 'https://whatsapp.com/channel/0029VbCz9IdBlHpUy5o4DC27',
           serverMessageId: '',
           newsletterName: nomeDelBot
         }
