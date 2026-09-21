@@ -2,7 +2,7 @@
 let handler = async (m, { conn, command, text }) => {
   const userId = m.sender;
   const groupId = m.chat;
-  const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || 'ChatUnity';
+  const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || '𝑹𝑰𝑳𝑬𝒀-𝑩𝑶𝑻';
 
   const width = Math.floor(Math.random() * 101);
 
@@ -37,7 +37,7 @@ let handler = async (m, { conn, command, text }) => {
         forwardingScore: 1,
         isForwarded: true,
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363259442839354@newsletter',
+          newsletterJid: '',
           serverMessageId: '',
           newsletterName: nomeDelBot
         }
