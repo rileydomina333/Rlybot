@@ -2,7 +2,7 @@
 let handler = async (m, { conn, isROwner }) => {
     const userId = m.sender;
     const groupId = m.chat;
-    const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || 'ChatUnity';
+    const nomeDelBot = conn.user?.name || global.db?.data?.nomedelbot || '𝑹𝑰𝑳𝑬𝒀-𝑩𝑶𝑻';
     
     try {
         const chatKeys = Object.keys(global.db.data.chats || {});
@@ -20,7 +20,7 @@ let handler = async (m, { conn, isROwner }) => {
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363259442839354@newsletter',
+                    newsletterJid: '',
                     serverMessageId: '',
                     newsletterName: nomeDelBot
                 }
@@ -35,7 +35,7 @@ let handler = async (m, { conn, isROwner }) => {
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363259442839354@newsletter',
+                    newsletterJid: '',
                     serverMessageId: '',
                     newsletterName: nomeDelBot
                 }
@@ -57,7 +57,7 @@ let handler = async (m, { conn, isROwner }) => {
                 forwardingScore: 999,
                 isForwarded: true,
                 forwardedNewsletterMessageInfo: {
-                    newsletterJid: '120363259442839354@newsletter',
+                    newsletterJid: '',
                     serverMessageId: '',
                     newsletterName: nomeDelBot
                 }
