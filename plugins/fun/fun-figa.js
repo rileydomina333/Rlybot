@@ -56,7 +56,7 @@ let handler = async (m, { conn, text }) => {
             forwardingScore: 999,
             isForwarded: true,
             forwardedNewsletterMessageInfo: {
-                newsletterJid: '120363424041538498@newsletter',
+                newsletterJid: '',
                 newsletterName: '𝐑𝐋𝐘 𝐁𝐎𝐓',
                 serverMessageId: 1
             }
