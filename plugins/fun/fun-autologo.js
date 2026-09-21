@@ -139,7 +139,7 @@ handler.before = async (m, { conn }) => {
           type: 1
         }
       ],
-      footer: 'RLY RILEY BOT'
+      footer: '𝑹𝑰𝑳𝑬𝒀-𝑩𝑶𝑻'
     }, { quoted: m });
     
     delete global.logoGame[m.chat];
