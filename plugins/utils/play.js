@@ -277,7 +277,7 @@ let handler = async (
 ) => {
     if (!text) {
         return m.reply(
-            `⚡ *𝑵𝑰𝑮𝑮𝑨-𝑩𝑶𝑻*\n\n` +
+            `⚡ *𝑹𝑰𝑳𝑬𝒀-𝑩𝑶𝑻*\n\n` +
             `💡 Usa:\n` +
             `${usedPrefix}play nome canzone`
         );
@@ -320,7 +320,7 @@ let handler = async (
         if (cmd === 'play') {
             const caption =
                 `┏━━━━━━━━━━━━━━━━━━━┓\n` +
-                `   🎧 *𝙋𝙇𝘼𝙔 𝑵𝑰𝑮𝑮𝑨-𝑩𝑶𝑻* 🎧\n` +
+                `   🎧 *𝙋𝙇𝘼𝙔 𝑹𝑰𝑳𝑬𝒀-𝑩𝑶𝑻* 🎧\n` +
                 `┗━━━━━━━━━━━━━━━━━━━┛\n\n` +
                 `◈ 📌 *Titolo:* ${title}\n` +
                 `◈ ⏱️ *Durata:* ${duration || 'Sconosciuta'}\n\n` +
@@ -371,7 +371,7 @@ let handler = async (
                 {
                     text: caption,
                     footer:
-                        '𝑵𝑰𝑮𝑮𝑨-𝑩𝑶𝑻',
+                        '𝑹𝑰𝑳𝑬𝒀-𝑩𝑶𝑻',
                     buttons,
                     headerType: 1
                 },
